@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import BezierEasing from 'bezier-easing'
 
-import defaultEasingFn from './easing'
 import {
   parseStyle,
   calculateDifference,
@@ -12,6 +12,7 @@ import {
 const ACTION_PREFIX = '@@animatronics';
 const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
 const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
+const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
@@ -99,7 +100,7 @@ const runAnimationStage = ({
   const {
     start: allStartStyles,
     end: allEndStyles,
-    easingFn = defaultEasingFn,
+    easingFn = DEFAULT_EASING_FN,
     duration,
   } = animationStage;
 
