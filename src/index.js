@@ -376,7 +376,9 @@ export const withRig = (BaseComponent, name) => {
     }
 
     _onRef(ref) {
-      this._ref = extractUnderlyingDOMNodeRef(ref);
+      if (!!ref) {
+        this._ref = extractUnderlyingDOMNodeRef(ref);
+      }
     }
 
     render() {
