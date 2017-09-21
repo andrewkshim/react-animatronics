@@ -396,3 +396,5 @@ export const withRig = (BaseComponent, name) => {
 
   return Rig;
 };
+
+export const createBezierEasingFn = BezierEasing;
