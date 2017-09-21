@@ -369,7 +369,7 @@ export const withRig = (BaseComponent, name) => {
     }
 
     componentWillUnmount() {
-      const { animationcs } = this.context;
+      const { animatronics } = this.context;
       animatronics.unregisterComponent({
         name,
       })
