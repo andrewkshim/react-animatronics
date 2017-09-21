@@ -2,12 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import BezierEasing from 'bezier-easing'
 
-import {
-  parseStyle,
-  calculateDifference,
-  updateStyleValue,
-  reconstructStyle,
-} from './styleParser'
 
 //==========================================================
 // Constants
@@ -18,10 +12,51 @@ const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
 const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
+const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
+const NUMBER_REGEX = /\d+/;
+
 
 //==========================================================
 // Internal
 //==========================================================
+
+const parseStyle = style => {
+  if (typeof style === 'number') {
+    return {
+      value: style,
+      unit: 'px',
+    };
+  } else if (style.indexOf('(') > -1) {
+    const openParenIndex = style.indexOf('(');
+    const matches = BETWEEN_PAREN_REGEX.exec(style);
+    return {
+      transformFn: style.slice(0, openParenIndex),
+      ...parseStyle(matches[1]),
+    };
+  } else {
+    const matches = NUMBER_REGEX.exec(style);
+    const value = matches[0];
+    return {
+      value: parseFloat(value),
+      unit: style.slice(value.length),
+    };
+  }
+}
+
+const calculateDifference = ({ parsedStartStyle, parsedEndStyle }) => {
+  return parsedEndStyle.value - parsedStartStyle.value;
+}
+
+const updateStyleValue = (parsedStyle, delta) => {
+  return {
+    ...parsedStyle,
+    value: parsedStyle.value + delta,
+  };
+}
+
+const reconstructStyle = ({ transformFn, value, unit }) => {
+  return transformFn ? `${transformFn}(${value}${unit})` : `${value}${unit}`;
+}
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
