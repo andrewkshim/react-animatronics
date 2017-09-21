@@ -9,10 +9,19 @@ import {
   reconstructStyle,
 } from './styleParser'
 
+//==========================================================
+// Constants
+//==========================================================
+
 const ACTION_PREFIX = '@@animatronics';
 const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
 const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
+
+
+//==========================================================
+// Internal
+//==========================================================
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
@@ -211,6 +220,9 @@ export const withAnimatronics = (BaseComponent, createAnimationStages) => {
       },
     );
   };
+//==========================================================
+// Exports
+//==========================================================
 
   const unregisterComponent = ({ name }) => {
     state = handleAnimatronicsAction(
