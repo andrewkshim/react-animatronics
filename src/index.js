@@ -259,7 +259,7 @@ const runAnimation = ({
 
 }
 
-export const AnimatronicsContextTypes = {
+const AnimatronicsContextTypes = {
   animatronics: PropTypes.shape({
     registerComponent: PropTypes.func.isRequired,
     unregisterComponent: PropTypes.func.isRequired,
