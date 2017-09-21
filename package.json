@@ -6,7 +6,8 @@
   "author": "Andrew Shim",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/babel src -d lib"
+    "build": "./node_modules/.bin/babel src --out-dir lib --ignore spec.js",
+    "test": "./node_modules/.bin/tape -r babel-register src/index.spec.js"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -15,6 +16,11 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
+    "enzyme": "^2.9.1",
+    "jsdom": "^11.2.0",
+    "react-test-renderer": "^15.6.1",
+    "sinon": "^3.3.0",
+    "tape": "^4.8.0",
     "webpack": "^3.6.0"
   },
   "dependencies": {
