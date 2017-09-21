@@ -10,7 +10,21 @@ import BezierEasing from 'bezier-easing'
 const ACTION_PREFIX = '@@animatronics';
 const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
 const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
+
+const IS_RAF_AVAILABLE = (
+  typeof window !== 'undefined'
+  && window.requestAnimationFrame
+);
+const MS_PER_ANIMATION_FRAME = 1000 / 60; // 60 fps
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
+
+const DEFAULT_REQUEST_ANIMATION_FRAME = IS_RAF_AVAILABLE
+  ? requestAnimationFrame
+  : callback => setTimeout(callback, MS_PER_ANIMATION_FRAME)
+
+const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
+  ? cancelAnimationFrame
+  : clearTimeout
 
 const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
 const NUMBER_REGEX = /\d+/;
@@ -137,9 +151,11 @@ const extractUnderlyingDOMNodeRef = ref => {
 
 const runAnimationStage = ({
   animationStage,
-  rigs,
+  cancelAnimationFrame,
   environment,
   onStageComplete,
+  requestAnimationFrame,
+  rigs,
 }) => {
   const {
     start: allStartStyles,
@@ -148,15 +164,10 @@ const runAnimationStage = ({
     duration,
   } = animationStage;
 
-  //let { requestAnimationFrame } = environment;
-  //if (!requestAnimationFrame) {
-    //requestAnimationFrame = window.requestAnimationFrame;
-  //}
-
   const startTime = Date.now();
+  let currentFrame;
 
-  const runAnimationLoop = () => {
-    const elapsedTime = Date.now() - startTime;
+  const updateStyles = (elapsedTime) => {
     Object.keys(rigs).forEach(rigName => {
       if (!allStartStyles || !allEndStyles) {
         // TODO: warn
@@ -180,10 +191,21 @@ const runAnimationStage = ({
         elapsedTime,
       });
     });
+  };
+
+  const runLastAnimationFrame = () => {
+    const completelyElapsedTime = duration;
+    updateStyles(completelyElapsedTime);
+  };
+
+  const runNextAnimationFrame = () => {
+    const elapsedTime = Date.now() - startTime;
+    updateStyles(elapsedTime);
 
     if (elapsedTime < duration) {
-      requestAnimationFrame(runAnimationLoop);
+      currentFrame = requestAnimationFrame(runNextAnimationFrame);
     } else {
+      currentFrame = requestAnimationFrame(runLastAnimationFrame);
       onStageComplete();
     }
     //if ((currentStageNum + 1) < animationStages.length) {
@@ -196,19 +218,23 @@ const runAnimationStage = ({
       ////);
     //}
   };
-  requestAnimationFrame(runAnimationLoop);
+  currentFrame = requestAnimationFrame(runNextAnimationFrame);
 }
 
 const runAnimation = ({
   animationStages,
-  rigs,
+  cancelAnimationFrame,
   environment,
   onAnimationComplete,
+  requestAnimationFrame,
+  rigs,
 }) => {
 
   const run = ({ animationStages, currentStageNum, rigs }) => {
     runAnimationStage({
       animationStage: animationStages[currentStageNum],
+      cancelAnimationFrame,
+      requestAnimationFrame,
       rigs,
       onStageComplete: () => {
         const nextStageNum = currentStageNum + 1;
@@ -240,76 +266,91 @@ export const AnimatronicsContextTypes = {
   }).isRequired,
 };
 
-export const withAnimatronics = (BaseComponent, createAnimationStages) => {
 
-  let state = {
-    rigs: {},
-  };
-
-  const registerComponent = ({ name, ref }) => {
-    state = handleAnimatronicsAction(
-      state,
-      {
-        type: REGISTER_COMPONENT,
-        payload: { name, ref },
-      },
-    );
-  };
 //==========================================================
 // Exports
 //==========================================================
 
-  const unregisterComponent = ({ name }) => {
-    state = handleAnimatronicsAction(
-      state,
-      {
-        type: UNREGISTER_COMPONENT,
-        payload: { name },
-      },
-    );
-  };
+export const createWithAnimatronics = (
+  {
+    requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
+    cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
+  } = {}
+) => {
 
-  class Animator extends React.Component {
-    constructor(props) {
-      super(props);
-      this._runAnimation = this._runAnimation.bind(this);
-    }
+  return (BaseComponent, createAnimationStages) => {
 
-    getChildContext() {
-      return {
-        animatronics: {
-          registerComponent,
-          unregisterComponent,
-        }
-      };
-    }
+    let state = {
+      rigs: {},
+    };
 
-    _runAnimation() {
-      const { rigs } = state;
-      runAnimation({
-        animationStages: createAnimationStages(rigs),
-        rigs,
-        environment: null,
-        onAnimationComplete: null,
-      })
-    }
-
-    render() {
-      const { ...props } = this.props;
-      return (
-        <BaseComponent
-          runAnimation={ this._runAnimation }
-          { ...props }
-        />
+    const registerComponent = ({ name, ref }) => {
+      state = handleAnimatronicsAction(
+        state,
+        {
+          type: REGISTER_COMPONENT,
+          payload: { name, ref },
+        },
       );
-    }
+    };
+
+    const unregisterComponent = ({ name }) => {
+      state = handleAnimatronicsAction(
+        state,
+        {
+          type: UNREGISTER_COMPONENT,
+          payload: { name },
+        },
+      );
+    };
+
+    class Animator extends React.Component {
+      constructor(props) {
+        super(props);
+        this._runAnimation = this._runAnimation.bind(this);
+      }
+
+      getChildContext() {
+        return {
+          animatronics: {
+            registerComponent,
+            unregisterComponent,
+          }
+        };
+      }
+
+      _runAnimation() {
+        const { rigs } = state;
+        runAnimation({
+          animationStages: createAnimationStages(rigs),
+          cancelAnimationFrame,
+          environment: null,
+          onAnimationComplete: null,
+          requestAnimationFrame,
+          rigs,
+        })
+      }
+
+      render() {
+        const { ...props } = this.props;
+        return (
+          <BaseComponent
+            runAnimation={ this._runAnimation }
+            { ...props }
+          />
+        );
+      }
+    };
+
+    Animator.childContextTypes = AnimatronicsContextTypes;
+
+    return Animator;
+
   };
-
-  Animator.childContextTypes = AnimatronicsContextTypes;
-
-  return Animator;
 
 };
+
+export const withAnimatronics = createWithAnimatronics();
 
 export const withRig = (BaseComponent, name) => {
 
