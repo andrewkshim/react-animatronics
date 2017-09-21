@@ -116,7 +116,7 @@ const calculateUpdatedStyle = ({
   const normalizedDuration = duration === 0 ? elapsedTime : duration;
   const parsedStartStyle = parseStyle(startValue);
   const parsedEndStyle = parseStyle(endValue);
-  const difference = calculateDifference(parsedStartStyle, parsedEndStyle);
+  const difference = calculateDifference({ parsedStartStyle, parsedEndStyle });
   const parsedUpdatedStyle = updateStyleValue(
     parsedStartStyle,
     difference * easingFn( elapsedTime / normalizedDuration ),
