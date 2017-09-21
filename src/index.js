@@ -236,6 +236,7 @@ const runAnimation = ({
       cancelAnimationFrame,
       requestAnimationFrame,
       rigs,
+
       onStageComplete: () => {
         const nextStageNum = currentStageNum + 1;
         if (nextStageNum === animationStages.length) {
