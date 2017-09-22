@@ -21,10 +21,15 @@
     "react-test-renderer": "^15.6.1",
     "sinon": "^3.3.0",
     "tape": "^4.8.0",
-    "webpack": "^3.6.0"
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2"
   },
   "dependencies": {
     "bezier-easing": "^2.0.3",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "peerDependencies": {
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   }

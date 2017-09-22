@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
-import { withAnimatronics, withRig } from 'react-animatronics'
+import { withAnimatronics, withRig } from '../../../src'
 
 class Circle extends React.Component {
   constructor(props) {
