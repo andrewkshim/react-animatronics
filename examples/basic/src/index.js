@@ -25,9 +25,9 @@ class Circle extends React.Component {
   }
 }
 
-const BlueCircle = withRig(Circle, 'blueCircle');
-const RedCircle = withRig(Circle, 'redCircle');
-const PurpleCircle = withRig(Circle, 'purpleCircle');
+const BlueCircle = withRig('blueCircle')(Circle);
+const RedCircle = withRig('redCircle')(Circle);
+const PurpleCircle = withRig('purpleCircle')(Circle);
 
 const App = ({
   runAnimation,
@@ -73,8 +73,7 @@ const App = ({
 );
 
 const AnimatedApp = withAnimatronics(
-  App,
-  ({ blueCircle, redCircle }) => {
+  ({ blueCircle, redCircle, purpleCircle }) => {
     const { offsetLeft, offsetTop } = redCircle;
     return ([
       {
@@ -144,7 +143,7 @@ const AnimatedApp = withAnimatronics(
       },
     ]);
   }
-);
+)( App );
 
 ReactDOM.render(
   <AnimatedApp />,

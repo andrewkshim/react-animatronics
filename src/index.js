@@ -74,11 +74,11 @@ const reconstructStyle = ({ transformFn, value, unit }) => {
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
-  [ REGISTER_COMPONENT ]: ({ rigs }, { name, ref }) => {
+  [ REGISTER_COMPONENT ]: ({ rigs }, { name, domRef }) => {
     return {
       rigs: {
         ...rigs,
-        [ name ]: ref,
+        [ name ]: domRef,
       },
     };
   },
@@ -146,13 +146,72 @@ const updateRigStyles = ({
 
 const extractUnderlyingDOMNodeRef = ref => {
   // HACK
-  return ref._reactInternalFiber.child.stateNode;
+  // react 16
+  // return ref._reactInternalFiber.child.stateNode;
+  return ref._reactInternalInstance._renderedComponent._ancestorInfo.current.instance._hostNode;
+}
+
+const createStyleUpdater = ({
+  allEndStyles,
+  allStartStyles,
+  duration,
+  easingFn,
+  rigs,
+}) => elapsedTime => {
+  Object.keys(rigs).forEach(rigName => {
+    const startStyles = allStartStyles[rigName];
+    const endStyles = allEndStyles[rigName];
+    const rigRef = rigs[rigName];
+
+    if (!rigRef) {
+      // TODO: warn
+      return;
+    }
+
+    if (!startStyles || !endStyles) {
+      // TODO: warn
+      return;
+    }
+
+    updateRigStyles({
+      rigRef: rigs[rigName],
+      startStyles,
+      endStyles,
+      easingFn,
+      duration,
+      elapsedTime,
+    });
+  });
+}
+
+const runAnimationStageWithoutStyleUpdates = ({
+  cancelAnimationFrame,
+  duration,
+  onStageComplete,
+  requestAnimationFrame,
+}) => {
+  const startTime = Date.now();
+  let currentFrame;
+
+  const runLastAnimationFrame = () => {
+    currentFrame = null;
+    onStageComplete();
+  };
+
+  const runNextAnimationFrame = () => {
+    const elapsedTime = Date.now() - startTime;
+    if (elapsedTime < duration) {
+      currentFrame = requestAnimationFrame(runNextAnimationFrame);
+    } else {
+      currentFrame = requestAnimationFrame(runLastAnimationFrame);
+    }
+  };
+  currentFrame = requestAnimationFrame(runNextAnimationFrame);
 }
 
 const runAnimationStage = ({
   animationStage,
   cancelAnimationFrame,
-  environment,
   onStageComplete,
   requestAnimationFrame,
   rigs,
@@ -167,35 +226,20 @@ const runAnimationStage = ({
   const startTime = Date.now();
   let currentFrame;
 
-  const updateStyles = (elapsedTime) => {
-    Object.keys(rigs).forEach(rigName => {
-      if (!allStartStyles || !allEndStyles) {
-        // TODO: warn
-        return;
-      }
-
-      const startStyles = allStartStyles[rigName];
-      const endStyles = allEndStyles[rigName];
-
-      if (!startStyles || !endStyles) {
-        // TODO: warn
-        return;
-      }
-
-      updateRigStyles({
-        rigRef: rigs[rigName],
-        startStyles,
-        endStyles,
-        easingFn,
-        duration,
-        elapsedTime,
-      });
-    });
-  };
+  const updateStyles = createStyleUpdater({
+    allStartStyles,
+    allEndStyles,
+    rigs,
+    easingFn,
+    duration,
+  });
 
   const runLastAnimationFrame = () => {
-    const completelyElapsedTime = duration;
-    updateStyles(completelyElapsedTime);
+    currentFrame = null;
+    if (duration > 0) {
+      updateStyles(duration);
+    }
+    onStageComplete();
   };
 
   const runNextAnimationFrame = () => {
@@ -206,17 +250,7 @@ const runAnimationStage = ({
       currentFrame = requestAnimationFrame(runNextAnimationFrame);
     } else {
       currentFrame = requestAnimationFrame(runLastAnimationFrame);
-      onStageComplete();
     }
-    //if ((currentStageNum + 1) < animationStages.length) {
-      //onNextStage();
-      ////this.setState(
-        ////{ currentStageNum: currentStageNum + 1 },
-        ////() => {
-          ////this._startAnimation();
-        ////}
-      ////);
-    //}
   };
   currentFrame = requestAnimationFrame(runNextAnimationFrame);
 }
@@ -224,32 +258,45 @@ const runAnimationStage = ({
 const runAnimation = ({
   animationStages,
   cancelAnimationFrame,
-  environment,
   onAnimationComplete,
   requestAnimationFrame,
   rigs,
 }) => {
 
   const run = ({ animationStages, currentStageNum, rigs }) => {
-    runAnimationStage({
-      animationStage: animationStages[currentStageNum],
-      cancelAnimationFrame,
-      requestAnimationFrame,
-      rigs,
+    const animationStage = animationStages[currentStageNum];
+    const { start, end, duration } = animationStage;
+    const hasStyleUpdates = !!start && !!end;
 
-      onStageComplete: () => {
-        const nextStageNum = currentStageNum + 1;
-        if (nextStageNum === animationStages.length) {
-          onAnimationComplete && onAnimationComplete();
-        } else {
-          run({
-            animationStages,
-            currentStageNum: nextStageNum,
-            rigs,
-          });
-        }
-      },
-    });
+    const onStageComplete = () => {
+      const nextStageNum = currentStageNum + 1;
+      if (nextStageNum === animationStages.length) {
+        onAnimationComplete && onAnimationComplete();
+      } else {
+        run({
+          animationStages,
+          currentStageNum: nextStageNum,
+          rigs,
+        });
+      }
+    }
+
+    if (hasStyleUpdates) {
+      runAnimationStage({
+        animationStage,
+        cancelAnimationFrame,
+        requestAnimationFrame,
+        rigs,
+        onStageComplete,
+      });
+    } else {
+      runAnimationStageWithoutStyleUpdates({
+        cancelAnimationFrame,
+        duration,
+        onStageComplete,
+        requestAnimationFrame,
+      });
+    }
   };
 
   run({
@@ -272,25 +319,26 @@ const AnimatronicsContextTypes = {
 // Exports
 //==========================================================
 
-export const createWithAnimatronics = (
+export const withAnimatronics = (
+  createAnimationStages,
   {
     requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
   } = {}
 ) => {
 
-  return (BaseComponent, createAnimationStages) => {
+  return BaseComponent => {
 
     let state = {
       rigs: {},
     };
 
-    const registerComponent = ({ name, ref }) => {
+    const registerComponent = ({ name, domRef }) => {
       state = handleAnimatronicsAction(
         state,
         {
           type: REGISTER_COMPONENT,
-          payload: { name, ref },
+          payload: { name, domRef },
         },
       );
     };
@@ -325,7 +373,6 @@ export const createWithAnimatronics = (
         runAnimation({
           animationStages: createAnimationStages(rigs),
           cancelAnimationFrame,
-          environment: null,
           onAnimationComplete: null,
           requestAnimationFrame,
           rigs,
@@ -351,9 +398,12 @@ export const createWithAnimatronics = (
 
 };
 
-export const withAnimatronics = createWithAnimatronics();
-
-export const withRig = (BaseComponent, name) => {
+export const withRig = (
+  name,
+  {
+    useStringRefs = false,
+  } = {}
+) => BaseComponent => {
 
   class Rig extends React.Component {
     constructor(props) {
@@ -363,8 +413,10 @@ export const withRig = (BaseComponent, name) => {
 
     componentDidMount() {
       const { animatronics } = this.context;
+      const ref = useStringRefs ? this.refs[name] : this._ref;
+      const domRef = extractUnderlyingDOMNodeRef(ref);
       animatronics.registerComponent({
-        ref: this._ref,
+        domRef,
         name,
       });
     }
@@ -378,15 +430,16 @@ export const withRig = (BaseComponent, name) => {
 
     _onRef(ref) {
       if (!!ref) {
-        this._ref = extractUnderlyingDOMNodeRef(ref);
+        this._ref = ref;
       }
     }
 
     render() {
       const { ...props } = this.props;
+      const ref = useStringRefs ? name : this._onRef;
       return (
         <BaseComponent
-          ref={ this._onRef }
+          ref={ ref }
           { ...props }
         />
       );
