@@ -80,14 +80,14 @@ const AnimatedApp = withAnimatronics(
         duration: 500,
         start: {
           blueCircle: {
-            top: 40,
-            left: 0,
+            top: '40px',
+            left: '0px',
           },
         },
         end: {
           blueCircle: {
-            top: offsetTop + 40,
-            left: offsetLeft + 40,
+            top: `${offsetTop + 40}px`,
+            left: `${offsetLeft + 40}px`,
           },
         },
       },
@@ -131,14 +131,14 @@ const AnimatedApp = withAnimatronics(
         damping: 10,
         start: {
           purpleCircle: {
-            top: offsetTop,
-            left: offsetLeft,
+            top: `${offsetTop}px`,
+            left: `${offsetLeft}px`,
           },
         },
         end: {
           purpleCircle: {
-            top: 100,
-            left: 800,
+            top: '100px',
+            left: '800px',
           },
         },
       },
