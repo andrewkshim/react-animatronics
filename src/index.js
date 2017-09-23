@@ -181,7 +181,7 @@ const createStyleUpdater = ({
 const runAnimationStageWithoutStyleUpdates = ({
   cancelAnimationFrame,
   duration,
-  onStageComplete,
+  runNextStage,
   requestAnimationFrame,
 }) => {
   const startTime = Date.now();
@@ -189,7 +189,7 @@ const runAnimationStageWithoutStyleUpdates = ({
 
   const runLastAnimationFrame = () => {
     currentFrame = null;
-    onStageComplete();
+    runNextStage();
   };
 
   const runNextAnimationFrame = () => {
@@ -206,7 +206,7 @@ const runAnimationStageWithoutStyleUpdates = ({
 const runAnimationStage = ({
   animationStage,
   cancelAnimationFrame,
-  onStageComplete,
+  runNextStage,
   requestAnimationFrame,
   rigs,
 }) => {
@@ -233,7 +233,7 @@ const runAnimationStage = ({
     if (duration > 0) {
       updateStyles(duration);
     }
-    onStageComplete();
+    runNextStage();
   };
 
   const runNextAnimationFrame = () => {
@@ -259,11 +259,19 @@ const runAnimation = ({
 
   const run = ({ animationStages, currentStageNum, rigs }) => {
     const animationStage = animationStages[currentStageNum];
-    const { start, end, duration } = animationStage;
+    const {
+      start,
+      end,
+      duration,
+      onStageComplete,
+    } = animationStage;
     const hasStyleUpdates = !!start && !!end;
 
-    const onStageComplete = () => {
+    const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
+      if (onStageComplete) {
+        onStageComplete();
+      }
       if (nextStageNum === animationStages.length) {
         onAnimationComplete && onAnimationComplete();
       } else {
@@ -281,13 +289,13 @@ const runAnimation = ({
         cancelAnimationFrame,
         requestAnimationFrame,
         rigs,
-        onStageComplete,
+        runNextStage,
       });
     } else {
       runAnimationStageWithoutStyleUpdates({
         cancelAnimationFrame,
         duration,
-        onStageComplete,
+        runNextStage,
         requestAnimationFrame,
       });
     }
