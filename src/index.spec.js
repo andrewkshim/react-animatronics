@@ -121,47 +121,49 @@ test.skip('withAnimatronics successfully runs each animation stage', assert => {
         duration: 250,
         start: {
           base: {
-            top: 0,
+            top: '0px',
           }
         },
         end: {
           base: {
-            top: 10,
+            top: '10px',
           }
         },
-        onStageComplete: onStage1Complete,
       },
       {
         stiffness: 120,
         damping: 50,
         start: {
           base: {
-            top: 10,
+            top: '10px',
           }
         },
         end: {
           base: {
-            top: 100,
+            top: '100px',
           }
         },
-        onStageComplete: onStage2Complete,
       },
     ];
   };
 
   let wrapper;
-  const Animated = withAnimatronics(
-    createAnimationStages,
-    {
-      onAnimationComplete: () => {
-        assert.true(onStage1Complete.calledOnce);
-        assert.true(onStage2Complete.calledOnce);
-        assert.equals(wrapper.find('div').node.style.top, '100px');
-        assert.end();
-      }
-    }
-  )(App);
+  const Animated = withAnimatronics(createAnimationStages)(App);
   wrapper = mount(<Animated/>);
   const runAnimation = wrapper.find(App).prop('runAnimation');
-  runAnimation();
+  runAnimation(
+    () => {
+      assert.true(onStage1Complete.calledOnce);
+      assert.true(onStage2Complete.calledOnce);
+      assert.equals(wrapper.find('div').node.style.top, '100px');
+      assert.end();
+    },
+    (stageIndex) => {
+      if (stageIndex === 0) {
+        onStage1Complete();
+      } else if (stageIndex === 1) {
+        onStage2Complete();
+      }
+    }
+  );
 })
