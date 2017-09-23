@@ -316,6 +316,7 @@ const AnimatronicsContextTypes = {
 export const withAnimatronics = (
   createAnimationStages,
   {
+    onAnimationComplete,
     requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
   } = {}
@@ -367,7 +368,7 @@ export const withAnimatronics = (
         runAnimation({
           animationStages: createAnimationStages(rigs),
           cancelAnimationFrame,
-          onAnimationComplete: null,
+          onAnimationComplete,
           requestAnimationFrame,
           rigs,
         })
