@@ -2,7 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import BezierEasing from 'bezier-easing'
+import chroma from 'chroma-js'
 
+import CSSColors from './css-colors'
 
 //==========================================================
 // Constants
@@ -11,6 +13,8 @@ import BezierEasing from 'bezier-easing'
 const ACTION_PREFIX = '@@animatronics';
 const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
 const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
+
+const CSS_TRANSFORM = 'transform';
 
 const IS_RAF_AVAILABLE = (
   typeof window !== 'undefined'
@@ -29,25 +33,34 @@ const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
   : clearTimeout
 
 const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
-const NUMBER_REGEX = /\d+(\.\d+)?/;
+const NUMBER_REGEX = /(-)?\d+(\.\d+)?/;
 
 
 //==========================================================
 // Internal
 //==========================================================
 
-const parseStyle = style => {
+const isStatelessComponent = Component => !Component.prototype.render;
+
+// TODO: use styleName?
+const parseStyle = (styleName, style) => {
   if (typeof style === 'number') {
     return {
       value: style,
-      unit: 'px',
     };
   } else if (style.indexOf('(') > -1) {
-    const openParenIndex = style.indexOf('(');
-    const matches = BETWEEN_PAREN_REGEX.exec(style);
+    const transforms = style.split(' ');
+    return transforms.reduce((result, transform) => {
+      const openParenIndex = transform.indexOf('(');
+      const matches = BETWEEN_PAREN_REGEX.exec(transform);
+      result.transformFns.push(transform.slice(0, openParenIndex));
+      result.transformStyles.push(parseStyle(styleName, matches[1]));
+      return result;
+    }, { transformFns: [], transformStyles: [] });
+  } else if (!!CSSColors[style]) {
     return {
-      transformFn: style.slice(0, openParenIndex),
-      ...parseStyle(matches[1]),
+      isColor: true, // TODO: type the styles?
+      value: CSSColors[style],
     };
   } else {
     const matches = NUMBER_REGEX.exec(style);
@@ -59,15 +72,31 @@ const parseStyle = style => {
   }
 }
 
-const updateStyleValue = (parsedStyle, delta) => {
+const updateStyleValue = (parsedStyle, value) => {
   return {
     ...parsedStyle,
-    value: parsedStyle.value + delta,
+    value,
   };
 }
 
-const reconstructStyle = ({ transformFn, value, unit }) => {
-  return transformFn ? `${transformFn}(${value}${unit})` : `${value}${unit}`;
+const updateTransformStyles = ({}) => {
+  return {
+  };
+}
+
+const stringifyStyle = ({ transformFns, transformStyles, value, unit }) => {
+  return transformFns ?
+    transformFns
+      .reduce((styleBuilder, transformFn, index) => {
+        const { value, unit } = transformStyles[index];
+        return styleBuilder.concat(`${transformFn}(${value}${unit})`);
+      }, [])
+      .join(' ')
+  : !unit ?
+    value
+  :
+    `${value}${unit}`
+  ;
 }
 
 const ANIMATRONICS_ACTION_HANDLERS = {
@@ -104,22 +133,57 @@ const handleAnimatronicsAction = (state, { type, payload }) => {
   ;
 }
 
+const isColorStyle = parsedStyle => parsedStyle.isColor;
+const isTransformStyle = parsedStyle => parsedStyle.transformFns;
+
 const calculateTimedUpdatedStyle = ({
   startValue,
   endValue,
   easingFn,
   duration,
   elapsedTime,
+  styleName,
 }) => {
   const normalizedDuration = duration === 0 ? elapsedTime : duration;
-  const parsedStartStyle = parseStyle(startValue);
-  const parsedEndStyle = parseStyle(endValue);
-  const difference = parsedEndStyle.value - parsedStartStyle.value;
-  const parsedUpdatedStyle = updateStyleValue(
-    parsedStartStyle,
-    difference * easingFn( elapsedTime / normalizedDuration ),
+  const parsedStartStyle = parseStyle(styleName, startValue);
+  const parsedEndStyle = parseStyle(styleName, endValue);
+  if (isColorStyle(parsedStartStyle)) {
+    if (!isColorStyle(parsedEndStyle)) {
+      console.error('using different styles D:');
+    }
+  }
+  return stringifyStyle(
+    isColorStyle(parsedStartStyle) ?
+      updateStyleValue(
+        parsedStartStyle,
+        chroma.mix(
+          parsedStartStyle.value,
+          parsedEndStyle.value,
+          easingFn( elapsedTime / normalizedDuration ),
+        )
+      )
+    : isTransformStyle(parsedStartStyle) ?
+      {
+        ...parsedStartStyle,
+        transformStyles: parsedStartStyle.transformStyles.map(
+          (parsedStyle, index) => {
+            return updateStyleValue(
+              parsedStyle,
+              parsedStyle.value + (
+                (parsedEndStyle.transformStyles[index].value - parsedStyle.value) * easingFn( elapsedTime / normalizedDuration )
+              )
+            )
+          }
+        ),
+      }
+    :
+      updateStyleValue(
+        parsedStartStyle,
+        parsedStartStyle.value + (
+          (parsedEndStyle.value - parsedStartStyle.value) * easingFn( elapsedTime / normalizedDuration )
+        ),
+      )
   );
-  return reconstructStyle(parsedUpdatedStyle);
 }
 
 const updateTimedRigStyles = ({
@@ -137,6 +201,7 @@ const updateTimedRigStyles = ({
       easingFn,
       duration,
       elapsedTime,
+      styleName,
     });
     rigRef.style[styleName] = updatedStyle;
   });
@@ -154,8 +219,8 @@ const updateSpringRigStyles = ({
   return Object.keys(currentStyles).reduce((result, styleName) => {
     const currentStyle = currentStyles[styleName];
     const endStyle = endStyles[styleName];
-    const parsedStartStyle = parseStyle(currentStyle);
-    const parsedEndStyle = parseStyle(endStyle);
+    const parsedStartStyle = parseStyle(styleName, currentStyle);
+    const parsedEndStyle = parseStyle(styleName, endStyle);
 
     const currentVelocity = currentVelocities[styleName];
 
@@ -165,9 +230,11 @@ const updateSpringRigStyles = ({
     const updatedVelocity = currentVelocity + (acceleration * SECONDS_PER_ANIMATION_FRAME);
     const updatedStyle = updateStyleValue(
       parsedStartStyle,
-      updatedVelocity * SECONDS_PER_ANIMATION_FRAME
+      parsedStartStyle.value + (
+        updatedVelocity * SECONDS_PER_ANIMATION_FRAME
+      )
     );
-    const reconstructedStyle = reconstructStyle(updatedStyle);
+    const reconstructedStyle = stringifyStyle(updatedStyle);
 
     result.updatedStyles[styleName] = reconstructedStyle;
     result.updatedVelocities[styleName] = updatedVelocity;
@@ -342,6 +409,7 @@ const runSpringAnimationStage = ({
         endStyles,
         stiffness,
       });
+      console.log(currentStyles, updatedStyles);
       currentStylesAndVelocities[rigName].currentStyles = updatedStyles;
       currentStylesAndVelocities[rigName].currentVelocities = updatedVelocities;
     });
@@ -353,8 +421,8 @@ const runSpringAnimationStage = ({
       const endStyles = allEndStyles[rigName];
       const rigRef = rigs[rigName];
       Object.keys(endStyles).forEach(styleName => {
-        rigRef.style[styleName] = reconstructStyle(
-          parseStyle(endStyles[styleName])
+        rigRef.style[styleName] = stringifyStyle(
+          parseStyle(styleName, endStyles[styleName])
         );
       });
     });
@@ -377,6 +445,7 @@ const runAnimation = ({
   animationStages,
   cancelAnimationFrame,
   onAnimationComplete,
+  onStageComplete,
   requestAnimationFrame,
   rigs,
 }) => {
@@ -389,7 +458,6 @@ const runAnimation = ({
       duration,
       stiffness,
       damping,
-      onStageComplete,
     } = animationStage;
 
     const hasStyleUpdates = !!start && !!end;
@@ -403,7 +471,7 @@ const runAnimation = ({
     const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
       if (onStageComplete) {
-        onStageComplete();
+        onStageComplete(currentStageNum);
       }
       if (nextStageNum === animationStages.length) {
         onAnimationComplete && onAnimationComplete();
@@ -467,7 +535,6 @@ const AnimatronicsContextTypes = {
 export const withAnimatronics = (
   createAnimationStages,
   {
-    onAnimationComplete,
     requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
   } = {}
@@ -514,12 +581,13 @@ export const withAnimatronics = (
         };
       }
 
-      _runAnimation() {
+      _runAnimation(onAnimationComplete, onStageComplete) {
         const { rigs } = state;
         runAnimation({
           animationStages: createAnimationStages(rigs),
           cancelAnimationFrame,
           onAnimationComplete,
+          onStageComplete,
           requestAnimationFrame,
           rigs,
         })
@@ -551,6 +619,10 @@ export const withRig = (
   } = {}
 ) => BaseComponent => {
 
+  if (isStatelessComponent(BaseComponent)) {
+    console.error(`Using stateless component but requires rig ${name}!`);
+  }
+
   class Rig extends React.Component {
     constructor(props) {
       super(props);
@@ -575,9 +647,7 @@ export const withRig = (
     }
 
     _onRef(ref) {
-      if (!!ref) {
-        this._ref = ref;
-      }
+      this._ref = ref;
     }
 
     render() {
