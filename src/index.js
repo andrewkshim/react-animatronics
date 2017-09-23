@@ -349,6 +349,15 @@ const runSpringAnimationStage = ({
 
   const runLastAnimationFrame = () => {
     currentFrame = null;
+    Object.keys(allStartStyles).forEach(rigName => {
+      const endStyles = allEndStyles[rigName];
+      const rigRef = rigs[rigName];
+      Object.keys(endStyles).forEach(styleName => {
+        rigRef.style[styleName] = reconstructStyle(
+          parseStyle(endStyles[styleName])
+        );
+      });
+    });
     runNextStage();
   };
 
