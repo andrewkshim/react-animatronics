@@ -75,7 +75,7 @@ const App = ({
 const AnimatedApp = withAnimatronics(
   ({ blueCircle, redCircle, purpleCircle }) => {
     const { offsetLeft, offsetTop } = redCircle;
-    return ([
+    return [
       {
         duration: 500,
         start: {
@@ -141,7 +141,7 @@ const AnimatedApp = withAnimatronics(
           },
         },
       },
-    ]);
+    ];
   }
 )( App );
 
