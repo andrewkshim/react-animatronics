@@ -127,7 +127,8 @@ const AnimatedApp = withAnimatronics(
         duration: 250,
       },
       {
-        duration: 500,
+        stiffness: 200,
+        damping: 10,
         start: {
           purpleCircle: {
             top: offsetTop,
