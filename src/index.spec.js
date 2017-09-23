@@ -111,11 +111,7 @@ test.skip('withAnimatronics successfully runs each animation stage', assert => {
   }
 
   const Rigged = withRig('base', { useStringRefs: true })(Base);
-  const App = () => (
-    <div>
-      <Rigged/>
-    </div>
-  );
+  const App = () => <Rigged/>;
 
   const onStage1Complete = sinon.spy();
   const onStage2Complete = sinon.spy();
@@ -152,17 +148,20 @@ test.skip('withAnimatronics successfully runs each animation stage', assert => {
       },
     ];
   };
+
+  let wrapper;
   const Animated = withAnimatronics(
     createAnimationStages,
     {
       onAnimationComplete: () => {
         assert.true(onStage1Complete.calledOnce);
         assert.true(onStage2Complete.calledOnce);
+        assert.equals(wrapper.find('div').node.style.top, '100px');
         assert.end();
       }
     }
   )(App);
-  const wrapper = mount(<Animated/>);
+  wrapper = mount(<Animated/>);
   const runAnimation = wrapper.find(App).prop('runAnimation');
   runAnimation();
 })
