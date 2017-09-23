@@ -102,8 +102,67 @@ test('withRig sets the ref to the DOM node', assert => {
   assert.end();
 });
 
-//test('withAnimatronics runs each animation stage', assert => {
-  //const Base = () => <div></div>;
-  //const Animated = withAnimatronics(Base, ({ baseRef }) => {
-  //});
-//})
+//test('withAnimatronics successfully runs each animation stage', assert => {
+test.skip('withAnimatronics successfully runs each animation stage', assert => {
+  class Base extends React.Component {
+    render() {
+      return <div/>;
+    }
+  }
+
+  const Rigged = withRig('base', { useStringRefs: true })(Base);
+  const App = () => (
+    <div>
+      <Rigged/>
+    </div>
+  );
+
+  const onStage1Complete = sinon.spy();
+  const onStage2Complete = sinon.spy();
+  const createAnimationStages = () => {
+    return [
+      {
+        duration: 250,
+        start: {
+          base: {
+            top: 0,
+          }
+        },
+        end: {
+          base: {
+            top: 10,
+          }
+        },
+        onStageComplete: onStage1Complete,
+      },
+      {
+        stiffness: 120,
+        damping: 50,
+        start: {
+          base: {
+            top: 10,
+          }
+        },
+        end: {
+          base: {
+            top: 100,
+          }
+        },
+        onStageComplete: onStage2Complete,
+      },
+    ];
+  };
+  const Animated = withAnimatronics(
+    createAnimationStages,
+    {
+      onAnimationComplete: () => {
+        assert.true(onStage1Complete.calledOnce);
+        assert.true(onStage2Complete.calledOnce);
+        assert.end();
+      }
+    }
+  )(App);
+  const wrapper = mount(<Animated/>);
+  const runAnimation = wrapper.find(App).prop('runAnimation');
+  runAnimation();
+})
