@@ -76,7 +76,7 @@ test('withRig unregisters the component when unmounted', assert => {
   assert.end();
 });
 
-test('withRig sets a refs', assert => {
+test('withRig sets the ref to the DOM node', assert => {
   class Base extends React.Component {
     render() {
       return <div/>;
