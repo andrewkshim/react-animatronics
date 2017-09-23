@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import BezierEasing from 'bezier-easing'
 
@@ -142,13 +143,6 @@ const updateRigStyles = ({
     });
     rigRef.style[styleName] = updatedStyle;
   });
-}
-
-const extractUnderlyingDOMNodeRef = ref => {
-  // HACK
-  // react 16
-  // return ref._reactInternalFiber.child.stateNode;
-  return ref._reactInternalInstance._renderedComponent._ancestorInfo.current.instance._hostNode;
 }
 
 const createStyleUpdater = ({
@@ -414,7 +408,7 @@ export const withRig = (
     componentDidMount() {
       const { animatronics } = this.context;
       const ref = useStringRefs ? this.refs[name] : this._ref;
-      const domRef = extractUnderlyingDOMNodeRef(ref);
+      const domRef = ReactDOM.findDOMNode(ref);
       animatronics.registerComponent({
         domRef,
         name,
