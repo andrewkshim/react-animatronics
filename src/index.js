@@ -12,31 +12,18 @@ import {
   SECONDS_PER_ANIMATION_FRAME,
 } from './constants'
 
-import { createModuleString } from './utils'
+import {
+  DEFAULT_REQUEST_ANIMATION_FRAME,
+  DEFAULT_CANCEL_ANIMATION_FRAME,
+  createModuleString,
+  ensureIsFunction,
+  isStatelessComponent,
+} from './utils'
 
 import runAnimation from './animator'
 
 const REGISTER_COMPONENT = createModuleString('REGISTER_COMPONENT');
 const UNREGISTER_COMPONENT = createModuleString('UNREGISTER_COMPONENT');
-
-const IS_RAF_AVAILABLE = (
-  typeof window !== 'undefined'
-  && window.requestAnimationFrame
-);
-
-const DEFAULT_REQUEST_ANIMATION_FRAME = IS_RAF_AVAILABLE
-  ? requestAnimationFrame
-  : callback => setTimeout(callback, MS_PER_ANIMATION_FRAME)
-
-const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
-  ? cancelAnimationFrame
-  : clearTimeout
-
-const ensureIsFunction = possibleFn => typeof possibleFn === 'function'
-  ? possibleFn
-  : () => {};
-
-const isStatelessComponent = Component => !Component.prototype.render;
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
