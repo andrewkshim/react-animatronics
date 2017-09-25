@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
     }}>
       <div style={{
         margin: '50px auto',
-        width: '70%',
+        width: '500px',
         height: '300px',
         position: 'relative',
         border: '1px solid red',
@@ -223,6 +223,9 @@ const AnimatedApp = withAnimatronics(
             bottom: '-1px',
           }
         },
+      },
+      {
+        duration: 250,
       },
       {
         duration: 600,
