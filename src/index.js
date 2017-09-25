@@ -13,6 +13,8 @@ import {
   SECONDS_PER_ANIMATION_FRAME,
 } from './constants'
 
+import { createModuleString } from './utils'
+
 import { updateTimedRigStyles } from './stylist/timed-stylist'
 import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
 
@@ -20,9 +22,8 @@ import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
 // Constants
 //==========================================================
 
-const ACTION_PREFIX = '@@animatronics';
-const REGISTER_COMPONENT = `${ ACTION_PREFIX }/REGISTER_COMPONENT`;
-const UNREGISTER_COMPONENT = `${ ACTION_PREFIX }/UNREGISTER_COMPONENT`;
+const REGISTER_COMPONENT = createModuleString('REGISTER_COMPONENT');
+const UNREGISTER_COMPONENT = createModuleString('UNREGISTER_COMPONENT');
 
 const IS_RAF_AVAILABLE = (
   typeof window !== 'undefined'
