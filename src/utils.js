@@ -1,3 +1,7 @@
+/**
+ * Utils: provides helper functions for other modules.
+ * @module utils
+ */
 
 const MODULE_PREFIX = '@@animatronics';
 

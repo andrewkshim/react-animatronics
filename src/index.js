@@ -1,3 +1,7 @@
+/**
+ * React Animatronics: coordinated, declarative animations for React components.
+ */
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
