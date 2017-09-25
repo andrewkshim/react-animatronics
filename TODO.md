@@ -2,3 +2,5 @@
 - Ignore unrecognized style (e.g. display: none)
 - Use `debug` module
 - Better errors/warnings
+- Make spring animations smoother?
+- Document spring logic
