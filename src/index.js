@@ -9,10 +9,8 @@ import {
   SECONDS_PER_ANIMATION_FRAME,
 } from './constants'
 
-import {
-  updateTimedRigStyles,
-  createFnUpdateSpringRigStyles,
-} from './stylist'
+import { updateTimedRigStyles } from './stylist/timed-stylist'
+import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
 
 //==========================================================
 // Constants
