@@ -1,3 +1,8 @@
+/**
+ * TimedStylist: manages styles for timed animations.
+ * @module stylist/timed-stylist
+ */
+
 import chroma from 'chroma-js'
 
 import {

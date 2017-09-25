@@ -1,3 +1,7 @@
+/**
+ * SpringStylist: manages styles for spring animations.
+ * @module stylist/spring-stylist
+ */
 
 import {
   MS_PER_ANIMATION_FRAME,

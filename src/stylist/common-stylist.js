@@ -1,3 +1,8 @@
+/**
+ * CommonStylist: provides utilities to help manage styles for other Stylists.
+ * @module stylist/common-stylist
+ */
+
 import chroma from 'chroma-js'
 
 import {
