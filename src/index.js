@@ -6,7 +6,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import BezierEasing from 'bezier-easing'
-import chroma from 'chroma-js'
 
 import {
   MS_PER_ANIMATION_FRAME,
