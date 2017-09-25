@@ -18,10 +18,6 @@ import { createModuleString } from './utils'
 import { updateTimedRigStyles } from './stylist/timed-stylist'
 import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
 
-//==========================================================
-// Constants
-//==========================================================
-
 const REGISTER_COMPONENT = createModuleString('REGISTER_COMPONENT');
 const UNREGISTER_COMPONENT = createModuleString('UNREGISTER_COMPONENT');
 
@@ -38,14 +34,6 @@ const DEFAULT_REQUEST_ANIMATION_FRAME = IS_RAF_AVAILABLE
 const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
   ? cancelAnimationFrame
   : clearTimeout
-
-const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
-const NUMBER_REGEX = /(-)?\d+(\.\d+)?/;
-
-
-//==========================================================
-// Internal
-//==========================================================
 
 const ensureIsFunction = possibleFn => typeof possibleFn === 'function'
   ? possibleFn
@@ -313,11 +301,6 @@ const AnimatronicsContextTypes = {
     unregisterComponent: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-
-//==========================================================
-// Exports
-//==========================================================
 
 export const withAnimatronics = (
   createAnimationStages,
