@@ -4,3 +4,4 @@
 - Better errors/warnings
 - Make spring animations smoother?
 - Document spring logic
+- More tests
