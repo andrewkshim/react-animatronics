@@ -177,9 +177,7 @@ export const withRig = (
 
     componentWillUnmount() {
       const { animatronics } = this.context;
-      animatronics.unregisterComponent({
-        componentName,
-      })
+      animatronics.unregisterComponent({ componentName });
     }
 
     _setComponentStyle(updatedStyles) {
