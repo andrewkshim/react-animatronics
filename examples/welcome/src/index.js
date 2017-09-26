@@ -170,7 +170,7 @@ class App extends React.Component {
               runAnimation(
                 () => {},
                 stageIndex => {
-                  if (stageIndex === 2) {
+                  if (stageIndex === 1) {
                     this.setState({ didEnter: true });
                   }
                 }
@@ -189,68 +189,69 @@ const AnimatedApp = withAnimatronics(
   ({ topLockHalfRef, bottomLockHalfRef }) => {
     return [
       {
-        duration: 500,
-        start: {
-          topLockHalfRef: {
+        topLockHalfRef: {
+          duration: 500,
+          start: {
             top: '-50px',
             height: '50px',
           },
-          bottomLockHalfRef: {
-            bottom: '-50px',
-            height: '50px',
-          }
-        },
-        end: {
-          topLockHalfRef: {
+          end: {
             height: '150px',
             top: '-1px',
           },
-          bottomLockHalfRef: {
+        },
+        bottomLockHalfRef: {
+          duration: 500,
+          start: {
+            bottom: '-50px',
+            height: '50px',
+          },
+          end: {
             height: '150px',
             bottom: '-1px',
-          }
+          },
         },
       },
       {
-        duration: 250,
-      },
-      {
-        duration: 600,
-        easingFn: createBezierEasingFn(0,.98,.01,.97),
-        start: {
-          topLockHalfRef: {
+        topLockHalfRef: {
+          duration: 600,
+          easingFn: createBezierEasingFn(0,.98,.01,.97),
+          start: {
             transform: 'rotateZ(0deg)',
           },
-          bottomLockHalfRef: {
-            transform: 'rotateZ(0deg)',
-          }
-        },
-        end: {
-          topLockHalfRef: {
+          end: {
             transform: 'rotateZ(1350deg)',
           },
-          bottomLockHalfRef: {
+        },
+        bottomLockHalfRef: {
+          duration: 600,
+          easingFn: createBezierEasingFn(0,.98,.01,.97),
+          start: {
+            transform: 'rotateZ(0deg)',
+          },
+          end: {
             transform: 'rotateZ(1350deg)',
-          }
+          },
         },
       },
       {
-        duration: 350,
-        start: {
-          topLockHalfRef: {
+        topLockHalfRef: {
+          duration: 350,
+          start: {
             transform: 'rotateZ(1350deg) translateY(0px)',
           },
-          bottomLockHalfRef: {
-            transform: 'rotateZ(1350deg) translateY(0px)',
-          }
-        },
-        end: {
-          topLockHalfRef: {
+          end: {
             transform: 'rotateZ(1350deg) translateY(-250px)',
           },
-          bottomLockHalfRef: {
+        },
+        bottomLockHalfRef: {
+          duration: 350,
+          start: {
+            transform: 'rotateZ(1350deg) translateY(0px)',
+          },
+          end: {
             transform: 'rotateZ(1350deg) translateY(250px)',
-          }
+          },
         },
       },
     ];

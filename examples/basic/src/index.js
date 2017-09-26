@@ -78,65 +78,57 @@ const AnimatedApp = withAnimatronics(
     const { offsetLeft, offsetTop } = redCircle;
     return [
       {
-        duration: 500,
-        start: {
-          blueCircle: {
-            top: '40px',
-            left: '0px',
+        blueCircle: {
+          duration: 500,
+          start: {
+              top: '40px',
+              left: '0px',
           },
-        },
-        end: {
-          blueCircle: {
+          end: {
             top: `${offsetTop + 40}px`,
             left: `${offsetLeft + 40}px`,
           },
         },
       },
       {
-        duration: 500,
-        start: {
-          purpleCircle: {
+        purpleCircle: {
+          duration: 500,
+          start: {
             transform: 'scale(0)',
           },
-        },
-        end: {
-          purpleCircle: {
+          end: {
             transform: 'scale(1)',
           },
         },
       },
       {
-        duration: 0,
-        start: {
-          blueCircle: {
+        blueCircle: {
+          duration: 0,
+          start: {
             transform: 'scale(1)',
           },
-          redCircle: {
-            transform: 'scale(1)',
-          },
-        },
-        end: {
-          blueCircle: {
+          end: {
             transform: 'scale(0)',
           },
-          redCircle: {
+        },
+        redCircle: {
+          duration: 0,
+          start: {
+            transform: 'scale(1)',
+          },
+          end: {
             transform: 'scale(0)',
           },
         },
       },
       {
-        duration: 250,
-      },
-      {
-        duration: 350,
-        start: {
-          purpleCircle: {
+        purpleCircle: {
+          duration: 350,
+          start: {
             top: `${offsetTop}px`,
             left: `${offsetLeft}px`,
           },
-        },
-        end: {
-          purpleCircle: {
+          end: {
             top: '100px',
             left: '800px',
           },

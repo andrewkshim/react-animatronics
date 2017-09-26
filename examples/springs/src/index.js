@@ -76,43 +76,37 @@ const AnimatedApp = withAnimatronics(
   ({ blueCircle, redCircle, purpleCircle }) => {
     return [
       {
-        stiffness: 170,
-        damping: 26,
-        start: {
-          blueCircle: {
+        blueCircle: {
+          stiffness: 170,
+          damping: 26,
+          start: {
             left: '0px',
           },
-        },
-        end: {
-          blueCircle: {
+          end: {
             left: '400px',
           },
         },
       },
       {
-        stiffness: 100,
-        damping: 10,
-        start: {
-          redCircle: {
+        redCircle: {
+          stiffness: 100,
+          damping: 10,
+          start: {
             left: '0px',
           },
-        },
-        end: {
-          redCircle: {
+          end: {
             left: '400px',
           },
         },
       },
       {
-        stiffness: 200,
-        damping: 5,
-        start: {
-          purpleCircle: {
+        purpleCircle: {
+          stiffness: 200,
+          damping: 5,
+          start: {
             left: '0px',
           },
-        },
-        end: {
-          purpleCircle: {
+          end: {
             left: '400px',
           },
         },
