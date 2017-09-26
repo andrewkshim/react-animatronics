@@ -18,6 +18,7 @@ import {
   createModuleString,
   ensureIsFunction,
   isStatelessComponent,
+  removeKeyFromObject,
 } from './utils'
 
 import runAnimation from './animator'
@@ -27,26 +28,27 @@ const UNREGISTER_COMPONENT = createModuleString('UNREGISTER_COMPONENT');
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
-  [ REGISTER_COMPONENT ]: ({ rigs }, { name, domRef }) => {
+  [ REGISTER_COMPONENT ]: (state, payload) => {
+    const { styleSettersForComponents, domNodesForComponents } = state;
+    const { componentName, domNode, setComponentStyle } = payload;
     return {
-      rigs: {
-        ...rigs,
-        [ name ]: domRef,
+      styleSettersForComponents: {
+        ...styleSettersForComponents,
+        [ componentName ]: setComponentStyle,
+      },
+      domNodesForComponents: {
+        ...domNodesForComponents,
+        [ componentName ]: domNode,
       },
     };
   },
 
-  [ UNREGISTER_COMPONENT ]: ({ rigs }, { name }) => {
+  [ UNREGISTER_COMPONENT ]: (state, payload) => {
+    const { styleSettersForComponents, domNodesForComponents } = state;
+    const { componentName } = payload;
     return {
-      rigs: Object
-        .keys(rigs)
-        .reduce((result, otherRigName) => {
-          if (name !== otherRigName) {
-            result[otherRigName] = rigs[otherRigName];
-          }
-          return result;
-        }, {})
-      ,
+      styleSettersForComponents: removeKeyFromObject(styleSettersForComponents, componentName),
+      domNodesForComponents: removeKeyFromObject(domNodesForComponents, componentName),
     };
   },
 
@@ -77,25 +79,26 @@ export const withAnimatronics = (
   return BaseComponent => {
 
     let state = {
-      rigs: {},
+      styleSettersForComponents: {},
+      domNodesForComponents: {},
     };
 
-    const registerComponent = ({ name, domRef }) => {
+    const registerComponent = ({ componentName, domNode, setComponentStyle }) => {
       state = handleAnimatronicsAction(
         state,
         {
           type: REGISTER_COMPONENT,
-          payload: { name, domRef },
+          payload: { componentName, domNode, setComponentStyle },
         },
       );
     };
 
-    const unregisterComponent = ({ name }) => {
+    const unregisterComponent = ({ componentName }) => {
       state = handleAnimatronicsAction(
         state,
         {
           type: UNREGISTER_COMPONENT,
-          payload: { name },
+          payload: { componentName },
         },
       );
     };
@@ -116,14 +119,14 @@ export const withAnimatronics = (
       }
 
       _runAnimation(onAnimationComplete, onStageComplete) {
-        const { rigs } = state;
+        const { styleSettersForComponents, domNodesForComponents } = state;
         runAnimation({
-          animationStages: createAnimationStages(rigs),
+          animationStages: createAnimationStages(domNodesForComponents),
           cancelAnimationFrame,
           onAnimationComplete: ensureIsFunction(onAnimationComplete),
           onStageComplete: ensureIsFunction(onStageComplete),
           requestAnimationFrame,
-          rigs,
+          styleSettersForComponents,
         })
       }
 
@@ -147,37 +150,49 @@ export const withAnimatronics = (
 };
 
 export const withRig = (
-  name,
+  componentName,
   {
     useStringRefs = false,
   } = {}
 ) => BaseComponent => {
 
   if (isStatelessComponent(BaseComponent)) {
-    console.error(`Using stateless component but requires rig ${name}!`);
+    console.error(`Using stateless component but requires rig ${componentName}!`);
   }
 
   class Rig extends React.Component {
     constructor(props) {
       super(props);
+      this.state = { style: {} };
       this._onRef = this._onRef.bind(this);
+      this._setComponentStyle = this._setComponentStyle.bind(this);
     }
 
     componentDidMount() {
       const { animatronics } = this.context;
-      const ref = useStringRefs ? this.refs[name] : this._ref;
-      const domRef = ReactDOM.findDOMNode(ref);
+      const ref = useStringRefs ? this.refs[componentName] : this._ref;
+      const domNode = ReactDOM.findDOMNode(ref);
       animatronics.registerComponent({
-        domRef,
-        name,
+        domNode,
+        componentName,
+        setComponentStyle: this._setComponentStyle,
       });
     }
 
     componentWillUnmount() {
       const { animatronics } = this.context;
       animatronics.unregisterComponent({
-        name,
+        componentName,
       })
+    }
+
+    _setComponentStyle(updatedStyles) {
+      this.setState(state => ({
+        style: {
+          ...state.style,
+          ...updatedStyles,
+        },
+      }));
     }
 
     _onRef(ref) {
@@ -186,10 +201,12 @@ export const withRig = (
 
     render() {
       const { ...props } = this.props;
-      const ref = useStringRefs ? name : this._onRef;
+      const { style } = this.state;
+      const ref = useStringRefs ? componentName : this._onRef;
       return (
         <BaseComponent
           ref={ ref }
+          animatronicStyles={ style }
           { ...props }
         />
       );

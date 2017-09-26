@@ -40,7 +40,7 @@ const runTimedAnimationStage = ({
   cancelAnimationFrame,
   runNextStage,
   requestAnimationFrame,
-  rigs,
+  styleSettersForComponents,
 }) => {
   const {
     start: allStartStyles,
@@ -53,12 +53,12 @@ const runTimedAnimationStage = ({
   let currentFrame;
 
   const updateTimedStyles = elapsedTime => {
-    Object.keys(rigs).forEach(rigName => {
-      const startStyles = allStartStyles[rigName];
-      const endStyles = allEndStyles[rigName];
-      const rigRef = rigs[rigName];
+    Object.keys(styleSettersForComponents).forEach(componentName => {
+      const startStyles = allStartStyles[componentName];
+      const endStyles = allEndStyles[componentName];
+      const setComponentStyle = styleSettersForComponents[componentName];
 
-      if (!rigRef) {
+      if (!setComponentStyle) {
         // TODO: warn
         return;
       }
@@ -69,7 +69,7 @@ const runTimedAnimationStage = ({
       }
 
       updateTimedRigStyles({
-        rigRef: rigs[rigName],
+        setComponentStyle,
         startStyles,
         endStyles,
         easingFn,
@@ -105,7 +105,7 @@ const runSpringAnimationStage = ({
   cancelAnimationFrame,
   runNextStage,
   requestAnimationFrame,
-  rigs,
+  styleSettersForComponents,
 }) => {
   const {
     start: allStartStyles,
@@ -125,11 +125,11 @@ const runSpringAnimationStage = ({
   let isAnimationDone = false;
 
   const updateSpringStyles = () => {
-    Object.keys(allStartStyles).forEach(rigName => {
+    Object.keys(allStartStyles).forEach(componentName => {
       isAnimationDone = updateSpringRigStyles({
-        rigRef: rigs[rigName],
-        rigName,
-        styleNames: Object.keys(allStartStyles[rigName]),
+        setComponentStyle: styleSettersForComponents[componentName],
+        componentName,
+        styleNames: Object.keys(allStartStyles[componentName]),
       });
     });
   };
@@ -158,10 +158,10 @@ const runAnimation = ({
   onAnimationComplete,
   onStageComplete,
   requestAnimationFrame,
-  rigs,
+  styleSettersForComponents,
 }) => {
 
-  const run = ({ animationStages, currentStageNum, rigs }) => {
+  const run = ({ animationStages, currentStageNum, styleSettersForComponents }) => {
     const animationStage = animationStages[currentStageNum];
     const {
       start,
@@ -190,7 +190,7 @@ const runAnimation = ({
         run({
           animationStages,
           currentStageNum: nextStageNum,
-          rigs,
+          styleSettersForComponents,
         });
       }
     }
@@ -201,7 +201,7 @@ const runAnimation = ({
           animationStage,
           cancelAnimationFrame,
           requestAnimationFrame,
-          rigs,
+          styleSettersForComponents,
           runNextStage,
         });
       } else if (isUsingSpring) {
@@ -209,7 +209,7 @@ const runAnimation = ({
           animationStage,
           cancelAnimationFrame,
           requestAnimationFrame,
-          rigs,
+          styleSettersForComponents,
           runNextStage,
         });
       }
@@ -226,7 +226,7 @@ const runAnimation = ({
   run({
     animationStages,
     currentStageNum: 0,
-    rigs,
+    styleSettersForComponents,
   });
 }
 

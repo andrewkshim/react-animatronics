@@ -149,20 +149,20 @@ const isSpringAnimationDone = springStates =>
 export const areAllSpringAnimationsDone = springStatesForRigs =>
   Object.keys(springStatesForRigs)
     .reduce(
-      (result, rigName) =>
-        result.concat(isSpringAnimationDone(springStatesForRigs[rigName])),
+      (result, componentName) =>
+        result.concat(isSpringAnimationDone(springStatesForRigs[componentName])),
       []
     )
     .every(isDone => isDone)
 ;
 
-const createInitialSpringStates = (allStartStyles, allEndStyles, rigName) =>
-  Object.keys(allStartStyles[rigName]).reduce(
+const createInitialSpringStates = (allStartStyles, allEndStyles, componentName) =>
+  Object.keys(allStartStyles[componentName]).reduce(
     (states, styleName) => ({
       ...states,
       [styleName]: createSpringState(
-        parseStyle(allStartStyles[rigName][styleName]),
-        parseStyle(allEndStyles[rigName][styleName]),
+        parseStyle(allStartStyles[componentName][styleName]),
+        parseStyle(allEndStyles[componentName][styleName]),
       )
     }),
     {}
@@ -171,22 +171,16 @@ const createInitialSpringStates = (allStartStyles, allEndStyles, rigName) =>
 
 const createInitialSpringStatesForRigs = (allStartStyles, allEndStyles) =>
   Object.keys(allStartStyles).reduce(
-    (result, rigName) => ({
+    (result, componentName) => ({
       ...result,
-      [rigName]: createInitialSpringStates(
+      [componentName]: createInitialSpringStates(
         allStartStyles,
         allEndStyles,
-        rigName,
+        componentName,
       ),
     }),
     {}
   )
-;
-
-const setEndStyles = (rigRef, endStyles) =>
-  Object.keys(endStyles).forEach(styleName => {
-    rigRef.style[styleName] = endStyles[styleName];
-  })
 ;
 
 const calculateActualSpringState = (
@@ -231,8 +225,8 @@ const getUpdatedStyleString = actualSpringState =>
 
 const updateStyleForRig = (
   styleName,
-  rigName,
-  rigRef,
+  componentName,
+  setComponentStyle,
   springStatesForRigs,
   numFramesRemaining,
   percentageFrameCompleted,
@@ -240,15 +234,15 @@ const updateStyleForRig = (
   damping,
 ) => {
   for (let i = 0; i < numFramesRemaining; i++) {
-    const currentSpringState = springStatesForRigs[rigName][styleName];
-    springStatesForRigs[rigName][styleName] = calculateNextSpringState(
+    const currentSpringState = springStatesForRigs[componentName][styleName];
+    springStatesForRigs[componentName][styleName] = calculateNextSpringState(
       currentSpringState,
       stiffness,
       damping,
     );
   }
 
-  const currentSpringState = springStatesForRigs[rigName][styleName];
+  const currentSpringState = springStatesForRigs[componentName][styleName];
   const updatedSpringState = calculateNextSpringState(
     currentSpringState,
     stiffness,
@@ -261,8 +255,8 @@ const updateStyleForRig = (
   );
   const updatedStyleString = getUpdatedStyleString(actualSpringState);
 
-  springStatesForRigs[rigName][styleName] = actualSpringState;
-  rigRef.style[styleName] = updatedStyleString;
+  springStatesForRigs[componentName][styleName] = actualSpringState;
+  setComponentStyle({ [styleName]: updatedStyleString });
 }
 
 // Credit for most of this logic goes to:
@@ -283,15 +277,15 @@ export const createFnUpdateSpringRigStyles = ({
   let isFirstIteration = true;
   let accumulatedTime = 0;
 
-  const updateSpringRigStyles = ({ rigRef, rigName, styleNames }) => {
+  const updateSpringRigStyles = ({ setComponentStyle, componentName, styleNames }) => {
 
     const isRigAnimationDone = (
       !isFirstIteration
-      && isSpringAnimationDone(springStatesForRigs[rigName])
+      && isSpringAnimationDone(springStatesForRigs[componentName])
     );
 
     if (isRigAnimationDone) {
-      setEndStyles(rigRef, allEndStyles[rigName]);
+      setComponentStyle(allEndStyles[componentName]);
     } else {
 
       const currentTime = Date.now();
@@ -305,8 +299,8 @@ export const createFnUpdateSpringRigStyles = ({
 
       styleNames.forEach(styleName => updateStyleForRig(
         styleName,
-        rigName,
-        rigRef,
+        componentName,
+        setComponentStyle,
         springStatesForRigs,
         numFramesRemaining,
         percentageFrameCompleted,

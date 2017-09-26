@@ -52,7 +52,7 @@ const calculateNextTimedStyle = (startStyle, endStyle, easingPosition) => (
 );
 
 export const updateTimedRigStyles = ({
-  rigRef,
+  setComponentStyle,
   startStyles,
   endStyles,
   easingFn,
@@ -62,13 +62,13 @@ export const updateTimedRigStyles = ({
   const normalizedDuration = duration === 0 ? elapsedTime : duration;
   const easingPosition = easingFn(elapsedTime / normalizedDuration);
   Object.keys(startStyles).forEach(styleName => {
-    const updatedStyle = stringifyStyle(
+    const updatedStyleString = stringifyStyle(
       calculateNextTimedStyle(
         parseStyle(startStyles[styleName]),
         parseStyle(endStyles[styleName]),
         easingPosition,
       )
     );
-    rigRef.style[styleName] = updatedStyle;
+    setComponentStyle({ [styleName]: updatedStyleString });
   });
 };
