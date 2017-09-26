@@ -156,10 +156,6 @@ export const withRig = (
   } = {}
 ) => BaseComponent => {
 
-  if (isStatelessComponent(BaseComponent)) {
-    console.error(`Using stateless component but requires rig ${componentName}!`);
-  }
-
   class Rig extends React.Component {
     constructor(props) {
       super(props);
