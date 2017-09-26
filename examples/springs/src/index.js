@@ -4,25 +4,17 @@ import PropTypes from 'prop-types'
 
 import { withAnimatronics, withRig } from '../../../src'
 
-class Circle extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    const { dimension, style } = this.props;
-    return (
-      <div
-        style={{
-          width: `${ dimension }px`,
-          height: `${ dimension }px`,
-          borderRadius: `${ dimension / 2 }px`,
-          ...style,
-        }}
-      />
-    );
-  }
-}
+const Circle = ({ dimension, style, animatronicStyles }) => (
+  <div
+    style={{
+      width: `${ dimension }px`,
+      height: `${ dimension }px`,
+      borderRadius: `${ dimension / 2 }px`,
+      ...style,
+      ...animatronicStyles,
+    }}
+  />
+);
 
 const BlueCircle = withRig('blueCircle')(Circle);
 const RedCircle = withRig('redCircle')(Circle);

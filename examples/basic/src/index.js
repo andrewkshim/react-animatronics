@@ -10,7 +10,7 @@ class Circle extends React.Component {
   }
 
   render() {
-    const { dimension, style } = this.props;
+    const { dimension, style, animatronicStyles } = this.props;
     return (
       <div
         style={{
@@ -19,6 +19,7 @@ class Circle extends React.Component {
           height: `${ dimension }px`,
           borderRadius: `${ dimension / 2 }px`,
           ...style,
+          ...animatronicStyles,
         }}
       />
     );
@@ -127,8 +128,7 @@ const AnimatedApp = withAnimatronics(
         duration: 250,
       },
       {
-        stiffness: 200,
-        damping: 10,
+        duration: 350,
         start: {
           purpleCircle: {
             top: `${offsetTop}px`,
