@@ -25,3 +25,9 @@ export const ensureIsFunction = possibleFn => typeof possibleFn === 'function'
   : () => {};
 
 export const isStatelessComponent = Component => !Component.prototype.render;
+
+export const removeKeyFromObject = (obj, keyToRemove) =>
+  Object.keys(obj)
+    .filter(key => key === keyToRemove)
+    .reduce((newObj, key) => ({ ...newObj, [key]: obj[key] }), {})
+;
