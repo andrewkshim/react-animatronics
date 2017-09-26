@@ -10,86 +10,50 @@ import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
-const runAnimationStageWithoutStyleUpdates = ({
-  cancelAnimationFrame,
+const isUsingTime = animation => animation.duration != null;
+const isUsingSpring = animation => (
+  animation.stiffness != null
+  && animation.damping != null
+);
+
+const runTimedAnimationStage = ({
+  startStyles,
+  endStyles,
   duration,
-  runNextStage,
+  easingFn,
+  setComponentStyle,
   requestAnimationFrame,
+  cancelAnimationFrame,
+  runNextStage,
 }) => {
   const startTime = Date.now();
   let currentFrame;
 
   const runLastAnimationFrame = () => {
     currentFrame = null;
-    runNextStage();
-  };
-
-  const runNextAnimationFrame = () => {
-    const elapsedTime = Date.now() - startTime;
-    if (elapsedTime < duration) {
-      currentFrame = requestAnimationFrame(runNextAnimationFrame);
-    } else {
-      currentFrame = requestAnimationFrame(runLastAnimationFrame);
-    }
-  };
-  currentFrame = requestAnimationFrame(runNextAnimationFrame);
-}
-
-const runTimedAnimationStage = ({
-  animationStage,
-  cancelAnimationFrame,
-  runNextStage,
-  requestAnimationFrame,
-  styleSettersForComponents,
-}) => {
-  const {
-    start: allStartStyles,
-    end: allEndStyles,
-    easingFn = DEFAULT_EASING_FN,
-    duration,
-  } = animationStage;
-
-  const startTime = Date.now();
-  let currentFrame;
-
-  const updateTimedStyles = elapsedTime => {
-    Object.keys(styleSettersForComponents).forEach(componentName => {
-      const startStyles = allStartStyles[componentName];
-      const endStyles = allEndStyles[componentName];
-      const setComponentStyle = styleSettersForComponents[componentName];
-
-      if (!setComponentStyle) {
-        // TODO: warn
-        return;
-      }
-
-      if (!startStyles || !endStyles) {
-        // TODO: warn
-        return;
-      }
-
+    if (duration > 0) {
       updateTimedRigStyles({
         setComponentStyle,
         startStyles,
         endStyles,
         easingFn,
         duration,
-        elapsedTime,
+        elapsedTime: duration,
       });
-    });
-  };
-
-  const runLastAnimationFrame = () => {
-    currentFrame = null;
-    if (duration > 0) {
-      updateTimedStyles(duration);
     }
     runNextStage();
   };
 
   const runNextAnimationFrame = () => {
     const elapsedTime = Date.now() - startTime;
-    updateTimedStyles(elapsedTime);
+    updateTimedRigStyles({
+      setComponentStyle,
+      startStyles,
+      endStyles,
+      easingFn,
+      duration,
+      elapsedTime,
+    });
 
     if (elapsedTime < duration) {
       currentFrame = requestAnimationFrame(runNextAnimationFrame);
@@ -97,51 +61,40 @@ const runTimedAnimationStage = ({
       currentFrame = requestAnimationFrame(runLastAnimationFrame);
     }
   };
+
   currentFrame = requestAnimationFrame(runNextAnimationFrame);
 }
 
 const runSpringAnimationStage = ({
-  animationStage,
+  startStyles,
+  endStyles,
+  stiffness,
+  damping,
+  setComponentStyle,
+  requestAnimationFrame,
   cancelAnimationFrame,
   runNextStage,
-  requestAnimationFrame,
-  styleSettersForComponents,
 }) => {
-  const {
-    start: allStartStyles,
-    end: allEndStyles,
-    stiffness,
-    damping,
-  } = animationStage;
 
   const updateSpringRigStyles = createFnUpdateSpringRigStyles({
-    allStartStyles,
-    allEndStyles,
+    startStyles,
+    endStyles,
     stiffness,
     damping,
+    setComponentStyle,
   });
 
   let currentFrame;
   let isAnimationDone = false;
 
-  const updateSpringStyles = () => {
-    Object.keys(allStartStyles).forEach(componentName => {
-      isAnimationDone = updateSpringRigStyles({
-        setComponentStyle: styleSettersForComponents[componentName],
-        componentName,
-        styleNames: Object.keys(allStartStyles[componentName]),
-      });
-    });
-  };
-
   const runLastAnimationFrame = () => {
     currentFrame = null;
-    updateSpringStyles();
+    isAnimationDone = updateSpringRigStyles();
     runNextStage();
   };
 
   const runNextAnimationFrame = () => {
-    updateSpringStyles();
+    isAnimationDone = updateSpringRigStyles();
     if (!isAnimationDone) {
       currentFrame = requestAnimationFrame(runNextAnimationFrame);
     } else {
@@ -151,6 +104,57 @@ const runSpringAnimationStage = ({
   currentFrame = requestAnimationFrame(runNextAnimationFrame);
 }
 
+const runAnimationStage = ({
+  animationStage,
+  cancelAnimationFrame,
+  requestAnimationFrame,
+  styleSettersForComponents,
+  runNextStage,
+}) => {
+  Object.keys(animationStage).forEach(componentName => {
+    const animation = animationStage[componentName];
+    const setComponentStyle = styleSettersForComponents[componentName];
+
+    if (isUsingTime(animation)) {
+      const {
+        start: startStyles,
+        end: endStyles,
+        duration,
+        easingFn = DEFAULT_EASING_FN,
+      } = animation;
+      runTimedAnimationStage({
+        startStyles,
+        endStyles,
+        duration,
+        easingFn,
+        setComponentStyle,
+        requestAnimationFrame,
+        cancelAnimationFrame,
+        runNextStage,
+      });
+    } else if (isUsingSpring(animation)) {
+      // TODO: rename to startStyles, endStyles
+      const {
+        start: startStyles,
+        end: endStyles,
+        stiffness,
+        damping,
+      } = animation;
+      runSpringAnimationStage({
+        startStyles,
+        endStyles,
+        stiffness,
+        damping,
+        setComponentStyle,
+        requestAnimationFrame,
+        cancelAnimationFrame,
+        runNextStage,
+      });
+    } else {
+      // TODO: warn
+    }
+  });
+}
 
 const runAnimation = ({
   animationStages,
@@ -161,23 +165,9 @@ const runAnimation = ({
   styleSettersForComponents,
 }) => {
 
-  const run = ({ animationStages, currentStageNum, styleSettersForComponents }) => {
+  const run = ({ animationStages, currentStageNum }) => {
+    // TODO: left off with changing the API, see basic example
     const animationStage = animationStages[currentStageNum];
-    const {
-      start,
-      end,
-      duration,
-      stiffness,
-      damping,
-    } = animationStage;
-
-    const hasStyleUpdates = !!start && !!end;
-    const isUsingTime = duration != null;
-    const isUsingSpring = stiffness != null && damping != null;
-
-    if (isUsingTime && isUsingSpring) {
-      // TODO: console.warn
-    }
 
     const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
@@ -190,44 +180,40 @@ const runAnimation = ({
         run({
           animationStages,
           currentStageNum: nextStageNum,
-          styleSettersForComponents,
         });
       }
     }
 
-    if (hasStyleUpdates) {
-      if (isUsingTime) {
-        runTimedAnimationStage({
-          animationStage,
-          cancelAnimationFrame,
-          requestAnimationFrame,
-          styleSettersForComponents,
-          runNextStage,
-        });
-      } else if (isUsingSpring) {
-        runSpringAnimationStage({
-          animationStage,
-          cancelAnimationFrame,
-          requestAnimationFrame,
-          styleSettersForComponents,
-          runNextStage,
-        });
-      }
-    } else {
-      runAnimationStageWithoutStyleUpdates({
-        cancelAnimationFrame,
-        duration,
-        runNextStage,
-        requestAnimationFrame,
-      });
-    }
+    runAnimationStage({
+      animationStage,
+      cancelAnimationFrame,
+      requestAnimationFrame,
+      styleSettersForComponents,
+      runNextStage,
+    });
   };
 
   run({
     animationStages,
     currentStageNum: 0,
-    styleSettersForComponents,
   });
 }
 
 export default runAnimation;
+
+
+
+    //const {
+      //start,
+      //end,
+      //duration,
+      //stiffness,
+      //damping,
+    //} = animationStage;
+
+    //const isUsingTime = duration != null;
+    //const isUsingSpring = stiffness != null && damping != null;
+
+    //if (isUsingTime && isUsingSpring) {
+      //// TODO: console.warn
+    //}

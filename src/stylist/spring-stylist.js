@@ -156,28 +156,14 @@ export const areAllSpringAnimationsDone = springStatesForRigs =>
     .every(isDone => isDone)
 ;
 
-const createInitialSpringStates = (allStartStyles, allEndStyles, componentName) =>
-  Object.keys(allStartStyles[componentName]).reduce(
+const createInitialSpringStates = (startStyles, endStyles) =>
+  Object.keys(startStyles).reduce(
     (states, styleName) => ({
       ...states,
       [styleName]: createSpringState(
-        parseStyle(allStartStyles[componentName][styleName]),
-        parseStyle(allEndStyles[componentName][styleName]),
+        parseStyle(startStyles[styleName]),
+        parseStyle(endStyles[styleName]),
       )
-    }),
-    {}
-  )
-;
-
-const createInitialSpringStatesForRigs = (allStartStyles, allEndStyles) =>
-  Object.keys(allStartStyles).reduce(
-    (result, componentName) => ({
-      ...result,
-      [componentName]: createInitialSpringStates(
-        allStartStyles,
-        allEndStyles,
-        componentName,
-      ),
     }),
     {}
   )
@@ -225,24 +211,23 @@ const getUpdatedStyleString = actualSpringState =>
 
 const updateStyleForRig = (
   styleName,
-  componentName,
   setComponentStyle,
-  springStatesForRigs,
+  springStates,
   numFramesRemaining,
   percentageFrameCompleted,
   stiffness,
   damping,
 ) => {
   for (let i = 0; i < numFramesRemaining; i++) {
-    const currentSpringState = springStatesForRigs[componentName][styleName];
-    springStatesForRigs[componentName][styleName] = calculateNextSpringState(
+    const currentSpringState = springStates[styleName];
+    springStates[styleName] = calculateNextSpringState(
       currentSpringState,
       stiffness,
       damping,
     );
   }
 
-  const currentSpringState = springStatesForRigs[componentName][styleName];
+  const currentSpringState = springStates[styleName];
   const updatedSpringState = calculateNextSpringState(
     currentSpringState,
     stiffness,
@@ -255,37 +240,35 @@ const updateStyleForRig = (
   );
   const updatedStyleString = getUpdatedStyleString(actualSpringState);
 
-  springStatesForRigs[componentName][styleName] = actualSpringState;
+  springStates[styleName] = actualSpringState;
   setComponentStyle({ [styleName]: updatedStyleString });
 }
 
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
 export const createFnUpdateSpringRigStyles = ({
-  allStartStyles,
-  allEndStyles,
+  startStyles,
+  endStyles,
   stiffness,
   damping,
+  setComponentStyle,
 }) => {
 
-  const springStatesForRigs = createInitialSpringStatesForRigs(
-    allStartStyles,
-    allEndStyles,
-  );
+  const springStates = createInitialSpringStates(startStyles, endStyles);
 
   let prevTime = Date.now();
   let isFirstIteration = true;
   let accumulatedTime = 0;
 
-  const updateSpringRigStyles = ({ setComponentStyle, componentName, styleNames }) => {
+  const updateSpringRigStyles = () => {
 
-    const isRigAnimationDone = (
+    let isRigAnimationDone = (
       !isFirstIteration
-      && isSpringAnimationDone(springStatesForRigs[componentName])
+      && isSpringAnimationDone(springStates)
     );
 
     if (isRigAnimationDone) {
-      setComponentStyle(allEndStyles[componentName]);
+      setComponentStyle(endStyles);
     } else {
 
       const currentTime = Date.now();
@@ -297,11 +280,10 @@ export const createFnUpdateSpringRigStyles = ({
       const remainingTime = numFramesRemaining * MS_PER_ANIMATION_FRAME;
       const percentageFrameCompleted = (accumulatedTime - remainingTime) / MS_PER_ANIMATION_FRAME;
 
-      styleNames.forEach(styleName => updateStyleForRig(
+      Object.keys(startStyles).forEach(styleName => updateStyleForRig(
         styleName,
-        componentName,
         setComponentStyle,
-        springStatesForRigs,
+        springStates,
         numFramesRemaining,
         percentageFrameCompleted,
         stiffness,
@@ -311,13 +293,14 @@ export const createFnUpdateSpringRigStyles = ({
       accumulatedTime -= (numFramesRemaining * MS_PER_ANIMATION_FRAME);
     }
 
-    const areAllAnimationsDone = (
+
+    isRigAnimationDone = (
       !isFirstIteration
-      && areAllSpringAnimationsDone(springStatesForRigs)
+      && isSpringAnimationDone(springStates)
     );
 
     isFirstIteration = false;
-    return areAllAnimationsDone;
+    return isRigAnimationDone;
   }
 
   return updateSpringRigStyles;
