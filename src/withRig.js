@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 
 import ContextTypes from './internal/context-types'
 
-export const withRig = (
+const withRig = (
   componentName,
   {
     useStringRefs = false,
@@ -71,3 +71,5 @@ export const withRig = (
 
   return Rig;
 };
+
+export default withRig;

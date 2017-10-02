@@ -71,7 +71,7 @@ const DEFAULT_CANCEL_ANIMATION_FRAME = (
     : window.clearTimeout
 );
 
-export const withAnimatronics = (
+const withAnimatronics = (
   createAnimationStages,
   {
     requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
@@ -154,3 +154,5 @@ export const withAnimatronics = (
   };
 
 };
+
+export default withAnimatronics;
