@@ -16,7 +16,7 @@ import {
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_CANCEL_ANIMATION_FRAME,
   createModuleString,
-  ensureIsFunction,
+  noop,
   isStatelessComponent,
   removeKeyFromObject,
 } from './utils'
@@ -118,13 +118,16 @@ export const withAnimatronics = (
         };
       }
 
-      _runAnimation(onAnimationComplete, onStageComplete) {
+      _runAnimation(
+        onAnimationComplete = noop,
+        onStageComplete = noop,
+      ) {
         const { styleSettersForComponents, domNodesForComponents } = state;
         runAnimation({
           animationStages: createAnimationStages(domNodesForComponents),
           cancelAnimationFrame,
-          onAnimationComplete: ensureIsFunction(onAnimationComplete),
-          onStageComplete: ensureIsFunction(onStageComplete),
+          onAnimationComplete,
+          onStageComplete,
           requestAnimationFrame,
           styleSettersForComponents,
         })

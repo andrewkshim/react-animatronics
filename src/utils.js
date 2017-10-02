@@ -20,9 +20,7 @@ export const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
   ? cancelAnimationFrame
   : clearTimeout
 
-export const ensureIsFunction = possibleFn => typeof possibleFn === 'function'
-  ? possibleFn
-  : () => {};
+export const noop = () => {};
 
 export const isStatelessComponent = Component => !Component.prototype.render;
 
