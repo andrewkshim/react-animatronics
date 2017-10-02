@@ -21,7 +21,7 @@ import {
   removeKeyFromObject,
 } from './utils'
 
-import runAnimation from './animator'
+import Animator from './animator'
 
 const REGISTER_COMPONENT = createPackageString('REGISTER_COMPONENT');
 const UNREGISTER_COMPONENT = createPackageString('UNREGISTER_COMPONENT');
@@ -103,7 +103,7 @@ export const withAnimatronics = (
       );
     };
 
-    class Animator extends React.Component {
+    class AnimatorComponent extends React.Component {
       constructor(props) {
         super(props);
         this._runAnimation = this._runAnimation.bind(this);
@@ -123,7 +123,7 @@ export const withAnimatronics = (
         onStageComplete = noop,
       ) {
         const { styleSettersForComponents, domNodesForComponents } = state;
-        runAnimation({
+        Animator.runAnimation({
           animationStages: createAnimationStages(domNodesForComponents),
           cancelAnimationFrame,
           onAnimationComplete,
@@ -144,9 +144,9 @@ export const withAnimatronics = (
       }
     };
 
-    Animator.childContextTypes = AnimatronicsContextTypes;
+    AnimatorComponent.childContextTypes = AnimatronicsContextTypes;
 
-    return Animator;
+    return AnimatorComponent;
 
   };
 

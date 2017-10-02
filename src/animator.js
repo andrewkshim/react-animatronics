@@ -199,4 +199,5 @@ const runAnimation = ({
   });
 }
 
-export default runAnimation;
+const Animator = { runAnimation };
+export default Animator;
