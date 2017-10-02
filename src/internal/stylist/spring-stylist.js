@@ -3,10 +3,7 @@
  * @module stylist/spring-stylist
  */
 
-import {
-  MS_PER_ANIMATION_FRAME,
-  SECONDS_PER_ANIMATION_FRAME,
-} from '../constants'
+import Constants from '../constants'
 
 import {
   createNumberStyle,
@@ -70,11 +67,11 @@ const calculateUpdatedVelocity = (currentVelocity, currentValue, endValue, stiff
   const spring = -stiffness * (currentValue - endValue);
   const damper = -damping * currentVelocity;
   const acceleration = spring + damper;
-  return currentVelocity + (acceleration * SECONDS_PER_ANIMATION_FRAME);
+  return currentVelocity + (acceleration * Constants.SECONDS_PER_ANIMATION_FRAME);
 };
 
 const calculateUpdatedStyleValue = (currentStyle, updatedVelocity) =>
-  currentStyle.value + (updatedVelocity * SECONDS_PER_ANIMATION_FRAME);
+  currentStyle.value + (updatedVelocity * Constants.SECONDS_PER_ANIMATION_FRAME);
 
 const constructUpdatedStyle = (currentStyle, endStyle, updatedVelocity) => (
   isColorType(currentStyle) ?
@@ -270,15 +267,14 @@ export const createFnUpdateSpringRigStyles = ({
     if (isRigAnimationDone) {
       setComponentStyle(endStyles);
     } else {
-
       const currentTime = Date.now();
       const elapsedTime = currentTime - prevTime;
       prevTime = currentTime;
       accumulatedTime += elapsedTime;
 
-      const numFramesRemaining = Math.floor(accumulatedTime / MS_PER_ANIMATION_FRAME);
-      const remainingTime = numFramesRemaining * MS_PER_ANIMATION_FRAME;
-      const percentageFrameCompleted = (accumulatedTime - remainingTime) / MS_PER_ANIMATION_FRAME;
+      const numFramesRemaining = Math.floor(accumulatedTime / Constants.MS_PER_ANIMATION_FRAME);
+      const remainingTime = numFramesRemaining * Constants.MS_PER_ANIMATION_FRAME;
+      const percentageFrameCompleted = (accumulatedTime - remainingTime) / Constants.MS_PER_ANIMATION_FRAME;
 
       Object.keys(startStyles).forEach(styleName => updateStyleForRig(
         styleName,
@@ -290,7 +286,7 @@ export const createFnUpdateSpringRigStyles = ({
         damping,
       ));
 
-      accumulatedTime -= (numFramesRemaining * MS_PER_ANIMATION_FRAME);
+      accumulatedTime -= (numFramesRemaining * Constants.MS_PER_ANIMATION_FRAME);
     }
 
 

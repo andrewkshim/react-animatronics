@@ -5,11 +5,6 @@
 
 import chroma from 'chroma-js'
 
-import {
-  MS_PER_ANIMATION_FRAME,
-  SECONDS_PER_ANIMATION_FRAME,
-} from '../constants'
-
 import { createPackageString } from '../utils'
 
 const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
