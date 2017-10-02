@@ -1,4 +1,4 @@
-import './test.setup'
+import './internal/test.setup'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
