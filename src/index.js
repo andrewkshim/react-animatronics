@@ -8,11 +8,6 @@ import PropTypes from 'prop-types'
 import BezierEasing from 'bezier-easing'
 
 import {
-  MS_PER_ANIMATION_FRAME,
-  SECONDS_PER_ANIMATION_FRAME,
-} from './constants'
-
-import {
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_CANCEL_ANIMATION_FRAME,
   createPackageString,
