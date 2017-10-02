@@ -8,8 +8,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import {
-  DEFAULT_REQUEST_ANIMATION_FRAME,
-  DEFAULT_CANCEL_ANIMATION_FRAME,
   createPackageString,
   noop,
   removeKeyFromObject,
@@ -19,6 +17,23 @@ import Animator from './animator'
 
 const REGISTER_COMPONENT = createPackageString('REGISTER_COMPONENT');
 const UNREGISTER_COMPONENT = createPackageString('UNREGISTER_COMPONENT');
+
+const IS_RAF_AVAILABLE = (
+  typeof window !== 'undefined'
+  && window.requestAnimationFrame
+);
+
+const DEFAULT_REQUEST_ANIMATION_FRAME = (
+  IS_RAF_AVAILABLE
+    ? requestAnimationFrame
+    : callback => setTimeout(callback, MS_PER_ANIMATION_FRAME)
+);
+
+const DEFAULT_CANCEL_ANIMATION_FRAME = (
+  IS_RAF_AVAILABLE
+    ? cancelAnimationFrame
+    : clearTimeout
+);
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 
