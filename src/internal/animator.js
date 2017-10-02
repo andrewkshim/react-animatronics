@@ -45,6 +45,7 @@ const runTimedAnimationStage = ({
   };
 
   const runNextAnimationFrame = () => {
+
     const elapsedTime = Date.now() - startTime;
     updateTimedRigStyles({
       setComponentStyle,
@@ -171,11 +172,9 @@ const runAnimation = ({
 
     const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
-      if (onStageComplete) {
-        onStageComplete(currentStageNum);
-      }
+      onStageComplete(currentStageNum);
       if (nextStageNum === animationStages.length) {
-        onAnimationComplete && onAnimationComplete();
+        onAnimationComplete();
       } else {
         run({
           animationStages,
