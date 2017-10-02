@@ -2,10 +2,10 @@
  * React Animatronics: coordinated, declarative animations for React components.
  */
 
+import BezierEasing from 'bezier-easing'
+import PropTypes from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
-import BezierEasing from 'bezier-easing'
 
 import {
   DEFAULT_REQUEST_ANIMATION_FRAME,
