@@ -7,7 +7,6 @@ import test from 'tape'
 import { shallow, mount } from 'enzyme'
 
 import {
-  createWithAnimatronics,
   withAnimatronics,
   withRig,
 } from './index'
