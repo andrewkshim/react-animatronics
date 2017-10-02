@@ -1,7 +1,7 @@
+- Better errors/warnings
 - Allow callers to provide styles in the stages that don't change
 - Ignore unrecognized style (e.g. display: none)
 - Use `debug` module
-- Better errors/warnings
 - Make spring animations smoother?
 - Document spring logic
 - More tests
