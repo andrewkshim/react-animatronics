@@ -10,7 +10,8 @@
     "example:basic": "./node_modules/.bin/webpack-dev-server --config examples/basic/webpack.config.js",
     "example:welcome": "./node_modules/.bin/webpack-dev-server --config examples/welcome/webpack.config.js",
     "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
-    "test": "./node_modules/.bin/babel-node src/index.spec.js"
+    "tests:unit": "./node_modules/.bin/tape -r babel-register src/**.spec.js",
+    "tests:integration": "./node_modules/.bin/tape -r babel-register src/integration.test.js"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
