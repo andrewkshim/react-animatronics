@@ -12,7 +12,6 @@ import {
   DEFAULT_CANCEL_ANIMATION_FRAME,
   createPackageString,
   noop,
-  isStatelessComponent,
   removeKeyFromObject,
 } from './utils'
 

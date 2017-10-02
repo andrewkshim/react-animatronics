@@ -22,8 +22,6 @@ export const DEFAULT_CANCEL_ANIMATION_FRAME = IS_RAF_AVAILABLE
 
 export const noop = () => {};
 
-export const isStatelessComponent = Component => !Component.prototype.render;
-
 export const removeKeyFromObject = (obj, keyToRemove) =>
   Object.keys(obj)
     .filter(key => key === keyToRemove)
