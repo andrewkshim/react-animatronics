@@ -15,6 +15,8 @@ import {
   removeKeyFromObject,
 } from './internal/utils'
 
+import Polyfills from './internal/polyfills'
+
 const REGISTER_COMPONENT = createPackageString('REGISTER_COMPONENT');
 const UNREGISTER_COMPONENT = createPackageString('UNREGISTER_COMPONENT');
 
@@ -54,28 +56,12 @@ const handleAnimatronicsAction = (state, { type, payload }) => {
 }
 
 
-const IS_RAF_AVAILABLE = (
-  typeof window !== 'undefined'
-  && window.requestAnimationFrame
-);
-
-const DEFAULT_REQUEST_ANIMATION_FRAME = (
-  IS_RAF_AVAILABLE
-    ? window.requestAnimationFrame
-    : callback => window.setTimeout(callback, MS_PER_ANIMATION_FRAME)
-);
-
-const DEFAULT_CANCEL_ANIMATION_FRAME = (
-  IS_RAF_AVAILABLE
-    ? window.cancelAnimationFrame
-    : window.clearTimeout
-);
 
 const withAnimatronics = (
   createAnimationStages,
   {
-    requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
-    cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
+    requestAnimationFrame = Polyfills.DEFAULT_REQUEST_ANIMATION_FRAME,
+    cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
   } = {}
 ) => {
 
