@@ -3,9 +3,9 @@
  * @module utils
  */
 
-const MODULE_PREFIX = '@@animatronics';
+const PACKAGE_PREFIX = '@@animatronics';
 
-export const createModuleString = str => `${ MODULE_PREFIX }/${ str }`;
+export const createPackageString = str => `${ PACKAGE_PREFIX }/${ str }`;
 
 export const IS_RAF_AVAILABLE = (
   typeof window !== 'undefined'

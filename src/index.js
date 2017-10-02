@@ -15,7 +15,7 @@ import {
 import {
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_CANCEL_ANIMATION_FRAME,
-  createModuleString,
+  createPackageString,
   noop,
   isStatelessComponent,
   removeKeyFromObject,
@@ -23,8 +23,8 @@ import {
 
 import runAnimation from './animator'
 
-const REGISTER_COMPONENT = createModuleString('REGISTER_COMPONENT');
-const UNREGISTER_COMPONENT = createModuleString('UNREGISTER_COMPONENT');
+const REGISTER_COMPONENT = createPackageString('REGISTER_COMPONENT');
+const UNREGISTER_COMPONENT = createPackageString('UNREGISTER_COMPONENT');
 
 const ANIMATRONICS_ACTION_HANDLERS = {
 

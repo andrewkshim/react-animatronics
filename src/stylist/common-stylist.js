@@ -10,16 +10,16 @@ import {
   SECONDS_PER_ANIMATION_FRAME,
 } from '../constants'
 
-import { createModuleString } from '../utils'
+import { createPackageString } from '../utils'
 
 const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
 const NUMBER_REGEX = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX = /\D+/;
 
-export const COLOR_STYLE_TYPE = createModuleString('COLOR_STYLE_TYPE');
-export const NUMBER_STYLE_TYPE = createModuleString('NUMBER_STYLE_TYPE');
-export const TRANSFORM_STYLE_TYPE = createModuleString('TRANSFORM_STYLE_TYPE');
-export const UNIT_STYLE_TYPE = createModuleString('UNIT_STYLE_TYPE');
+export const COLOR_STYLE_TYPE = createPackageString('COLOR_STYLE_TYPE');
+export const NUMBER_STYLE_TYPE = createPackageString('NUMBER_STYLE_TYPE');
+export const TRANSFORM_STYLE_TYPE = createPackageString('TRANSFORM_STYLE_TYPE');
+export const UNIT_STYLE_TYPE = createPackageString('UNIT_STYLE_TYPE');
 
 export const isColorType = subject => subject.type === COLOR_STYLE_TYPE;
 
