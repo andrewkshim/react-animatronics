@@ -1,5 +1,5 @@
 /**
- * TODO: improve
+ * TODO: improve docs
  * withAnimatronics: (createAnimationStages, options) => higher-order component
  * @module withAnimatronics
  */
