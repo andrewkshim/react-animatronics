@@ -200,20 +200,3 @@ const runAnimation = ({
 }
 
 export default runAnimation;
-
-
-
-    //const {
-      //start,
-      //end,
-      //duration,
-      //stiffness,
-      //damping,
-    //} = animationStage;
-
-    //const isUsingTime = duration != null;
-    //const isUsingSpring = stiffness != null && damping != null;
-
-    //if (isUsingTime && isUsingSpring) {
-      //// TODO: console.warn
-    //}
