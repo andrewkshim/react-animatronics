@@ -1,19 +1,13 @@
 import './internal/test.setup'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import sinon from 'sinon'
 import test from 'tape'
-import { shallow, mount } from 'enzyme'
+import { mount } from 'enzyme'
 
-import {
-  withAnimatronics,
-  withRig,
-} from './index'
+import { withAnimatronics, withRig } from './index'
 
-
-//test('withAnimatronics successfully runs each animation stage', assert => {
-test.skip('withAnimatronics successfully runs each animation stage', assert => {
+test('runs each animation stage', assert => {
   class Base extends React.Component {
     render() {
       return <div/>;
@@ -28,30 +22,26 @@ test.skip('withAnimatronics successfully runs each animation stage', assert => {
   const createAnimationStages = () => {
     return [
       {
-        duration: 250,
-        start: {
-          base: {
+        base: {
+          duration: 250,
+          start: {
             top: '0px',
-          }
-        },
-        end: {
-          base: {
+          },
+          end: {
             top: '10px',
-          }
+          },
         },
       },
       {
-        stiffness: 120,
-        damping: 50,
-        start: {
-          base: {
+        base: {
+          stiffness: 120,
+          damping: 50,
+          start: {
             top: '10px',
-          }
-        },
-        end: {
-          base: {
+          },
+          end: {
             top: '100px',
-          }
+          },
         },
       },
     ];
@@ -65,7 +55,6 @@ test.skip('withAnimatronics successfully runs each animation stage', assert => {
     () => {
       assert.true(onStage1Complete.calledOnce);
       assert.true(onStage2Complete.calledOnce);
-      assert.equals(wrapper.find('div').node.style.top, '100px');
       assert.end();
     },
     (stageIndex) => {
