@@ -13,7 +13,7 @@ test('PerpetualMachineFactory', assert => {
   let numIterations = 0;
 
   const onComplete = () => {
-    assert.equals(spy.callCount, expectedCallCount);
+    assert.equals(spy.callCount, expectedCallCount, 'the machine runs the expected number of iterations');
     assert.end();
   }
 
