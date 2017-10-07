@@ -26,6 +26,7 @@
     "babel-preset-typescript": "^7.0.0-beta.2",
     "babel-traverse": "7.0.0-beta.2",
     "enzyme": "^2.9.1",
+    "flow-bin": "^0.56.0",
     "jsdom": "^11.2.0",
     "react-test-renderer": "^15.6.1",
     "sinon": "^3.3.0",
