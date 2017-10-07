@@ -89,8 +89,8 @@ export const TimedMachineFactory = (
     }
   }
 
-  const factory = PerpetualMachineFactory(requestAnimationFrame, cancelAnimationFrame);
-  const machine: Machine = factory(onComplete, _onFrame);
+  const PerpetualMachine = PerpetualMachineFactory(requestAnimationFrame, cancelAnimationFrame);
+  const machine: Machine = PerpetualMachine(onComplete, _onFrame);
 
   const _run = machine.run;
   machine.run = () => {

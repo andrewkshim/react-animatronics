@@ -17,8 +17,8 @@ test('PerpetualMachineFactory', assert => {
     assert.end();
   }
 
-  const factory = PerpetualMachineFactory(requestAnimationFrame, cancelAnimationFrame);
-  const machine = factory(onComplete);
+  const PerpetualMachine = PerpetualMachineFactory(requestAnimationFrame, cancelAnimationFrame);
+  const machine = PerpetualMachine(onComplete);
 
   const job = () => {
     if (numIterations === expectedCallCount) {
@@ -47,8 +47,8 @@ test('TimedMachineFactory', assert => {
     assert.end();
   }
 
-  const factory = TimedMachineFactory(requestAnimationFrame, cancelAnimationFrame);
-  const machine = factory(duration, onComplete);
+  const TimedMachine = TimedMachineFactory(requestAnimationFrame, cancelAnimationFrame);
+  const machine = TimedMachine(duration, onComplete);
 
   machine
     .do(job)
