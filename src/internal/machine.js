@@ -22,7 +22,7 @@ export const PerpetualMachineFactory = (
 ) => (
   onComplete?: VoidFn = noop,
   onFrame?: VoidFn = noop,
-) => {
+): Machine => {
 
   let frame: ?number = null;
   let machineIsStopped: boolean = false;
@@ -77,7 +77,7 @@ export const TimedMachineFactory = (
   duration: number,
   onComplete?: VoidFn = noop,
   onFrame?: VoidFn = noop,
-) => {
+): Machine => {
 
   let startTime: number = 0;
 
