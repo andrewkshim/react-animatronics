@@ -11,7 +11,8 @@
     "example:welcome": "./node_modules/.bin/webpack-dev-server --config examples/welcome/webpack.config.js",
     "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
     "tests:unit": "./node_modules/.bin/tape -r babel-register src/**.spec.js",
-    "tests:integration": "./node_modules/.bin/tape -r babel-register src/integration.test.js"
+    "tests:integration": "./node_modules/.bin/tape -r babel-register src/integration.test.js",
+    "lint": "./node_modules/.bin/tsc"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -26,6 +27,7 @@
     "react-test-renderer": "^15.6.1",
     "sinon": "^3.3.0",
     "tape": "^4.8.0",
+    "typescript": "^2.5.3",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"
   },
