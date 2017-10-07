@@ -20,6 +20,7 @@
     "babel-plugin-transform-export-extensions": "^7.0.0-alpha.19",
     "babel-plugin-transform-object-rest-spread": "^7.0.0-beta.2",
     "babel-preset-env": "^2.0.0-beta.2",
+    "babel-preset-flow": "^7.0.0-beta.2",
     "babel-preset-react": "^7.0.0-beta.2",
     "babel-traverse": "7.0.0-beta.2",
     "enzyme": "^2.9.1",
