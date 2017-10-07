@@ -1,4 +1,4 @@
-import './internal/test.setup'
+import './internal/setup.test'
 
 import React from 'react'
 import sinon from 'sinon'
