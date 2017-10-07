@@ -8,14 +8,7 @@
  * Animator.
  */
 
-type VoidFn = () => void;
-
-type Machine = {
-  isStopped: () => boolean,
-  do: (job: VoidFn) => Machine,
-  run: (onComplete?: VoidFn) => Machine,
-  stop: VoidFn,
-};
+import type { VoidFn, Machine } from './flow-types'
 
 // TODO: use utils
 const noop: VoidFn = () => {};
