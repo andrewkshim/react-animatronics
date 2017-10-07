@@ -1,12 +1,7 @@
 {
-  "presets": ["env", "react", "typescript"],
+  "presets": ["env", "react", "flow"],
   "plugins": [
     "transform-object-rest-spread",
-    "transform-export-extensions",
-    "transform-typescript"
-  ],
-  "ignore": [
-    "**/*.spec.js",
-    "**/*.test.js"
+    "transform-export-extensions"
   ]
 }

@@ -12,7 +12,7 @@
     "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
     "tests:unit": "./node_modules/.bin/tape -r babel-register src/**.spec.js",
     "tests:integration": "./node_modules/.bin/tape -r babel-register src/integration.test.js",
-    "lint": "./node_modules/.bin/tsc"
+    "lint": "./node_modules/.bin/flow status"
   },
   "devDependencies": {
     "babel-cli": "^7.0.0-beta.2",
@@ -30,7 +30,6 @@
     "react-test-renderer": "^15.6.1",
     "sinon": "^3.3.0",
     "tape": "^4.8.0",
-    "typescript": "^2.5.3",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"
   },
