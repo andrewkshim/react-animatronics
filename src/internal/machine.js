@@ -55,8 +55,8 @@ export const PerpetualMachineFactory = (
     stop: () => {
       if (frame) {
         cancelAnimationFrame(frame);
-        frame = null;
       }
+      frame = null;
       machineIsStopped = true;
       onComplete();
     }
