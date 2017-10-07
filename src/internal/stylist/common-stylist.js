@@ -1,3 +1,4 @@
+// @flow
 /**
  * CommonStylist: provides utilities to help manage styles for other Stylists.
  * @module stylist/common-stylist
@@ -5,26 +6,34 @@
 
 import chroma from 'chroma-js'
 
+import type {
+  ColorStyle,
+  NumberStyle,
+  UnitStyle,
+  BasicStyle,
+  TransformStyle,
+  Style,
+} from '../flow-types'
+
 import { createPackageString } from '../utils'
 
-const BETWEEN_PAREN_REGEX = /\(([^)]+)\)/;
-const NUMBER_REGEX = /(-)?\d+(\.\d+)?/;
-const NON_NUMER_REGEX = /\D+/;
+const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
+const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
+const NON_NUMER_REGEX: RegExp = /\D+/;
 
-export const COLOR_STYLE_TYPE = createPackageString('COLOR_STYLE_TYPE');
-export const NUMBER_STYLE_TYPE = createPackageString('NUMBER_STYLE_TYPE');
-export const TRANSFORM_STYLE_TYPE = createPackageString('TRANSFORM_STYLE_TYPE');
-export const UNIT_STYLE_TYPE = createPackageString('UNIT_STYLE_TYPE');
+export const isColorType = (subject: Object): boolean =>
+  subject.ColorType;
 
-export const isColorType = subject => subject.type === COLOR_STYLE_TYPE;
+export const isNumberType = (subject: Object): boolean =>
+  subject.NumberType;
 
-export const isNumberType = subject => subject.type === NUMBER_STYLE_TYPE;
+export const isTransformType = (subject: Object): boolean =>
+  subject.TransformType;
 
-export const isTransformType = subject => subject.type === TRANSFORM_STYLE_TYPE;
+export const isUnitType = (subject: Object): boolean =>
+  subject.UnitType;
 
-export const isUnitType = subject => subject.type === UNIT_STYLE_TYPE;
-
-export const isColorString = str => {
+export const isColorString = (str: string): boolean => {
   let color;
   try {
     color = chroma(str);
@@ -34,69 +43,85 @@ export const isColorString = str => {
   return !!color;
 }
 
-const isNumber = possibleNum => (
-  !isNaN(parseFloat(possibleNum))
-  && !NON_NUMER_REGEX.test(possibleNum.toString())
+const isNumberStr = (str: string): boolean => (
+  !isNaN(parseFloat(str))
+  && !NON_NUMER_REGEX.test(str)
 );
-const parseTransformName = transform => transform.slice(0, transform.indexOf('('))
-const parseTransformStyle = transform => parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
-export const createColorStyle = style => ({
-  type: COLOR_STYLE_TYPE,
-  value: chroma(style).hex(),
+export const createColorStyle = (raw: string): ColorStyle => ({
+  ColorType: true,
+  value: chroma(raw).hex(),
 });
 
-export const createNumberStyle = style => ({
-  type: NUMBER_STYLE_TYPE,
-  value: parseFloat(style),
+export const createNumberStyle = (raw: string | number): NumberStyle => ({
+  NumberType: true,
+  value: parseFloat(raw),
 });
 
-export const createTransformStyle = style => ({
-  type: TRANSFORM_STYLE_TYPE,
-  names: style.split(' ').map(parseTransformName),
-  styles: style.split(' ').map(parseTransformStyle),
+const parseTransformName = (transform: string): string =>
+  transform.slice(0, transform.indexOf('('));
+
+const parseTransformStyle = (transform: string): BasicStyle =>
+  parseBasicStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
+
+export const createUnitStyle = (raw: string): UnitStyle => ({
+  UnitType: true,
+  value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
+  unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
 });
 
-// TODO: clean up double-using exec
-export const createUnitStyle = style => ({
-  type: UNIT_STYLE_TYPE,
-  value: parseFloat(NUMBER_REGEX.exec(style)[0]),
-  unit: style.slice(NUMBER_REGEX.exec(style)[0].length),
+export const createTransformStyle = (raw: string): TransformStyle => ({
+  TransformType: true,
+  names: raw.split(' ').map(parseTransformName),
+  styles: raw.split(' ').map(parseTransformStyle),
 });
+
+const parseBasicStyle = (raw: string | number): BasicStyle => (
+  typeof raw === 'number' ?
+    createNumberStyle(raw)
+  : isNumberStr(raw) ?
+    createNumberStyle(raw)
+  : isColorString(raw) ?
+    createColorStyle(raw)
+  :
+    createUnitStyle(raw)
+);
 
 // TODO: actually check for unit vs defaulting to it
-export const parseStyle = style => (
-  (isNumber(style)) ?
-    createNumberStyle(style)
-  : (style.indexOf('(') > -1) ?
-    createTransformStyle(style)
-  : (isColorString(style)) ?
-    createColorStyle(style)
+export const parseStyle = (raw: string | number): Style => (
+  typeof raw === 'string' && raw.indexOf('(') > -1 ?
+    createTransformStyle(raw)
   :
-    createUnitStyle(style)
+    parseBasicStyle(raw)
 );
 
-export const stringifyColorStyle = ({ value }) => `${ chroma(value).hex() }`;
+export const stringifyColor = (color: ColorStyle) => `${ chroma(color.value).hex() }`;
 
-export const stringifyNumberStyle = ({ value }) => `${ value }`;
+export const stringifyNumber = (number: NumberStyle) => `${ number.value }`;
 
-export const stringifyTransformStyle = ({ names, styles }) => names
-  .reduce((styleStrBuilder, name, index) => {
-    const { value, unit } = styles[index];
-    return styleStrBuilder.concat(`${ name }(${ value }${ unit ? unit : '' })`);
+export const stringifyUnit = (style: UnitStyle) => `${ style.value }${ style.unit }`;
+
+export const stringifyTransform = (transform: TransformStyle) => transform.names
+  .reduce((arr: Array<string>, name: string, index: number) => {
+    const style: BasicStyle = transform.styles[index];
+    return arr.concat(`${ name }(${ stringifyStyle(style) })`);
   }, [])
   .join(' ');
 
-export const stringifyUnitStyle = ({ value, unit }) => `${ value }${ unit }`;
-
-// TODO: don't default to unit style, throw instead?
-export const stringifyStyle = style => (
-  isColorType(style) ?
-    stringifyColorStyle(style)
-  : isNumberType(style) ?
-    stringifyNumberStyle(style)
-  : isTransformType(style) ?
-    stringifyTransformStyle(style)
+const stringifyBasic = (style: BasicStyle): string => (
+  style.ColorType ?
+    stringifyColor(style)
+  : style.NumberType ?
+    stringifyNumber(style)
+  : style.UnitType ?
+    stringifyUnit(style)
   :
-    stringifyUnitStyle(style)
+    ''
+);
+
+export const stringifyStyle = (style: Style): string => (
+  style.TransformType ?
+    stringifyTransform(style)
+  : // default: unknown style
+    stringifyBasic(style)
 );

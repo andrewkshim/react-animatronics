@@ -1,21 +1,17 @@
+// @flow
 import test from 'tape'
 
 import {
-  COLOR_STYLE_TYPE,
-  NUMBER_STYLE_TYPE,
-  TRANSFORM_STYLE_TYPE,
-  UNIT_STYLE_TYPE,
-
   createColorStyle,
   createNumberStyle,
   createTransformStyle,
   createUnitStyle,
   parseStyle,
 
-  stringifyColorStyle,
-  stringifyNumberStyle,
-  stringifyTransformStyle,
-  stringifyUnitStyle,
+  stringifyColor,
+  stringifyNumber,
+  stringifyTransform,
+  stringifyUnit,
   stringifyStyle,
 
   isColorString,
@@ -23,26 +19,20 @@ import {
 
 test('createColorStyle creates a valid ColorStyle', assert => {
   const colorStyle = createColorStyle('blue');
-  const actualType = colorStyle.type;
-  const expectedType = COLOR_STYLE_TYPE;
-  assert.equals(actualType, expectedType);
+  assert.ok(colorStyle.ColorType);
   assert.end();
 });
 
 test('createNumberStyle creates a valid NumberStyle', assert => {
   const numberStyle = createNumberStyle(10);
-  const actualType = numberStyle.type;
-  const expectedType = NUMBER_STYLE_TYPE;
-  assert.equals(actualType, expectedType);
+  assert.ok(numberStyle.NumberType);
   assert.end();
 });
 
 test('createTransformStyle creates a valid TransformStyle', assert => {
   const transformStyle = createTransformStyle('scale(0) rotateZ(90deg)');
 
-  const actualType = transformStyle.type;
-  const expectedType = TRANSFORM_STYLE_TYPE;
-  assert.equals(actualType, expectedType);
+  assert.ok(transformStyle.TransformType);
 
   const actualTransformNames = transformStyle.names;
   const expectedTransformNames = ['scale', 'rotateZ'];
@@ -57,9 +47,7 @@ test('createTransformStyle creates a valid TransformStyle', assert => {
 
 test('createUnitStyle creates a valid UnitStyle', assert => {
   const unitStyle = createUnitStyle('10px');
-  const actualType = unitStyle.type;
-  const expectedType = UNIT_STYLE_TYPE;
-  assert.equals(actualType, expectedType);
+  assert.ok(unitStyle.UnitType);
   assert.end();
 });
 
@@ -83,29 +71,29 @@ test('parseStyle creates the correct Styles', assert => {
   assert.end();
 });
 
-test('stringifyColorStyle creates the correct style string', assert => {
-  const actualColorStyleStr = stringifyColorStyle(createColorStyle('black'));
+test('stringifyColor creates the correct style string', assert => {
+  const actualColorStyleStr = stringifyColor(createColorStyle('black'));
   const expectedColorStyleStr = '#000000';
   assert.equals(actualColorStyleStr, expectedColorStyleStr);
   assert.end();
 });
 
-test('stringifyNumberStyle creates the correct style string', assert => {
-  const actualNumberStyleStr = stringifyNumberStyle(createNumberStyle(1));
+test('stringifyNumber creates the correct style string', assert => {
+  const actualNumberStyleStr = stringifyNumber(createNumberStyle(1));
   const expectedNumberStyleStr = '1';
   assert.equals(actualNumberStyleStr, expectedNumberStyleStr);
   assert.end();
 });
 
-test('stringifyTransformStyle creates the correct style string', assert => {
-  const actualTransformStyleStr = stringifyTransformStyle(createTransformStyle('scale(0.5)'));
+test('stringifyTransform creates the correct style string', assert => {
+  const actualTransformStyleStr = stringifyTransform(createTransformStyle('scale(0.5)'));
   const expectedTransformStyleStr = 'scale(0.5)';
   assert.equals(actualTransformStyleStr, expectedTransformStyleStr);
   assert.end();
 });
 
-test('stringifyUnitStyle creates the correct style string', assert => {
-  const actualUnitStyleStr = stringifyUnitStyle(createUnitStyle('1234em'));
+test('stringifyUnit creates the correct style string', assert => {
+  const actualUnitStyleStr = stringifyUnit(createUnitStyle('1234em'));
   const expectedUnitStyleStr = '1234em';
   assert.equals(actualUnitStyleStr, expectedUnitStyleStr);
   assert.end();
@@ -114,22 +102,22 @@ test('stringifyUnitStyle creates the correct style string', assert => {
 test('stringifyStyle creates the correct style strings', assert => {
   const colorStyle = createColorStyle('black');
   const actualColorStyleStr = stringifyStyle(colorStyle);
-  const expectedColorStyleStr = stringifyColorStyle(colorStyle);
+  const expectedColorStyleStr = stringifyColor(colorStyle);
   assert.equals(actualColorStyleStr, expectedColorStyleStr);
 
   const numberStyle = createNumberStyle(42);
   const actualNumberStyleStr = stringifyStyle(numberStyle);
-  const expectedNumberStyleStr = stringifyNumberStyle(numberStyle);
+  const expectedNumberStyleStr = stringifyNumber(numberStyle);
   assert.equals(actualNumberStyleStr, expectedNumberStyleStr);
 
   const transformStyle = createTransformStyle('translateZ(42deg)');
   const actualTransformStyleStr = stringifyStyle(transformStyle);
-  const expectedTransformStyleStr = stringifyTransformStyle(transformStyle);
+  const expectedTransformStyleStr = stringifyTransform(transformStyle);
   assert.equals(actualTransformStyleStr, expectedTransformStyleStr);
 
   const unitStyle = createUnitStyle('42px');
   const actualUnitStyleStr = stringifyStyle(unitStyle);
-  const expectedUnitStyleStr = stringifyUnitStyle(unitStyle);
+  const expectedUnitStyleStr = stringifyUnit(unitStyle);
   assert.equals(actualUnitStyleStr, expectedUnitStyleStr);
 
   assert.end();
