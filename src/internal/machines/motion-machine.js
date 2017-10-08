@@ -1,25 +1,15 @@
 // @flow
 /**
- * Machine: contains all mutable state.
- * @module machine
- *
- * The machine should be in charge of managing the animation frames, but it
- * doesn't know anything about what to do in those frames, that's up to the
- * Animator.
+ * MotionMachine
+ * @module machines/motion-machine
  */
 
-import type { VoidFn, Machine } from './flow-types'
+import type { VoidFn, MotionMachine } from '../flow-types'
 
-// TODO: use utils
-const noop: VoidFn = () => {};
-
-/**
- * Creates a machine that will continue to run until the caller tells it to stop.
- */
-export const PerpetualMachine = (
+export const PerpetualMotionMachine = (
   requestAnimationFrame: (fn: VoidFn) => void,
   cancelAnimationFrame: (frame: number) => void,
-): Machine => {
+): MotionMachine => {
 
   let _frame: ?number = null;
   let _machineIsStopped: boolean = false;
@@ -35,7 +25,7 @@ export const PerpetualMachine = (
     });
   }
 
-  const machine: Machine = {
+  const machine: MotionMachine = {
     isStopped: () => _machineIsStopped,
 
     do: (job: VoidFn, onFrame: VoidFn) => {
@@ -62,22 +52,7 @@ export const PerpetualMachine = (
   return machine;
 };
 
-/**
- * Creates a machine that maintains extra state for managing spring animations.
- */
-export const SpringMachineUpgrade = (machine: Machine): Machine => {
-
-  let prevTime = Date.now();
-  let numIterations = 0;
-  let accumulatedTime = 0;
-
-
-}
-
-/**
- * Creates a machine that will stop running after the specified duration.
- */
-export const TimedMachineUpgrade = (machine: Machine, duration: number): Machine => {
+export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): MotionMachine => {
 
   let startTime: number = 0;
 

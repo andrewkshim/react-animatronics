@@ -2,9 +2,10 @@
 import sinon from 'sinon'
 import test from 'tape'
 
-import { PerpetualMachineFactory, TimedMachineFactory } from './machine'
+//TODO: import { PerpetualMotionMachine, TimedMachineFactory } from './machine'
+import { PerpetualMotionMachine } from './motion-machine'
 
-test('PerpetualMachineFactory', assert => {
+test('PerpetualMotionMachine', assert => {
   const expectedCallCount = 5;
   const interval = 100;
   const requestAnimationFrame = (fn) => { setTimeout(fn, interval) };
@@ -17,7 +18,7 @@ test('PerpetualMachineFactory', assert => {
     assert.end();
   }
 
-  const PerpetualMachine = PerpetualMachineFactory(requestAnimationFrame, cancelAnimationFrame);
+  const PerpetualMachine = PerpetualMotionMachine(requestAnimationFrame, cancelAnimationFrame);
   const machine = PerpetualMachine(onComplete);
 
   const job = () => {
