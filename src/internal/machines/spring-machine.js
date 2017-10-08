@@ -1,7 +1,8 @@
 // @flow
 /**
  * SpringMachine
- * @module machines/spring-machine
+ *
+ * @module internal/machines/spring-machine
  */
 
 import type {

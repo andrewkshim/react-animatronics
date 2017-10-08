@@ -1,7 +1,8 @@
 // @flow
 /**
  * Constants: where any shared constants go.
- * @module constants
+ *
+ * @module internal/constants
  */
 
 const MS_PER_ANIMATION_FRAME: number = 1000 / 60;

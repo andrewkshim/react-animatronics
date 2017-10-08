@@ -1,7 +1,8 @@
 // @flow
 /**
  * MotionMachine
- * @module machines/motion-machine
+ *
+ * @module internal/machines/motion-machine
  */
 
 import type { VoidFn, MotionMachine } from '../flow-types'

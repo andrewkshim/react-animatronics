@@ -1,6 +1,7 @@
 // @flow
 /**
  * polyfills: provides anything related to the browser environment
+ *
  * @module internal/polyfills
  */
 

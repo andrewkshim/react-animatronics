@@ -1,7 +1,8 @@
 // @flow
 /**
  * Internal Flow type definitions.
- * @module flow-types
+ *
+ * @module internal/flow-types
  */
 
 

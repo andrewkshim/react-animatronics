@@ -1,5 +1,6 @@
 /**
  * ContextTypes: provides the context types for all internal components
+ *
  * @module internal/context-types
  */
 

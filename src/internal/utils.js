@@ -1,6 +1,7 @@
 /**
  * Utils: provides helper functions for other modules.
- * @module utils
+ *
+ * @module internal/utils
  */
 
 const PACKAGE_PREFIX = '@@animatronics';

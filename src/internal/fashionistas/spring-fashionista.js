@@ -2,7 +2,7 @@
 /**
  * SpringFashionista: manages Fashions for spring animations.
  *
- * @module fashionistas/spring-fashionista
+ * @module internal/fashionistas/spring-fashionista
  */
 
 import chroma from 'chroma-js'

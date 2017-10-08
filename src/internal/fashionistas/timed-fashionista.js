@@ -1,7 +1,8 @@
 // @flow
 /**
  * TimedFashionista: manages Fashions for timed animations.
- * @module fashionistas/timed-fashionista
+ *
+ * @module internal/fashionistas/timed-fashionista
  */
 
 import chroma from 'chroma-js'
