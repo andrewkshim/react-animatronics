@@ -90,7 +90,6 @@ const parseBasicStyle = (raw: string | number): BasicStyle => (
     createUnitStyle(raw)
 );
 
-// TODO: actually check for unit vs defaulting to it
 export const parseStyle = (raw: string | number): Style => (
   typeof raw === 'string' && raw.indexOf('(') > -1 ?
     createTransformStyle(raw)
