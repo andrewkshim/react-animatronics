@@ -54,14 +54,14 @@ export const PerpetualMotionMachine = (
 
 export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): MotionMachine => {
 
-  let startTime: number = 0;
+  let _startTime: number = 0;
   let _onComplete = () => {};
 
   const { do: _do, run: _run } = machine;
 
   machine.do = (job: VoidFn) => {
     const _job = () => {
-      const elapsedTime: number = Date.now() - startTime;
+      const elapsedTime: number = Date.now() - _startTime;
       if (elapsedTime >= duration) {
         machine.stop();
         _onComplete();
@@ -72,6 +72,7 @@ export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): M
   }
 
   machine.run = (onComplete) => {
+    _startTime = Date.now();
     _onComplete = onComplete || _onComplete;
     return _run();
   }
