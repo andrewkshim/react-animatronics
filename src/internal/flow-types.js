@@ -23,6 +23,11 @@ export type MotionMachine = {
   stop: VoidFn,
 };
 
+export type SpringMachine = {
+  isStopped: ()=> boolean,
+  next: (onNext: Function, onComplete: Function) => void,
+}
+
 
 //==========================================================
 // Stylist
