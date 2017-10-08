@@ -19,20 +19,20 @@ import {
 
 test('createColorStyle creates a valid ColorStyle', assert => {
   const colorStyle = createColorStyle('blue');
-  assert.ok(colorStyle.ColorType);
+  assert.ok(colorStyle.isColorType);
   assert.end();
 });
 
 test('createNumberStyle creates a valid NumberStyle', assert => {
   const numberStyle = createNumberStyle(10);
-  assert.ok(numberStyle.NumberType);
+  assert.ok(numberStyle.isNumberType);
   assert.end();
 });
 
 test('createTransformStyle creates a valid TransformStyle', assert => {
   const transformStyle = createTransformStyle('scale(0) rotateZ(90deg)');
 
-  assert.ok(transformStyle.TransformType);
+  assert.ok(transformStyle.isTransformType);
 
   const actualTransformNames = transformStyle.names;
   const expectedTransformNames = ['scale', 'rotateZ'];
@@ -47,7 +47,7 @@ test('createTransformStyle creates a valid TransformStyle', assert => {
 
 test('createUnitStyle creates a valid UnitStyle', assert => {
   const unitStyle = createUnitStyle('10px');
-  assert.ok(unitStyle.UnitType);
+  assert.ok(unitStyle.isUnitType);
   assert.end();
 });
 
