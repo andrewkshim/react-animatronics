@@ -1,6 +1,6 @@
 // @flow
 /**
- * CommonStylist: provides utilities to help manage styles for other Stylists.
+ * CommonStylist: provides utilities to help manage Styles.
  * @module stylists/common-stylist
  */
 
