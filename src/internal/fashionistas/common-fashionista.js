@@ -69,7 +69,7 @@ export const createTransformFashion = (raw: string): TransformFashion => ({
   styles: raw.split(' ').map(parseTransformStyle),
 });
 
-const parseBasicStyle = (raw: string | number): BasicFashion => (
+export const parseBasicStyle = (raw: string | number): BasicFashion => (
   typeof raw === 'number' ?
     createNumberFashion(raw)
   : isNumberStr(raw) ?
