@@ -39,9 +39,10 @@ const calculateStyle = (startStyle: Style, endStyle: Style, progress: number): S
       ...startStyle,
       styles: endStyle.styles.map(
         (end: BasicStyle, index: number): BasicStyle => {
-          // $FlowFixMe: flow isn't playing nicely with disjoint types here. I'd expect it
-          // to know that startStyle isTransformStyle, but flow isn't recognizing it as such.
+          // Flow isn't playing nicely with disjoint types here. I'd expect it to know
+          // that startStyle isTransformStyle, but flow isn't recognizing it as such.
           // There might be an issue with detecting disjoint types via multiple conditions.
+          // $FlowFixMe
           const start: BasicStyle = startStyle.styles[index];
           return calculateBasic(start, end, progress);
         }),
