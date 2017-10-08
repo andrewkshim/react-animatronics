@@ -24,7 +24,7 @@ export type MotionMachine = {
   stop: VoidFn,
 };
 
-export type SpringMachine = {
+export type Spring = {
   isStopped: ()=> boolean,
   next: (onNext: Function, onComplete: Function) => void,
 }

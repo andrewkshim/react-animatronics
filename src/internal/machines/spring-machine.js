@@ -8,7 +8,7 @@
 import type {
   VoidFn,
   CSS,
-  SpringMachine as SpringMachineType,
+  Spring,
 } from '../flow-types'
 
 import Constants from '../constants'
@@ -47,7 +47,7 @@ export const SpringMachine = (
   endStyles: CSS,
   stiffness: number,
   damping: number,
-): SpringMachineType => {
+): Spring => {
 
   const styleNames: Array<string> = Object.keys(startStyles);
   const endValues: Array<number> = styleNames.map(() => 1);
