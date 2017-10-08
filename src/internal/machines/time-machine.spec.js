@@ -7,7 +7,7 @@ import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 test('InfiniteTimeMachine', assert => {
   const expectedCallCount = 5;
   const interval = 100;
-  const requestAnimationFrame = (fn) => { setTimeout(fn, interval) };
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const spy = sinon.spy();
   let numIterations = 0;
@@ -34,7 +34,7 @@ test('FiniteTimeMachine', assert => {
   const duration = 500;
   const interval = 90;
   const expectedCallCount = Math.floor(duration / interval);
-  const requestAnimationFrame = (fn) => { setTimeout(fn, interval) };
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const job = sinon.spy();
 
