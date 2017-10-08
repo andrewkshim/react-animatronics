@@ -8,7 +8,7 @@ import type { VoidFn } from '../flow-types'
 
 import Constants from '../constants'
 import { noop } from '../utils'
-import { parseValues, interpolateStyle } from '../stylists/common-stylist'
+import { parseStyle, stringifyStyle } from '../stylists/common-stylist'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally
