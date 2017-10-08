@@ -4,11 +4,16 @@
  * @module machines/spring-machine
  */
 
-import type { VoidFn } from '../flow-types'
+import type {
+  VoidFn,
+  CSS,
+  SpringMachine as SpringMachineType,
+} from '../flow-types'
 
 import Constants from '../constants'
 import { noop } from '../utils'
 import { parseStyle, stringifyStyle } from '../stylists/common-stylist'
+import { reconstructCSS, interpolateValue } from '../stylists/spring-stylist'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally
@@ -25,58 +30,26 @@ const calculateVelocity = (
   stiffness: number,
   damping: number,
 ): number => {
-  const spring = -stiffness * (currentPosition - endPosition);
-  const damper = -damping * currentVelocity;
-  const acceleration = spring + damper;
+  const spring: number = -stiffness * (currentPosition - endPosition);
+  const damper: number = -damping * currentVelocity;
+  const acceleration: number = spring + damper;
   return currentVelocity + (acceleration * Constants.SECONDS_PER_ANIMATION_FRAME);
 };
 
-const calculateValue = (currentValue, velocity) =>
+const calculateValue = (currentValue: number, velocity: number): number =>
   currentValue + (velocity * Constants.SECONDS_PER_ANIMATION_FRAME);
 
-const interpolateValue = (currentValue, endValue, progress) => {
-  const delta = endValue - currentValue;
-  return currentValue + (delta * progress);
-}
+// Credit for most of this logic goes to:
+// https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
+export const SpringMachine = (
+  startStyles: CSS,
+  endStyles: CSS,
+  stiffness: number,
+  damping: number,
+): SpringMachineType => {
 
-const interpolateStyle = (start, end, value) =>
-  start.isColorType ?
-    { ...start, value: chroma.mix(start.value, end.value, value) }
-  : start.isNumberType ?
-    { ...start, value: interpolateValue(start.value, end.value, value) }
-  : start.isUnitType ?
-    { ...start, value: interpolateValue(start.value, end.value, value) }
-  :
-    end;
-
-const reconstructCSS = (startStyles, endStyles, styleNames, values) => {
-  const reconstructed = {};
-  styleNames.forEach((name, index) => {
-    const start = parseStyle(startStyles[name]);
-    const end = parseStyle(endStyles[name]);
-    const value = values[index];
-    reconstructed[name] = stringifyStyle(
-      start.isBasicType ?
-        interpolateStyle(start, end, value)
-      : start.isTransformType ?
-        {
-          ...start,
-          styles: start.styles.map(
-            (s, i) => interpolateStyle(s, end.styles[i], value)
-          ),
-        }
-      :
-        end
-    );
-  });
-  return reconstructed;
-}
-
-// Each SpringMachine manages the spring state for a single Style.
-const SpringMachine = (startStyles, endStyles, stiffness, damping) => {
-
-  const styleNames = Object.keys(startStyles);
-  const endValues = styleNames.map(() => 1);
+  const styleNames: Array<string> = Object.keys(startStyles);
+  const endValues: Array<number> = styleNames.map(() => 1);
 
   let _prevTime = Date.now();
   let _numIterations = 0;
@@ -126,10 +99,11 @@ const SpringMachine = (startStyles, endStyles, stiffness, damping) => {
 
   const isStopped = () => _velocities.every(hasStopped) && _numIterations > MIN_ITERATIONS;
 
-  const next = (onNext = noop) => {
+  const next = (onNext = noop, onComplete = noop) => {
     if (isStopped()) {
       const updatedCSS = reconstructCSS(startStyles, endStyles, styleNames, endValues);
-      onNext(updatedCSS);
+      onComplete(updatedCSS);
+      return;
     }
     const currentTime = Date.now();
     const timeSinceLastFrame = currentTime - _prevTime;
@@ -148,6 +122,7 @@ const SpringMachine = (startStyles, endStyles, stiffness, damping) => {
     onNext(updatedCSS);
 
     _accumulatedTime -= (numFramesBehind * Constants.MS_PER_ANIMATION_FRAME);
+    _numIterations++;
   }
 
   const machine = { isStopped, next };
