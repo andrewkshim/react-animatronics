@@ -5,6 +5,7 @@
  */
 
 import type { VoidFn, MotionMachine } from '../flow-types'
+import { noop } from '../utils'
 
 export const PerpetualMotionMachine = (
   requestAnimationFrame: (fn: VoidFn) => void,
@@ -13,8 +14,8 @@ export const PerpetualMotionMachine = (
 
   let _frame: ?number = null;
   let _machineIsStopped: boolean = false;
-  let _job: ?VoidFn = null;
-  let _onFrame: ?VoidFn = null;
+  let _job: Function = noop;
+  let _onFrame: VoidFn = noop;
 
   const runIteration: VoidFn = () => {
     if (_machineIsStopped) return;
@@ -26,9 +27,9 @@ export const PerpetualMotionMachine = (
   }
 
   const machine: MotionMachine = {
-    isStopped: () => _machineIsStopped,
+    isStopped: (): boolean => _machineIsStopped,
 
-    do: (job: VoidFn, onFrame: VoidFn) => {
+    do: (job: Function, onFrame?: VoidFn) => {
       _job = job;
       return machine;
     },
@@ -59,7 +60,7 @@ export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): M
 
   const { do: _do, run: _run } = machine;
 
-  machine.do = (job: VoidFn) => {
+  machine.do = (job: Function, onFrame?: VoidFn) => {
     const _job = () => {
       const elapsedTime: number = Date.now() - _startTime;
       if (elapsedTime >= duration) {
@@ -68,7 +69,7 @@ export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): M
       }
       job(elapsedTime);
     }
-    return _do(_job);
+    return _do(_job, onFrame);
   }
 
   machine.run = (onComplete) => {

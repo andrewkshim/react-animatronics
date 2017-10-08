@@ -18,7 +18,7 @@ export type VoidFn = () => void;
 
 export type MotionMachine = {
   isStopped: () => boolean,
-  do: (job: VoidFn) => MotionMachine,
+  do: (job: Function, onFrame?: VoidFn) => MotionMachine,
   run: (onComplete?: VoidFn) => MotionMachine,
   stop: VoidFn,
 };
