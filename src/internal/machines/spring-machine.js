@@ -100,7 +100,7 @@ export const SpringMachine = (
 
   const isStopped = () => _velocities.every(hasStopped) && _numIterations > MIN_ITERATIONS;
 
-  const next = (onNext = noop, onComplete = noop) => {
+  const next = (onNext: Function = noop, onComplete: Function = noop) => {
     if (isStopped()) {
       const updatedCSS = reconstructCSS(startStyles, endStyles, styleNames, endValues);
       onComplete(updatedCSS);
