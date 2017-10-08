@@ -1,3 +1,4 @@
+// @flow
 /**
  * SpringFashionista: manages Fashions for spring animations.
  *
@@ -6,26 +7,40 @@
 
 import chroma from 'chroma-js'
 
+import type { CSS, BasicFashion } from '../flow-types'
 import Constants from '../constants'
-
 import { parseStyle, stringifyFashion } from './common-fashionista'
 
-export const interpolateValue = (currentValue: number, endValue: number, progress: number): number => {
-  const delta = endValue - currentValue;
+export const interpolateValue = (
+  currentValue: number,
+  endValue: number,
+  progress: number,
+): number => {
+  const delta: number = endValue - currentValue;
   return currentValue + (delta * progress);
 }
 
-export const interpolateFashion = (start, end, springValue) =>
-  start.isColorType ?
+export const interpolateFashion = (
+  start: BasicFashion,
+  end: BasicFashion,
+  springValue: number,
+): BasicFashion => (
+  start.isColorType && end.isColorType ?
     { ...start, value: chroma.mix(start.value, end.value, springValue) }
-  : start.isNumberType ?
+  : start.isNumberType && end.isNumberType ?
     { ...start, value: interpolateValue(start.value, end.value, springValue) }
-  : start.isUnitType ?
+  : start.isUnitType && end.isUnitType ?
     { ...start, value: interpolateValue(start.value, end.value, springValue) }
   :
-    end;
+    end
+);
 
-export const reconstructCSS = (startStyles, endStyles, styleNames, springValues) =>
+export const reconstructCSS = (
+  startStyles: CSS,
+  endStyles: CSS,
+  styleNames: Array<string>,
+  springValues: Array<number>,
+): CSS =>
   styleNames.reduce(
     (reconstructed, name, index) => {
       const start = parseStyle(startStyles[name]);
@@ -38,7 +53,7 @@ export const reconstructCSS = (startStyles, endStyles, styleNames, springValues)
           {
             ...start,
             styles: start.styles.map(
-              (s, i) => interpolateFashion(s, end.styles[i], value)
+              (s: BasicFashion, i: number) => interpolateFashion(s, end.styles[i], value)
             ),
           }
         :

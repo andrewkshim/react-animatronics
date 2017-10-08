@@ -1,7 +1,7 @@
 // @flow
 import test from 'tape'
 
-import { parseStyle } from './common-fashionista'
+import { parseBasicStyle } from './common-fashionista'
 import { interpolateValue, interpolateFashion, reconstructCSS } from './spring-fashionista'
 
 test('interpolateValue', assert => {
@@ -12,18 +12,25 @@ test('interpolateValue', assert => {
 });
 
 test('interpolateFashion', assert => {
-  const startColor = parseStyle('black');
-  const endColor = parseStyle('white');
+  const startColor = parseBasicStyle('black');
+  const endColor = parseBasicStyle('white');
   const interpolatedColor = interpolateFashion(startColor, endColor, 0.5);
-  assert.equals(interpolatedColor.value.name(), 'gray', 'correctly interpolates colors');
+  // HACK: Flow will complain about the disjoint type since it can't tell
+  // that interpolatedColor is a ColorFashion unless we have the isColorCheck
+  // before calling value.name since it'll think that "value" could also be
+  // a number which wouldn't have a "name" fn.
+  assert.equals(
+    interpolatedColor.isColorType && interpolatedColor.value.name(), 'gray',
+    'correctly interpolates colors'
+  );
 
-  const startNumber = parseStyle(0);
-  const endNumber = parseStyle(100);
+  const startNumber = parseBasicStyle(0);
+  const endNumber = parseBasicStyle(100);
   const interpolatedNumber = interpolateFashion(startNumber, endNumber, 0.6)
   assert.equals(interpolatedNumber.value, 60, 'correctly interpolates numbers');
 
-  const startUnit = parseStyle('0px');
-  const endUnit = parseStyle('100px');
+  const startUnit = parseBasicStyle('0px');
+  const endUnit = parseBasicStyle('100px');
   const interpolatedUnit = interpolateFashion(startUnit, endUnit, 0.42);
   assert.equals(interpolatedUnit.value, 42, 'correctly interpolates units');
 
