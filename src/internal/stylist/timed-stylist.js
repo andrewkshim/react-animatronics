@@ -1,3 +1,4 @@
+// @flow
 /**
  * TimedStylist: manages styles for timed animations.
  * @module stylist/timed-stylist
@@ -5,70 +6,61 @@
 
 import chroma from 'chroma-js'
 
-import {
-  isColorType,
-  isNumberType,
-  isTransformType,
-  parseStyle,
-  stringifyStyle,
-} from './common-stylist'
+import { parseStyle, stringifyStyle } from './common-stylist'
 
-const calculateNextTimedStyle = (startStyle, endStyle, easingPosition) => (
-  isColorType(startStyle) ?
+import type { BasicStyle, TransformStyle, Style, CSS } from '../flow-types'
+import { calculateCurrentValue } from '../calculator'
+
+const calculateBasic = (startStyle: BasicStyle, endStyle: BasicStyle, progress: number): BasicStyle => (
+  startStyle.isColorType && endStyle.isColorType ?
     {
       ...startStyle,
-      value: chroma.mix(
-        startStyle.value,
-        endStyle.value,
-        easingPosition,
-      ),
+      value: chroma.mix(startStyle.value, endStyle.value, progress),
     }
-  : isNumberType(startStyle) ?
+  : startStyle.isNumberType && endStyle.isNumberType ?
     {
       ...startStyle,
-      value: startStyle.value + (
-        (endStyle.value - startStyle.value) * easingPosition
-      ),
+      value: calculateCurrentValue(startStyle.value, endStyle.value, progress),
     }
-  : isTransformType(startStyle) ?
+  : startStyle.isUnitType && endStyle.isUnitType ?
     {
       ...startStyle,
-      styles: startStyle.styles.map(
-        (style, index) => ({
-          ...style,
-          value: style.value + (
-            (endStyle.styles[index].value - style.value) * easingPosition
-          ),
-        })
-      ),
+      value: calculateCurrentValue(startStyle.value, endStyle.value, progress),
     }
   :
-    {
-      ...startStyle,
-      value: startStyle.value + (
-        (endStyle.value - startStyle.value) * easingPosition
-      ),
-    }
+    endStyle
 );
 
-export const updateTimedRigStyles = ({
-  setComponentStyle,
-  startStyles,
-  endStyles,
-  easingFn,
-  duration,
-  elapsedTime,
-}) => {
-  const normalizedDuration = duration === 0 ? elapsedTime : duration;
-  const easingPosition = easingFn(elapsedTime / normalizedDuration);
-  Object.keys(startStyles).forEach(styleName => {
-    const updatedStyleString = stringifyStyle(
-      calculateNextTimedStyle(
-        parseStyle(startStyles[styleName]),
-        parseStyle(endStyles[styleName]),
-        easingPosition,
-      )
-    );
-    setComponentStyle({ [styleName]: updatedStyleString });
-  });
-};
+const calculateStyle = (startStyle: Style, endStyle: Style, progress: number): Style => (
+  startStyle.isBasicType && endStyle.isBasicType ?
+    calculateBasic(startStyle, endStyle, progress)
+  : startStyle.isTransformType && endStyle.isTransformType ?
+    {
+      ...startStyle,
+      styles: endStyle.styles.map(
+        (end: BasicStyle, index: number): BasicStyle => {
+          // $FlowFixMe: flow isn't playing nicely with disjoint types here
+          const start: BasicStyle = startStyle.styles[index];
+          return calculateBasic(start, end, progress);
+        }),
+    }
+  :
+    endStyle
+);
+
+export const constructStyles = (
+  startStyles: CSS,
+  endStyles: CSS,
+  progress: number,
+): CSS =>
+  Object.keys(startStyles).reduce(
+    (currentStyles: CSS, styleName: string) => {
+      const startStyle: Style = parseStyle(startStyles[styleName]);
+      const endStyle: Style = parseStyle(endStyles[styleName]);
+      currentStyles[styleName] = stringifyStyle(
+        calculateStyle(startStyle, endStyle, progress)
+      );
+      return currentStyles;
+    },
+    {}
+  );
