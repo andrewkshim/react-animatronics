@@ -21,18 +21,6 @@ const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
 const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX: RegExp = /\D+/;
 
-export const isColorType = (subject: Object): boolean =>
-  subject.isColorType;
-
-export const isNumberType = (subject: Object): boolean =>
-  subject.isNumberType;
-
-export const isTransformType = (subject: Object): boolean =>
-  subject.isTransformType;
-
-export const isUnitType = (subject: Object): boolean =>
-  subject.isUnitType;
-
 export const isColorString = (str: string): boolean => {
   let color;
   try {
