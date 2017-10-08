@@ -6,9 +6,9 @@
 
 import chroma from 'chroma-js'
 
-import { parseStyle, stringifyStyle } from './common-fashionista'
+import { parseStyle, stringifyFashion } from './common-fashionista'
 
-import type { BasicStyle, TransformStyle, Style, CSS } from '../flow-types'
+import type { BasicFashion, TransformFashion, Fashion, CSS } from '../flow-types'
 
 export const calculateCurrentValue = (
   startValue: number,
@@ -17,44 +17,44 @@ export const calculateCurrentValue = (
 ): number =>
   startValue + (endValue - startValue) * progress;
 
-const calculateBasic = (startStyle: BasicStyle, endStyle: BasicStyle, progress: number): BasicStyle => (
-  startStyle.isColorType && endStyle.isColorType ?
+const calculateBasic = (startFashion: BasicFashion, endFashion: BasicFashion, progress: number): BasicFashion => (
+  startFashion.isColorType && endFashion.isColorType ?
     {
-      ...startStyle,
-      value: chroma.mix(startStyle.value, endStyle.value, progress),
+      ...startFashion,
+      value: chroma.mix(startFashion.value, endFashion.value, progress),
     }
-  : startStyle.isNumberType && endStyle.isNumberType ?
+  : startFashion.isNumberType && endFashion.isNumberType ?
     {
-      ...startStyle,
-      value: calculateCurrentValue(startStyle.value, endStyle.value, progress),
+      ...startFashion,
+      value: calculateCurrentValue(startFashion.value, endFashion.value, progress),
     }
-  : startStyle.isUnitType && endStyle.isUnitType ?
+  : startFashion.isUnitType && endFashion.isUnitType ?
     {
-      ...startStyle,
-      value: calculateCurrentValue(startStyle.value, endStyle.value, progress),
+      ...startFashion,
+      value: calculateCurrentValue(startFashion.value, endFashion.value, progress),
     }
   :
-    endStyle
+    endFashion
 );
 
-const calculateStyle = (startStyle: Style, endStyle: Style, progress: number): Style => (
-  startStyle.isBasicType && endStyle.isBasicType ?
-    calculateBasic(startStyle, endStyle, progress)
-  : startStyle.isTransformType && endStyle.isTransformType ?
+const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: number): Fashion => (
+  startFashion.isBasicType && endFashion.isBasicType ?
+    calculateBasic(startFashion, endFashion, progress)
+  : startFashion.isTransformType && endFashion.isTransformType ?
     {
-      ...startStyle,
-      styles: endStyle.styles.map(
-        (end: BasicStyle, index: number): BasicStyle => {
+      ...startFashion,
+      styles: endFashion.styles.map(
+        (end: BasicFashion, index: number): BasicFashion => {
           // Flow isn't playing nicely with disjoint types here. I'd expect it to know
-          // that startStyle isTransformStyle, but flow isn't recognizing it as such.
+          // that startFashion isTransformType, but flow isn't recognizing it as such.
           // There might be an issue with detecting disjoint types via multiple conditions.
           // $FlowFixMe
-          const start: BasicStyle = startStyle.styles[index];
+          const start: BasicFashion = startFashion.styles[index];
           return calculateBasic(start, end, progress);
         }),
     }
   :
-    endStyle
+    endFashion
 );
 
 export const constructStyles = (
@@ -64,10 +64,10 @@ export const constructStyles = (
 ): CSS =>
   Object.keys(startStyles).reduce(
     (currentStyles: CSS, styleName: string) => {
-      const startStyle: Style = parseStyle(startStyles[styleName]);
-      const endStyle: Style = parseStyle(endStyles[styleName]);
-      currentStyles[styleName] = stringifyStyle(
-        calculateStyle(startStyle, endStyle, progress)
+      const startFashion: Fashion = parseStyle(startStyles[styleName]);
+      const endFashion: Fashion = parseStyle(endStyles[styleName]);
+      currentStyles[styleName] = stringifyFashion(
+        calculateFashion(startFashion, endFashion, progress)
       );
       return currentStyles;
     },

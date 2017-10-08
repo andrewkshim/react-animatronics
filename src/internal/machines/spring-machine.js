@@ -12,7 +12,7 @@ import type {
 
 import Constants from '../constants'
 import { noop } from '../utils'
-import { parseStyle, stringifyStyle } from '../fashionistas/common-fashionista'
+import { parseStyle } from '../fashionistas/common-fashionista'
 import { reconstructCSS, interpolateValue } from '../fashionistas/spring-fashionista'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum

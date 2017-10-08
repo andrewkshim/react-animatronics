@@ -30,36 +30,38 @@ export type SpringMachine = {
 
 
 //==========================================================
-// Stylist
+// Fashionista
+//
+// "Fashions" are object-representations of CSS styles.
 //==========================================================
 
-export type ColorStyle = {|
+export type ColorFashion = {|
   isBasicType: true,
   isColorType: true,
   value: string,
 |}
 
-export type NumberStyle = {|
+export type NumberFashion = {|
   isBasicType: true,
   isNumberType: true,
   value: number,
 |}
 
-export type UnitStyle = {|
+export type UnitFashion = {|
   isBasicType: true,
   isUnitType: true,
   value: number,
   unit: string,
 |}
 
-export type BasicStyle = ColorStyle | NumberStyle | UnitStyle;
+export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
 
-export type TransformStyle = {|
+export type TransformFashion = {|
   isTransformType: true,
   names: Array<string>,
-  styles: Array<BasicStyle>,
+  styles: Array<BasicFashion>,
 |}
 
-export type Style = BasicStyle | TransformStyle;
+export type Fashion = BasicFashion | TransformFashion;
 
 export type CSS = { [string]: string | number };
