@@ -1,11 +1,12 @@
 /**
  * SpringStylist: manages styles for spring animations.
- * @module stylist/spring-stylist
+ * @module stylists/spring-stylist
  */
 
 import Constants from '../constants'
 
 import {
+  TRANSFORM_STYLE_TYPE,
   createNumberStyle,
   isColorType,
   isNumberType,
@@ -23,7 +24,7 @@ const createTransformSpringState = (startTransformStyle, endTransformStyle) => {
     actualVelocities: startVelocities,
     currentStyles: startStyles,
     currentVelocities: startVelocities,
-    endStyles: endStyles,
+    endStyles,
     names,
     type,
   };
@@ -176,8 +177,8 @@ const calculateActualSpringState = (
     (updatedStyle, index) => ({
       ...updatedStyle,
       value: calculateUpdatedSpringValue(
-        currentSpringState.currentStyles[index],
-        updatedStyle,
+        currentSpringState.currentStyles[index].value,
+        updatedStyle.value,
         percentageFrameCompleted,
       )
     })
@@ -205,6 +206,15 @@ const getUpdatedStyleString = actualSpringState =>
         actualSpringState.currentStyles[0]
   )
 ;
+
+const SpringMachineFactory = () => {
+
+  const machine = {};
+
+
+  return machine;
+
+};
 
 const updateStyleForRig = (
   styleName,
@@ -241,6 +251,8 @@ const updateStyleForRig = (
   setComponentStyle({ [styleName]: updatedStyleString });
 }
 
+const MIN_ITERATIONS = 10;
+
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
 export const createFnUpdateSpringRigStyles = ({
@@ -254,13 +266,13 @@ export const createFnUpdateSpringRigStyles = ({
   const springStates = createInitialSpringStates(startStyles, endStyles);
 
   let prevTime = Date.now();
-  let isFirstIteration = true;
+  let numIterations = 0;
   let accumulatedTime = 0;
 
   const updateSpringRigStyles = () => {
 
     let isRigAnimationDone = (
-      !isFirstIteration
+      numIterations > MIN_ITERATIONS
       && isSpringAnimationDone(springStates)
     );
 
@@ -268,8 +280,12 @@ export const createFnUpdateSpringRigStyles = ({
       setComponentStyle(endStyles);
     } else {
       const currentTime = Date.now();
+
+      // how much time has passed since last frame
       const elapsedTime = currentTime - prevTime;
+
       prevTime = currentTime;
+
       accumulatedTime += elapsedTime;
 
       const numFramesRemaining = Math.floor(accumulatedTime / Constants.MS_PER_ANIMATION_FRAME);
@@ -291,11 +307,11 @@ export const createFnUpdateSpringRigStyles = ({
 
 
     isRigAnimationDone = (
-      !isFirstIteration
+      numIterations > MIN_ITERATIONS
       && isSpringAnimationDone(springStates)
     );
 
-    isFirstIteration = false;
+    numIterations++;
     return isRigAnimationDone;
   }
 

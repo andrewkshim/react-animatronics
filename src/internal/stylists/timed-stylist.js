@@ -1,7 +1,7 @@
 // @flow
 /**
  * TimedStylist: manages styles for timed animations.
- * @module stylist/timed-stylist
+ * @module stylists/timed-stylist
  */
 
 import chroma from 'chroma-js'
