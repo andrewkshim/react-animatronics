@@ -2,8 +2,7 @@
 import sinon from 'sinon'
 import test from 'tape'
 
-//TODO: import { PerpetualMotionMachine, TimedMachineFactory } from './machine'
-import { PerpetualMotionMachine } from './motion-machine'
+import { PerpetualMotionMachine, TimedMachineUpgrade } from './motion-machine'
 
 test('PerpetualMotionMachine', assert => {
   const expectedCallCount = 5;
@@ -13,45 +12,42 @@ test('PerpetualMotionMachine', assert => {
   const spy = sinon.spy();
   let numIterations = 0;
 
-  const onComplete = () => {
-    assert.equals(spy.callCount, expectedCallCount, 'the machine runs the expected number of iterations');
-    assert.end();
-  }
-
-  const PerpetualMachine = PerpetualMotionMachine(requestAnimationFrame, cancelAnimationFrame);
-  const machine = PerpetualMachine(onComplete);
+  const motionMachine = PerpetualMotionMachine(requestAnimationFrame, cancelAnimationFrame);
 
   const job = () => {
     if (numIterations === expectedCallCount) {
-      machine.stop();
+      motionMachine.stop();
+      assert.true(motionMachine.isStopped(), 'the machine knows when it is stopped');
+      assert.equals(spy.callCount, expectedCallCount, 'the machine runs the expected number of iterations');
+      assert.end();
     }
     numIterations++;
     spy();
   };
 
-  machine
+  motionMachine
     .do(job)
     .run();
 });
 
-test('TimedMachineFactory', assert => {
+test('TimedMachineUpgrade', assert => {
   const duration = 500;
-  const interval = 100;
+  const interval = 90;
   const expectedCallCount = Math.floor(duration / interval);
   const requestAnimationFrame = (fn) => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const job = sinon.spy();
 
+  const motionMachine = PerpetualMotionMachine(requestAnimationFrame, cancelAnimationFrame);
+  const timedMachine = TimedMachineUpgrade(motionMachine, duration);
+
   const onComplete = () => {
+    assert.true(timedMachine.isStopped(), 'the machine knows when it is stopped');
     assert.equals(job.callCount, expectedCallCount, 'the machine runs the expected number of iterations');
-    assert.true(machine.isStopped(), 'the machine knows when it is stopped');
     assert.end();
   }
 
-  const TimedMachine = TimedMachineFactory(requestAnimationFrame, cancelAnimationFrame);
-  const machine = TimedMachine(duration, onComplete);
-
-  machine
+  timedMachine
     .do(job)
-    .run();
+    .run(onComplete);
 });
