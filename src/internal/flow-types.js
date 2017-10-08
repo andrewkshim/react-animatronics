@@ -56,3 +56,5 @@ export type TransformStyle = {|
 |}
 
 export type Style = BasicStyle | TransformStyle;
+
+export type CSS = { [string]: string | number };
