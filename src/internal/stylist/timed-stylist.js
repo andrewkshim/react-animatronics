@@ -9,7 +9,13 @@ import chroma from 'chroma-js'
 import { parseStyle, stringifyStyle } from './common-stylist'
 
 import type { BasicStyle, TransformStyle, Style, CSS } from '../flow-types'
-import { calculateCurrentValue } from '../calculator'
+
+export const calculateCurrentValue = (
+  startValue: number,
+  endValue: number,
+  progress: number,
+): number =>
+  startValue + (endValue - startValue) * progress;
 
 const calculateBasic = (startStyle: BasicStyle, endStyle: BasicStyle, progress: number): BasicStyle => (
   startStyle.isColorType && endStyle.isColorType ?

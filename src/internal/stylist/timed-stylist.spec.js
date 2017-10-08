@@ -1,6 +1,11 @@
 import test from 'tape'
 
-import { constructStyles } from './timed-stylist'
+import { calculateCurrentValue, constructStyles } from './timed-stylist'
+
+test('calculateCurrentValue', assert => {
+  assert.equals(calculateCurrentValue(0, 100, 0.5), 50, 'returns the expected value');
+  assert.end();
+});
 
 test('constructStyles', assert => {
   const startStyles = { left: '0px' };
