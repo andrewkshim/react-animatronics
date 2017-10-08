@@ -1,6 +1,6 @@
 // @flow
 /**
- * TimeMachine,
+ * TimeMachine
  *
  * @module internal/machines/time-machine
  */
