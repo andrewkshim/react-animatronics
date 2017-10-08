@@ -83,7 +83,7 @@ const SpringMachine = (startStyles, endStyles, stiffness, damping) => {
   let _accumulatedTime = 0;
   let _values = styleNames.map(() => 0);
   let _velocities = styleNames.map(() => 0);
-  let _intermediateValues = styleNames.map(name => parseValues(startStyles[name]));
+  let _intermediateValues = styleNames.map(() => 0);
   let _intermediateVelocities = styleNames.map(() => 0);
 
   const calculateVelocities = (velocities) => {
