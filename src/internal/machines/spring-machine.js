@@ -12,8 +12,8 @@ import type {
 
 import Constants from '../constants'
 import { noop } from '../utils'
-import { parseStyle, stringifyStyle } from '../stylists/common-stylist'
-import { reconstructCSS, interpolateValue } from '../stylists/spring-stylist'
+import { parseStyle, stringifyStyle } from '../fashionistas/common-fashionista'
+import { reconstructCSS, interpolateValue } from '../fashionistas/spring-fashionista'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally

@@ -1,7 +1,9 @@
 // @flow
 /**
- * CommonStylist: provides utilities to help manage Styles.
- * @module stylists/common-stylist
+ * CommonFashionista: provides utilities to help manage Fashions
+ * (which are * object-representations of CSS styles).
+ *
+ * @module fashionistas/common-fashionista
  */
 
 import chroma from 'chroma-js'

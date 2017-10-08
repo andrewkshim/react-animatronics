@@ -1,12 +1,12 @@
 // @flow
 /**
- * TimedStylist: manages styles for timed animations.
- * @module stylists/timed-stylist
+ * TimedFashionista: manages Fashions for timed animations.
+ * @module fashionistas/timed-fashionista
  */
 
 import chroma from 'chroma-js'
 
-import { parseStyle, stringifyStyle } from './common-stylist'
+import { parseStyle, stringifyStyle } from './common-fashionista'
 
 import type { BasicStyle, TransformStyle, Style, CSS } from '../flow-types'
 

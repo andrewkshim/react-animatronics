@@ -1,13 +1,14 @@
 /**
- * SpringStylist: manages styles for spring animations.
- * @module stylists/spring-stylist
+ * SpringFashionista: manages Fashions for spring animations.
+ *
+ * @module fashionistas/spring-fashionista
  */
 
 import chroma from 'chroma-js'
 
 import Constants from '../constants'
 
-import { parseStyle, stringifyStyle } from './common-stylist'
+import { parseStyle, stringifyStyle } from './common-fashionista'
 
 export const interpolateValue = (currentValue: number, endValue: number, progress: number): number => {
   const delta = endValue - currentValue;

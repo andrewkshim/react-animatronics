@@ -15,7 +15,7 @@ import {
   stringifyStyle,
 
   isColorString,
-} from './common-stylist'
+} from './common-fashionista'
 
 test('createColorStyle creates a valid ColorStyle', assert => {
   const colorStyle = createColorStyle('blue');
