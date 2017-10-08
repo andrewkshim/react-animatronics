@@ -17,10 +17,10 @@ export type VoidFn = () => void;
 // Machine
 //==========================================================
 
-export type MotionMachine = {
+export type Time = {
   isStopped: () => boolean,
-  do: (job: Function, onFrame?: VoidFn) => MotionMachine,
-  run: (onComplete?: VoidFn) => MotionMachine,
+  do: (job: Function, onFrame?: VoidFn) => Time,
+  run: (onComplete?: VoidFn) => Time,
   stop: VoidFn,
 };
 

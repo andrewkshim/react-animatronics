@@ -1,17 +1,17 @@
 // @flow
 /**
- * MotionMachine
+ * TimeMachine,
  *
- * @module internal/machines/motion-machine
+ * @module internal/machines/time-machine
  */
 
-import type { VoidFn, MotionMachine } from '../flow-types'
+import type { VoidFn, Time } from '../flow-types'
 import { noop } from '../utils'
 
-export const PerpetualMotionMachine = (
+export const InfiniteTimeMachine = (
   requestAnimationFrame: (fn: VoidFn) => void,
   cancelAnimationFrame: (frame: number) => void,
-): MotionMachine => {
+): Time => {
 
   let _frame: ?number = null;
   let _machineIsStopped: boolean = false;
@@ -27,7 +27,7 @@ export const PerpetualMotionMachine = (
     });
   }
 
-  const machine: MotionMachine = {
+  const machine: Time = {
     isStopped: (): boolean => _machineIsStopped,
 
     do: (job: Function, onFrame?: VoidFn) => {
@@ -54,7 +54,7 @@ export const PerpetualMotionMachine = (
   return machine;
 };
 
-export const TimedMachineUpgrade = (machine: MotionMachine, duration: number): MotionMachine => {
+export const FiniteTimeMachine = (machine: Time, duration: number): Time => {
 
   let _startTime: number = 0;
   let _onComplete = () => {};
