@@ -35,10 +35,14 @@ export type SpringMachine = {
 // "Fashions" are object-representations of CSS styles.
 //==========================================================
 
+type ChromaColor = {
+  name: Function,
+}
+
 export type ColorFashion = {|
   isBasicType: true,
   isColorType: true,
-  value: string,
+  value: ChromaColor,
 |}
 
 export type NumberFashion = {|
