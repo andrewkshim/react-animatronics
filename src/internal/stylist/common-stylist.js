@@ -22,16 +22,16 @@ const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX: RegExp = /\D+/;
 
 export const isColorType = (subject: Object): boolean =>
-  subject.ColorType;
+  subject.isColorType;
 
 export const isNumberType = (subject: Object): boolean =>
-  subject.NumberType;
+  subject.isNumberType;
 
 export const isTransformType = (subject: Object): boolean =>
-  subject.TransformType;
+  subject.isTransformType;
 
 export const isUnitType = (subject: Object): boolean =>
-  subject.UnitType;
+  subject.isUnitType;
 
 export const isColorString = (str: string): boolean => {
   let color;
@@ -49,13 +49,22 @@ const isNumberStr = (str: string): boolean => (
 );
 
 export const createColorStyle = (raw: string): ColorStyle => ({
-  ColorType: true,
+  isBasicType: true,
+  isColorType: true,
   value: chroma(raw).hex(),
 });
 
 export const createNumberStyle = (raw: string | number): NumberStyle => ({
-  NumberType: true,
+  isBasicType: true,
+  isNumberType: true,
   value: parseFloat(raw),
+});
+
+export const createUnitStyle = (raw: string): UnitStyle => ({
+  isBasicType: true,
+  isUnitType: true,
+  value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
+  unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
 });
 
 const parseTransformName = (transform: string): string =>
@@ -64,14 +73,8 @@ const parseTransformName = (transform: string): string =>
 const parseTransformStyle = (transform: string): BasicStyle =>
   parseBasicStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
-export const createUnitStyle = (raw: string): UnitStyle => ({
-  UnitType: true,
-  value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
-  unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
-});
-
 export const createTransformStyle = (raw: string): TransformStyle => ({
-  TransformType: true,
+  isTransformType: true,
   names: raw.split(' ').map(parseTransformName),
   styles: raw.split(' ').map(parseTransformStyle),
 });
@@ -109,18 +112,18 @@ export const stringifyTransform = (transform: TransformStyle) => transform.names
   .join(' ');
 
 const stringifyBasic = (style: BasicStyle): string => (
-  style.ColorType ?
+  style.isColorType ?
     stringifyColor(style)
-  : style.NumberType ?
+  : style.isNumberType ?
     stringifyNumber(style)
-  : style.UnitType ?
+  : style.isUnitType ?
     stringifyUnit(style)
   :
     ''
 );
 
 export const stringifyStyle = (style: Style): string => (
-  style.TransformType ?
+  style.isTransformType ?
     stringifyTransform(style)
   : // default: unknown style
     stringifyBasic(style)

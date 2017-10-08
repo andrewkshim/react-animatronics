@@ -29,17 +29,20 @@ export type Machine = {
 //==========================================================
 
 export type ColorStyle = {|
-  ColorType: true,
+  isBasicType: true,
+  isColorType: true,
   value: string,
 |}
 
 export type NumberStyle = {|
-  NumberType: true,
+  isBasicType: true,
+  isNumberType: true,
   value: number,
 |}
 
 export type UnitStyle = {|
-  UnitType: true,
+  isBasicType: true,
+  isUnitType: true,
   value: number,
   unit: string,
 |}
@@ -47,7 +50,7 @@ export type UnitStyle = {|
 export type BasicStyle = ColorStyle | NumberStyle | UnitStyle;
 
 export type TransformStyle = {|
-  TransformType: true,
+  isTransformType: true,
   names: Array<string>,
   styles: Array<BasicStyle>,
 |}
