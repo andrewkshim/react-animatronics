@@ -38,8 +38,8 @@ export const interpolateFashion = (
 export const reconstructStyles = (
   startStyles: Styles,
   endStyles: Styles,
-  styleNames: Array<string>,
-  springValues: Array<number>,
+  styleNames: string[],
+  springValues: number[],
 ): Styles =>
   styleNames.reduce(
     (reconstructed, name, index) => {

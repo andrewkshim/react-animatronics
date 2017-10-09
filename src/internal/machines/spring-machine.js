@@ -45,8 +45,8 @@ export const SpringMachine = (
   damping: number,
 ): Spring => {
 
-  const styleNames: Array<string> = Object.keys(startStyles);
-  const endValues: Array<number> = styleNames.map(() => 1);
+  const styleNames: string[] = Object.keys(startStyles);
+  const endValues: number[] = styleNames.map(() => 1);
 
   let _prevTime = Date.now();
   let _numIterations = 0;

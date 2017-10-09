@@ -73,7 +73,7 @@ const playAnimation = (
 }
 
 const rewindAnimation = (
-  stages: Array<AnimationStage>,
+  stages: AnimationStage[],
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
   controls: Controls,

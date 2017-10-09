@@ -94,7 +94,7 @@ export const stringifyNumber = (number: NumberFashion) => `${ number.value }`;
 export const stringifyUnit = (style: UnitFashion) => `${ style.value }${ style.unit }`;
 
 export const stringifyTransform = (transform: TransformFashion) => transform.names
-  .reduce((arr: Array<string>, name: string, index: number) => {
+  .reduce((arr: string[], name: string, index: number) => {
     const style: BasicFashion = transform.styles[index];
     return arr.concat(`${ name }(${ stringifyFashion(style) })`);
   }, [])
