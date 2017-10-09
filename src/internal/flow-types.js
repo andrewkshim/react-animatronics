@@ -74,3 +74,7 @@ export type TransformFashion = {|
 export type Fashion = BasicFashion | TransformFashion;
 
 export type Styles = { [string]: string | number };
+
+export type StyleUpdater = (styles: Styles) => void;
+
+export type DOMNode = Object;
