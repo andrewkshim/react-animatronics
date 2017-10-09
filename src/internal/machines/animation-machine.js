@@ -112,6 +112,8 @@ export const AnimationMachine = (
     }, {});
   }
 
-  const machine = { run };
+  const stop = () => infiniteMachine.stop();
+
+  const machine = { run, stop };
   return machine;
 };

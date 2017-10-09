@@ -41,52 +41,45 @@ export const playAnimation = (
     // $FlowFixMe
     const stage: AnimationStage = stages[currentStageNum];
 
-    const runNextStage = () => {
+    const onComponentFrame = controls.updateStyles;
+
+    const onStageComplete = () => {
       const nextStageNum = currentStageNum + 1;
       if (nextStageNum === stages.length) {
+        controls.clearAnimation();
         onComplete();
       } else {
         run(stages, nextStageNum);
       }
     }
 
-    const onComponentFrame = controls.updateStyles;
-
-    const onStageComplete = runNextStage;
-
     const animationMachine = AnimationMachine(
       stage,
       requestAnimationFrame,
       cancelAnimationFrame,
     );
-    animationMachine.run(onComponentFrame, onStageComplete);
+    controls.setAnimation(animationMachine);
 
-    // return machine;
+    animationMachine.run(onComponentFrame, onStageComplete);
   };
 
-  return run(stages, 0);
+  run(stages, 0);
 }
 
-const rewindAnimation = (
+export const rewindAnimation = (
   stages: AnimationStage[],
+  controls: Controls,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
-  controls: Controls,
+  onComplete: Function,
 ) => playAnimation(
   reverseStages(stages),
+  controls,
   requestAnimationFrame,
   cancelAnimationFrame,
-  controls,
+  onComplete,
 );
 
-const cancelAnimation = (): void => {
-  // TODO:
-}
-
-const Animator = {
-  playAnimation,
-  rewindAnimation,
-  cancelAnimation,
-};
+const Animator = { playAnimation, rewindAnimation };
 
 export default Animator;

@@ -79,10 +79,14 @@ export type Spring = {
 
 export type Animation = {
   run: (onComponentFrame: Function, onStageComplete: Function) => void,
+  stop: () => void,
 }
 
 export type Controls = {
   registerComponent: (componentName: string, node: DOMNode, styleUpdater: StyleUpdater) => void,
   unregisterComponent: (componentName: string) => void,
   updateStyles: (componentName: string, styles: Styles) => void,
+  setAnimation: (animation: Animation) => void,
+  stopAnimation: () => void,
+  clearAnimation: () => void,
 }
