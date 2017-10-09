@@ -13,7 +13,8 @@ export const ControlsMachine = (): Controls => {
 
   const registerComponent = (
     componentName: string,
-    node: DOMNode, styleUpdater: StyleUpdater,
+    node: DOMNode,
+    styleUpdater: StyleUpdater,
   ) => {
     nodes[componentName] = node;
     styleUpdaters[componentName] = styleUpdater;
