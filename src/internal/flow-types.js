@@ -89,4 +89,5 @@ export type Controls = {
   setAnimation: (animation: Animation) => void,
   stopAnimation: () => void,
   clearAnimation: () => void,
+  getNodes: () => { [string]: DOMNode },
 }

@@ -42,6 +42,8 @@ export const ControlsMachine = (): Controls => {
     _animationMachine = null;
   };
 
+  const getNodes = () => _nodes;
+
   const machine: Controls = {
     registerComponent,
     unregisterComponent,
@@ -49,6 +51,7 @@ export const ControlsMachine = (): Controls => {
     setAnimation,
     stopAnimation,
     clearAnimation,
+    getNodes,
   };
   return machine;
 }
