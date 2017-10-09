@@ -90,6 +90,7 @@ export const AnimationMachine = (
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
 ): Animation => {
+
   const infiniteMachine: Time = InfiniteTimeMachine(
     requestAnimationFrame,
     cancelAnimationFrame,
