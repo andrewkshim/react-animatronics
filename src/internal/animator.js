@@ -1,203 +1,97 @@
+// @flow
 /**
  * Animator: runs the animations.
- * @module animator
+ *
+ * @module internal/animator
  */
 
-import BezierEasing from 'bezier-easing'
+import Debug from 'debug'
 
-import { updateTimedRigStyles } from './stylist/timed-stylist'
-import { createFnUpdateSpringRigStyles } from './stylist/spring-stylist'
+import type { AnimationStage, Controls } from './flow-types'
+import { AnimationMachine } from './machines/animation-machine'
 
-const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
+const debug = Debug('animatronics:animator');
 
-const isUsingTime = animation => animation.duration != null;
-const isUsingSpring = animation => (
-  animation.stiffness != null
-  && animation.damping != null
+const reverseAnimationStages = stages => stages.map(stage =>
+  Object.keys(stage).reduce((result, componentName) => {
+    const { start, end, ...rest } = stage[componentName];
+    result[componentName] = {
+      start: end,
+      end: start,
+      ...rest,
+    };
+    return result;
+  }, {})
 );
 
-const runTimedAnimationStage = ({
-  startStyles,
-  endStyles,
-  duration,
-  easingFn,
-  setComponentStyle,
-  requestAnimationFrame,
-  cancelAnimationFrame,
-  runNextStage,
-}) => {
-  const startTime = Date.now();
-  let currentFrame;
+const playAnimation = (
+  stages: AnimationStage[],
+  requestAnimationFrame: Function,
+  cancelAnimationFrame: Function,
+  controls: Controls,
+) => {
 
-  const runLastAnimationFrame = () => {
-    currentFrame = null;
-    if (duration > 0) {
-      updateTimedRigStyles({
-        setComponentStyle,
-        startStyles,
-        endStyles,
-        easingFn,
-        duration,
-        elapsedTime: duration,
-      });
-    }
-    runNextStage();
-  };
+  debug('starting animation %O', stages);
 
-  const runNextAnimationFrame = () => {
+  const run = (stages, currentStageNum) => {
+    debug('running animation stage %d', currentStageNum);
 
-    const elapsedTime = Date.now() - startTime;
-    updateTimedRigStyles({
-      setComponentStyle,
-      startStyles,
-      endStyles,
-      easingFn,
-      duration,
-      elapsedTime,
-    });
-
-    if (elapsedTime < duration) {
-      currentFrame = requestAnimationFrame(runNextAnimationFrame);
-    } else {
-      currentFrame = requestAnimationFrame(runLastAnimationFrame);
-    }
-  };
-
-  currentFrame = requestAnimationFrame(runNextAnimationFrame);
-}
-
-const runSpringAnimationStage = ({
-  startStyles,
-  endStyles,
-  stiffness,
-  damping,
-  setComponentStyle,
-  requestAnimationFrame,
-  cancelAnimationFrame,
-  runNextStage,
-}) => {
-
-  const updateSpringRigStyles = createFnUpdateSpringRigStyles({
-    startStyles,
-    endStyles,
-    stiffness,
-    damping,
-    setComponentStyle,
-  });
-
-  let currentFrame;
-  let isAnimationDone = false;
-
-  const runLastAnimationFrame = () => {
-    currentFrame = null;
-    isAnimationDone = updateSpringRigStyles();
-    runNextStage();
-  };
-
-  const runNextAnimationFrame = () => {
-    isAnimationDone = updateSpringRigStyles();
-    if (!isAnimationDone) {
-      currentFrame = requestAnimationFrame(runNextAnimationFrame);
-    } else {
-      currentFrame = requestAnimationFrame(runLastAnimationFrame);
-    }
-  };
-  currentFrame = requestAnimationFrame(runNextAnimationFrame);
-}
-
-const runAnimationStage = ({
-  animationStage,
-  cancelAnimationFrame,
-  requestAnimationFrame,
-  styleSettersForComponents,
-  runNextStage,
-}) => {
-  Object.keys(animationStage).forEach(componentName => {
-    const animation = animationStage[componentName];
-    const setComponentStyle = styleSettersForComponents[componentName];
-
-    if (isUsingTime(animation)) {
-      const {
-        start: startStyles,
-        end: endStyles,
-        duration,
-        easingFn = DEFAULT_EASING_FN,
-      } = animation;
-      runTimedAnimationStage({
-        startStyles,
-        endStyles,
-        duration,
-        easingFn,
-        setComponentStyle,
-        requestAnimationFrame,
-        cancelAnimationFrame,
-        runNextStage,
-      });
-    } else if (isUsingSpring(animation)) {
-      // TODO: rename to startStyles, endStyles
-      const {
-        start: startStyles,
-        end: endStyles,
-        stiffness,
-        damping,
-      } = animation;
-      runSpringAnimationStage({
-        startStyles,
-        endStyles,
-        stiffness,
-        damping,
-        setComponentStyle,
-        requestAnimationFrame,
-        cancelAnimationFrame,
-        runNextStage,
-      });
-    } else {
-      // TODO: warn
-    }
-  });
-}
-
-const runAnimation = ({
-  animationStages,
-  cancelAnimationFrame,
-  onAnimationComplete,
-  onStageComplete,
-  requestAnimationFrame,
-  styleSettersForComponents,
-}) => {
-
-  const run = ({ animationStages, currentStageNum }) => {
-    // TODO: left off with changing the API, see basic example
-    const animationStage = animationStages[currentStageNum];
+    // Flow doesn't play nicely with computed properties / array access.
+    // $FlowFixMe
+    const stage: AnimationStage = stages[currentStageNum];
 
     const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
-      onStageComplete(currentStageNum);
-      if (nextStageNum === animationStages.length) {
-        onAnimationComplete();
+      if (nextStageNum === stages.length) {
+        // onAnimationComplete();
       } else {
         run({
-          animationStages,
+          stages,
           currentStageNum: nextStageNum,
         });
       }
     }
 
-    runAnimationStage({
-      animationStage,
-      cancelAnimationFrame,
+    const onComponentFrame = controls.updateStyles;
+
+    const onComplete = runNextStage;
+
+    const animationMachine = AnimationMachine(
+      stage,
       requestAnimationFrame,
-      styleSettersForComponents,
-      runNextStage,
-    });
+      cancelAnimationFrame,
+    );
+    animationMachine.run(onComponentFrame, onComplete);
+
+    // return machine;
   };
 
-  run({
-    animationStages,
+  return run({
+    stages,
     currentStageNum: 0,
   });
 }
 
-const Animator = { runAnimation };
+const rewindAnimation = (
+  stages: Array<AnimationStage>,
+  requestAnimationFrame: Function,
+  cancelAnimationFrame: Function,
+  controls: Controls,
+) => playAnimation(
+  reverseAnimationStages(stages),
+  requestAnimationFrame,
+  cancelAnimationFrame,
+  controls,
+);
+
+const cancelAnimation = (): void => {
+  // TODO:
+}
+
+const Animator = {
+  playAnimation,
+  rewindAnimation,
+  cancelAnimation,
+};
 
 export default Animator;
