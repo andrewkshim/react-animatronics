@@ -8,54 +8,9 @@ import React from 'react'
 
 import Animator from './internal/animator'
 import ContextTypes from './internal/context-types'
-
-import {
-  createPackageString,
-  noop,
-  removeKeyFromObject,
-} from './internal/utils'
+import { ControlsMachine } from './internal/machines/controls-machine'
 
 import Polyfills from './internal/polyfills'
-
-const REGISTER_COMPONENT = createPackageString('REGISTER_COMPONENT');
-const UNREGISTER_COMPONENT = createPackageString('UNREGISTER_COMPONENT');
-
-const ANIMATRONICS_ACTION_HANDLERS = {
-
-  [ REGISTER_COMPONENT ]: (state, payload) => {
-    const { styleSettersForComponents, domNodesForComponents } = state;
-    const { componentName, domNode, setComponentStyle } = payload;
-    return {
-      styleSettersForComponents: {
-        ...styleSettersForComponents,
-        [ componentName ]: setComponentStyle,
-      },
-      domNodesForComponents: {
-        ...domNodesForComponents,
-        [ componentName ]: domNode,
-      },
-    };
-  },
-
-  [ UNREGISTER_COMPONENT ]: (state, payload) => {
-    const { styleSettersForComponents, domNodesForComponents } = state;
-    const { componentName } = payload;
-    return {
-      styleSettersForComponents: removeKeyFromObject(styleSettersForComponents, componentName),
-      domNodesForComponents: removeKeyFromObject(domNodesForComponents, componentName),
-    };
-  },
-
-}
-
-const handleAnimatronicsAction = (state, { type, payload }) => {
-  return !ANIMATRONICS_ACTION_HANDLERS[type]
-    ? state
-    : ANIMATRONICS_ACTION_HANDLERS[type](state, payload)
-  ;
-}
-
-
 
 const withAnimatronics = (
   createAnimationStages,
@@ -67,66 +22,67 @@ const withAnimatronics = (
 
   return BaseComponent => {
 
-    let state = {
-      styleSettersForComponents: {},
-      domNodesForComponents: {},
-    };
-
-    const registerComponent = ({ componentName, domNode, setComponentStyle }) => {
-      state = handleAnimatronicsAction(
-        state,
-        {
-          type: REGISTER_COMPONENT,
-          payload: { componentName, domNode, setComponentStyle },
-        },
-      );
-    };
-
-    const unregisterComponent = ({ componentName }) => {
-      state = handleAnimatronicsAction(
-        state,
-        {
-          type: UNREGISTER_COMPONENT,
-          payload: { componentName },
-        },
-      );
-    };
+    const controls = ControlsMachine();
 
     class AnimatorComponent extends React.Component {
       constructor(props) {
         super(props);
-        this._runAnimation = this._runAnimation.bind(this);
+        this.isAnimatronic = true;
+        this._playAnimation = this._playAnimation.bind(this);
+        this._rewindAnimation = this._rewindAnimation.bind(this);
+        this._cancelAnimation = this._cancelAnimation.bind(this);
       }
 
       getChildContext() {
         return {
           animatronics: {
-            registerComponent,
-            unregisterComponent,
+            registerComponent: controls.registerComponent,
+            unregisterComponent: controls.unregisterComponent,
           }
         };
       }
 
-      _runAnimation(
-        onAnimationComplete = noop,
-        onStageComplete = noop,
-      ) {
-        const { styleSettersForComponents, domNodesForComponents } = state;
-        Animator.runAnimation({
-          animationStages: createAnimationStages(domNodesForComponents),
-          cancelAnimationFrame,
-          onAnimationComplete,
-          onStageComplete,
+      _rewindAnimation() {
+        const rawAnimationStages = createAnimationStages(controls.getNodes());
+        const createStages = typeof rawAnimationStages === 'function'
+          ? rawAnimationStages
+          : () => rawAnimationStages;
+        Animator.rewindAnimation(
+          createStages(),
+          controls,
           requestAnimationFrame,
-          styleSettersForComponents,
-        })
+          cancelAnimationFrame,
+          () => {},
+        )
+      }
+
+      _playAnimation() {
+        // TODO: warn when an event might have been passed in
+        const rawAnimationStages = createAnimationStages(controls.getNodes());
+        const createStages = typeof rawAnimationStages === 'function'
+          ? rawAnimationStages
+          : () => rawAnimationStages;
+        Animator.playAnimation(
+          createStages(),
+          controls,
+          requestAnimationFrame,
+          cancelAnimationFrame,
+          () => {},
+        );
+      }
+
+      _cancelAnimation() {
+        controls.stopAnimation();
+        controls.clearAnimation();
       }
 
       render() {
         const { ...props } = this.props;
         return (
           <BaseComponent
-            runAnimation={ this._runAnimation }
+            playAnimation={ this._playAnimation }
+            rewindAnimation={ this._rewindAnimation }
+            cancelAnimation={ this._cancelAnimation }
             { ...props }
           />
         );
