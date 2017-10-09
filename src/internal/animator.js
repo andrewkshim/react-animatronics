@@ -12,23 +12,25 @@ import { AnimationMachine } from './machines/animation-machine'
 
 const debug = Debug('animatronics:animator');
 
-const reverseAnimationStages = stages => stages.map(stage =>
-  Object.keys(stage).reduce((result, componentName) => {
-    const { start, end, ...rest } = stage[componentName];
-    result[componentName] = {
-      start: end,
-      end: start,
-      ...rest,
-    };
-    return result;
-  }, {})
-);
+export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
+  stages.map(stage =>
+    Object.keys(stage).reduce((result, componentName) => {
+      const { start, end, ...rest } = stage[componentName];
+      result[componentName] = {
+        start: end,
+        end: start,
+        ...rest,
+      };
+      return result;
+    }, {})
+  );
 
-const playAnimation = (
+export const playAnimation = (
   stages: AnimationStage[],
+  controls: Controls,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
-  controls: Controls,
+  onComplete: Function,
 ) => {
   debug('starting animation %O', stages);
 
@@ -42,33 +44,27 @@ const playAnimation = (
     const runNextStage = () => {
       const nextStageNum = currentStageNum + 1;
       if (nextStageNum === stages.length) {
-        // onAnimationComplete();
+        onComplete();
       } else {
-        run({
-          stages,
-          currentStageNum: nextStageNum,
-        });
+        run(stages, nextStageNum);
       }
     }
 
     const onComponentFrame = controls.updateStyles;
 
-    const onComplete = runNextStage;
+    const onStageComplete = runNextStage;
 
     const animationMachine = AnimationMachine(
       stage,
       requestAnimationFrame,
       cancelAnimationFrame,
     );
-    animationMachine.run(onComponentFrame, onComplete);
+    animationMachine.run(onComponentFrame, onStageComplete);
 
     // return machine;
   };
 
-  return run({
-    stages,
-    currentStageNum: 0,
-  });
+  return run(stages, 0);
 }
 
 const rewindAnimation = (
@@ -77,7 +73,7 @@ const rewindAnimation = (
   cancelAnimationFrame: Function,
   controls: Controls,
 ) => playAnimation(
-  reverseAnimationStages(stages),
+  reverseStages(stages),
   requestAnimationFrame,
   cancelAnimationFrame,
   controls,
