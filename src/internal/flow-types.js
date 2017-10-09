@@ -29,6 +29,10 @@ export type Spring = {
   next: (onNext: Function, onComplete: Function) => void,
 }
 
+export type Animation = {
+  run: (onComponentFrame: Function, onComplete: Function) => void,
+}
+
 
 //==========================================================
 // Fashionista
