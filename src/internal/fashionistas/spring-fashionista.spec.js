@@ -2,7 +2,7 @@
 import test from 'tape'
 
 import { parseBasicStyle } from './common-fashionista'
-import { interpolateValue, interpolateFashion, reconstructCSS } from './spring-fashionista'
+import { interpolateValue, interpolateFashion, reconstructStyles } from './spring-fashionista'
 
 test('interpolateValue', assert => {
   const actual = interpolateValue(0, 100, 0.5);
@@ -37,12 +37,17 @@ test('interpolateFashion', assert => {
   assert.end();
 });
 
-test('reconstructCSS', assert => {
+test('reconstructStyles', assert => {
   const startStyles = { left: '0px', top: '0px' };
   const endStyles = { left: '100px', top: '100px' };
   const styleNames = ['left', 'top'];
   const springValues = [0.4, 0.7];
-  const reconstructed = reconstructCSS(startStyles, endStyles, styleNames, springValues);
+  const reconstructed = reconstructStyles(
+    startStyles,
+    endStyles,
+    styleNames,
+    springValues,
+  );
 
   assert.deepEquals(reconstructed, { left: '40px', top: '70px' });
   assert.end();

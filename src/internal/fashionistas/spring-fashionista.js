@@ -7,7 +7,7 @@
 
 import chroma from 'chroma-js'
 
-import type { CSS, BasicFashion } from '../flow-types'
+import type { Styles, BasicFashion } from '../flow-types'
 import Constants from '../constants'
 import { parseStyle, stringifyFashion } from './common-fashionista'
 
@@ -35,12 +35,12 @@ export const interpolateFashion = (
     end
 );
 
-export const reconstructCSS = (
-  startStyles: CSS,
-  endStyles: CSS,
+export const reconstructStyles = (
+  startStyles: Styles,
+  endStyles: Styles,
   styleNames: Array<string>,
   springValues: Array<number>,
-): CSS =>
+): Styles =>
   styleNames.reduce(
     (reconstructed, name, index) => {
       const start = parseStyle(startStyles[name]);

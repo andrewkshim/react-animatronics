@@ -5,16 +5,12 @@
  * @module internal/machines/spring-machine
  */
 
-import type {
-  VoidFn,
-  CSS,
-  Spring,
-} from '../flow-types'
+import type { VoidFn, Styles, Spring } from '../flow-types'
 
 import Constants from '../constants'
 import { noop } from '../utils'
 import { parseStyle } from '../fashionistas/common-fashionista'
-import { reconstructCSS, interpolateValue } from '../fashionistas/spring-fashionista'
+import { reconstructStyles, interpolateValue } from '../fashionistas/spring-fashionista'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally
@@ -43,8 +39,8 @@ const calculateValue = (currentValue: number, velocity: number): number =>
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
 export const SpringMachine = (
-  startStyles: CSS,
-  endStyles: CSS,
+  startStyles: Styles,
+  endStyles: Styles,
   stiffness: number,
   damping: number,
 ): Spring => {
@@ -102,8 +98,8 @@ export const SpringMachine = (
 
   const next = (onNext: Function = noop, onComplete: Function = noop) => {
     if (isStopped()) {
-      const updatedCSS = reconstructCSS(startStyles, endStyles, styleNames, endValues);
-      onComplete(updatedCSS);
+      const updatedStyles = reconstructStyles(startStyles, endStyles, styleNames, endValues);
+      onComplete(updatedStyles);
       return;
     }
     const currentTime = Date.now();
@@ -119,8 +115,8 @@ export const SpringMachine = (
     syncToLatestFrame(numFramesBehind);
     moveToNextFrame(progress);
 
-    const updatedCSS = reconstructCSS(startStyles, endStyles, styleNames, _values);
-    onNext(updatedCSS);
+    const updatedStyles = reconstructStyles(startStyles, endStyles, styleNames, _values);
+    onNext(updatedStyles);
 
     _accumulatedTime -= (numFramesBehind * Constants.MS_PER_ANIMATION_FRAME);
     _numIterations++;

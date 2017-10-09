@@ -9,7 +9,7 @@ import chroma from 'chroma-js'
 
 import { parseStyle, stringifyFashion } from './common-fashionista'
 
-import type { BasicFashion, TransformFashion, Fashion, CSS } from '../flow-types'
+import type { BasicFashion, TransformFashion, Fashion, Styles } from '../flow-types'
 
 export const calculateCurrentValue = (
   startValue: number,
@@ -59,12 +59,12 @@ const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: 
 );
 
 export const constructStyles = (
-  startStyles: CSS,
-  endStyles: CSS,
+  startStyles: Styles,
+  endStyles: Styles,
   progress: number,
-): CSS =>
+): Styles =>
   Object.keys(startStyles).reduce(
-    (currentStyles: CSS, styleName: string) => {
+    (currentStyles: Styles, styleName: string) => {
       const startFashion: Fashion = parseStyle(startStyles[styleName]);
       const endFashion: Fashion = parseStyle(endStyles[styleName]);
       currentStyles[styleName] = stringifyFashion(

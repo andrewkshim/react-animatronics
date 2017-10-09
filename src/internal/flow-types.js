@@ -73,4 +73,4 @@ export type TransformFashion = {|
 
 export type Fashion = BasicFashion | TransformFashion;
 
-export type CSS = { [string]: string | number };
+export type Styles = { [string]: string | number };
