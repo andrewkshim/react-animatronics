@@ -32,7 +32,7 @@ const runTimedAnimation = (
   timeMachine: Time,
   animation: Object,
   onFrame: Function,
-  onComplete: Function,
+  onStageComplete: Function,
 ) => {
   const {
     start: startStyles,
@@ -51,7 +51,7 @@ const runTimedAnimation = (
     })
     .run(() => {
       onFrame(endStyles);
-      onComplete();
+      onStageComplete();
     });
 }
 
@@ -59,7 +59,7 @@ const runSpringAnimation = (
   timeMachine: Time,
   animation: Object,
   onFrame: Function,
-  onComplete: Function,
+  onStageComplete: Function,
 ) => {
   const {
     start: startStyles,
@@ -75,7 +75,7 @@ const runSpringAnimation = (
   const _onComplete = (endStyles) => {
     onFrame(endStyles);
     timeMachine.stop();
-    onComplete();
+    onStageComplete();
   }
 
   timeMachine
@@ -95,16 +95,16 @@ export const AnimationMachine = (
     cancelAnimationFrame,
   );
 
-  const run = (onComponentFrame: Function, onComplete: Function) => {
+  const run = (onComponentFrame: Function, onStageComplete: Function) => {
     Object.keys(stage).reduce((updatedComponentStyles, componentName) => {
       const animation: Object = stage[componentName];
       const onFrame: Function = (updatedStyles) => {
         onComponentFrame(componentName, updatedStyles);
       }
       if (isUsingTime(animation)) {
-        runTimedAnimation(infiniteMachine, animation, onFrame, onComplete);
+        runTimedAnimation(infiniteMachine, animation, onFrame, onStageComplete);
       } else if (isUsingSpring(animation)) {
-        runSpringAnimation(infiniteMachine, animation, onFrame, onComplete);
+        runSpringAnimation(infiniteMachine, animation, onFrame, onStageComplete);
       } else {
         // TODO: Error
       }
