@@ -59,7 +59,6 @@ export const playAnimation = (
       cancelAnimationFrame,
     );
     controls.setAnimation(animationMachine);
-
     animationMachine.run(onComponentFrame, onStageComplete);
   };
 
