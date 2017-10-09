@@ -14,27 +14,6 @@ export type VoidFn = () => void;
 
 
 //==========================================================
-// Machine
-//==========================================================
-
-export type Time = {
-  isStopped: () => boolean,
-  do: (job: Function, onFrame?: VoidFn) => Time,
-  run: (onComplete?: VoidFn) => Time,
-  stop: VoidFn,
-};
-
-export type Spring = {
-  isStopped: ()=> boolean,
-  next: (onNext: Function, onComplete: Function) => void,
-}
-
-export type Animation = {
-  run: (onComponentFrame: Function, onComplete: Function) => void,
-}
-
-
-//==========================================================
 // Fashionista
 //
 // "Fashions" are object-representations of CSS styles.
@@ -78,3 +57,32 @@ export type Styles = { [string]: string | number };
 export type StyleUpdater = (styles: Styles) => void;
 
 export type DOMNode = Object;
+
+export type AnimationStage = Object;
+
+
+//==========================================================
+// Machine
+//==========================================================
+
+export type Time = {
+  isStopped: () => boolean,
+  do: (job: Function, onFrame?: VoidFn) => Time,
+  run: (onComplete?: VoidFn) => Time,
+  stop: VoidFn,
+};
+
+export type Spring = {
+  isStopped: ()=> boolean,
+  next: (onNext: Function, onComplete: Function) => void,
+}
+
+export type Animation = {
+  run: (onComponentFrame: Function, onComplete: Function) => void,
+}
+
+export type Controls = {
+  registerComponent: (componentName: string, node: DOMNode, styleUpdater: StyleUpdater) => void,
+  unregisterComponent: (componentName: string) => void,
+  updateStyles: (componentName: string, styles: Styles) => void,
+}

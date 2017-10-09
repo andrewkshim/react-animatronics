@@ -5,16 +5,15 @@
  * @module internal/machines/controls-machine
  */
 
-import type { Styles, StyleUpdater, DOMNode } from '../flow-types'
+import type { Styles, StyleUpdater, DOMNode, Controls } from '../flow-types'
 
-export const ControlsMachine = () => {
+export const ControlsMachine = (): Controls => {
   const nodes: { [string]: DOMNode } = {};
   const styleUpdaters: { [string]: StyleUpdater } = {};
 
   const registerComponent = (
     componentName: string,
-    node: DOMNode,
-    styleUpdater: StyleUpdater,
+    node: DOMNode, styleUpdater: StyleUpdater,
   ) => {
     nodes[componentName] = node;
     styleUpdaters[componentName] = styleUpdater;
@@ -29,6 +28,6 @@ export const ControlsMachine = () => {
     styleUpdaters[componentName](styles);
   }
 
-  const machine = { registerComponent, unregisterComponent, updateStyles };
+  const machine: Controls = { registerComponent, unregisterComponent, updateStyles };
   return machine;
 }
