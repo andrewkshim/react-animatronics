@@ -30,7 +30,6 @@ const playAnimation = (
   cancelAnimationFrame: Function,
   controls: Controls,
 ) => {
-
   debug('starting animation %O', stages);
 
   const run = (stages, currentStageNum) => {
