@@ -32,7 +32,7 @@ const runTimedAnimation = (
   timeMachine: Time,
   animation: Object,
   onFrame: Function,
-  onStageComplete: Function,
+  onComponentDone: Function,
 ) => {
   const {
     start: startStyles,
@@ -51,7 +51,7 @@ const runTimedAnimation = (
     })
     .run(() => {
       onFrame(endStyles);
-      onStageComplete();
+      onComponentDone();
     });
 }
 
@@ -100,15 +100,23 @@ export const AnimationMachine = (
     onComponentFrame: Function,
     onStageComplete: Function,
   ) => {
-    Object.keys(stage).forEach(componentName => {
+    let numComponentsDone = 0;
+    const componentNames = Object.keys(stage);
+    const onComponentDone = () => {
+      numComponentsDone++;
+      if (numComponentsDone === componentNames.length) {
+        onStageComplete();
+      }
+    };
+    componentNames.forEach(componentName => {
       const animation: Object = stage[componentName];
       const onFrame: Function = (updatedStyles) => {
         onComponentFrame(componentName, updatedStyles);
       }
       if (isUsingTime(animation)) {
-        runTimedAnimation(infiniteMachine, animation, onFrame, onStageComplete);
+        runTimedAnimation(infiniteMachine, animation, onFrame, onComponentDone);
       } else if (isUsingSpring(animation)) {
-        runSpringAnimation(infiniteMachine, animation, onFrame, onStageComplete);
+        runSpringAnimation(infiniteMachine, animation, onFrame, onComponentDone);
       } else {
         // TODO: Error
       }
