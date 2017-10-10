@@ -1,5 +1,3 @@
-import './internal/setup.test'
-
 import React from 'react'
 import sinon from 'sinon'
 import test from 'tape'
@@ -68,7 +66,7 @@ test('withRig sets the ref to the DOM node', assert => {
   const wrapper = mount(<Rigged/>, {
     context: {
       animatronics: {
-        registerComponent: ({ domNode }) => {
+        registerComponent: (componentName, domNode, styleUpdater) => {
           actualDomNode = domNode;
         },
         unregisterComponent: () => {},
