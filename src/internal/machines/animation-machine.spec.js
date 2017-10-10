@@ -23,7 +23,7 @@ test('AnimationMachine', assert => {
 
   const onComplete = () => {
     assert.equals(
-      onComponentFrame.callCount, Math.floor(duration / interval),
+      onComponentFrame.callCount, Math.floor(duration / interval) + 1,
       'calls onComponentFrame the expected number of times'
     );
     assert.deepEquals(
