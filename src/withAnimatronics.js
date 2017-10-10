@@ -68,8 +68,7 @@ const withAnimatronics = (
       }
 
       _cancelAnimation() {
-        controls.stopAnimation();
-        controls.clearAnimation();
+        animation.stop();
       }
 
       render() {

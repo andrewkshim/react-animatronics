@@ -10,7 +10,6 @@ import type { Styles, StyleUpdater, DOMNode, Controls } from '../flow-types'
 export const ControlsMachine = (): Controls => {
   const _nodes: { [string]: DOMNode } = {};
   const _styleUpdaters: { [string]: StyleUpdater } = {};
-  let _animationMachine = null;
 
   const registerComponent = (
     componentName: string,
@@ -30,27 +29,12 @@ export const ControlsMachine = (): Controls => {
     _styleUpdaters[componentName](styles);
   };
 
-  const setAnimation = (animationMachine) => {
-    _animationMachine = animationMachine;
-  };
-
-  const stopAnimation = () => {
-    _animationMachine && _animationMachine.stop();
-  };
-
-  const clearAnimation = () => {
-    _animationMachine = null;
-  };
-
   const getNodes = () => _nodes;
 
   const machine: Controls = {
     registerComponent,
     unregisterComponent,
     updateStyles,
-    setAnimation,
-    stopAnimation,
-    clearAnimation,
     getNodes,
   };
   return machine;

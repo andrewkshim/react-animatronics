@@ -86,8 +86,5 @@ export type Controls = {
   registerComponent: (componentName: string, node: DOMNode, styleUpdater: StyleUpdater) => void,
   unregisterComponent: (componentName: string) => void,
   updateStyles: (componentName: string, styles: Styles) => void,
-  setAnimation: (animation: Animation) => void,
-  stopAnimation: () => void,
-  clearAnimation: () => void,
   getNodes: () => { [string]: DOMNode },
 }

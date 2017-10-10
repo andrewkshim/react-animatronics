@@ -45,14 +45,12 @@ export const playAnimation = (
     const onStageComplete = () => {
       const nextStageNum = currentStageNum + 1;
       if (nextStageNum === stages.length) {
-        controls.clearAnimation();
         onComplete();
       } else {
         run(stages, nextStageNum);
       }
     }
 
-    controls.setAnimation(animation);
     animation.run(stage, onComponentFrame, onStageComplete);
   };
 
