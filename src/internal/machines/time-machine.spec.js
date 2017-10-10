@@ -4,7 +4,7 @@ import test from 'tape'
 
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 
-test('InfiniteTimeMachine', assert => {
+test('InfiniteTimeMachine running a single job', assert => {
   const expectedCallCount = 5;
   const interval = 100;
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
@@ -27,6 +27,46 @@ test('InfiniteTimeMachine', assert => {
 
   infiniteMachine
     .do(job)
+    .run();
+});
+
+test('InfiniteTimeMachine running multiple jobs', assert => {
+  const expectedCallCount = 10;
+  const interval = 20;
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
+  const cancelAnimationFrame = clearTimeout;
+  const spyA = sinon.spy();
+  const spyB = sinon.spy();
+  let numIterations = 0;
+
+  const infiniteMachine = InfiniteTimeMachine(requestAnimationFrame, cancelAnimationFrame);
+
+  const jobA = () => {
+    numIterations++;
+    spyA();
+  };
+
+  const jobB = () => {
+    numIterations++;
+    spyB();
+    if (numIterations === expectedCallCount) {
+      console.log(numIterations);
+      infiniteMachine.stop();
+      assert.equals(
+        spyA.callCount, (expectedCallCount / 2),
+        'the machine runs the first job the expected number of times'
+      );
+      assert.equals(
+        spyB.callCount, (expectedCallCount / 2),
+        'the machine runs the second job the expected number of times'
+      );
+      assert.end();
+    }
+  };
+
+  infiniteMachine
+    .do(jobA)
+    .do(jobB)
     .run();
 });
 
