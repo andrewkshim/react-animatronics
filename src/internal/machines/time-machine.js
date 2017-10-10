@@ -66,11 +66,12 @@ export const FiniteTimeMachine = (machine: Time, duration: number): Time => {
     do: (job: Function) => {
       const _job = () => {
         const elapsedTime: number = Date.now() - _startTime;
+        job(elapsedTime);
+
         if (elapsedTime >= duration) {
           machine.stop();
           _onComplete();
         }
-        job(elapsedTime);
       }
       _do(_job);
       return finiteMachine;
