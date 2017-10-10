@@ -100,19 +100,23 @@ export const AnimationMachine = (
     onComponentFrame: Function,
     onStageComplete: Function,
   ) => {
-    let numComponentsDone = 0;
     const componentNames = Object.keys(stage);
+    let numComponentsDone = 0;
+
     const onComponentDone = () => {
       numComponentsDone++;
       if (numComponentsDone === componentNames.length) {
         onStageComplete();
       }
     };
+
     componentNames.forEach(componentName => {
       const animation: Object = stage[componentName];
+
       const onFrame: Function = (updatedStyles) => {
         onComponentFrame(componentName, updatedStyles);
       }
+
       if (isUsingTime(animation)) {
         runTimedAnimation(infiniteMachine, animation, onFrame, onComponentDone);
       } else if (isUsingSpring(animation)) {
