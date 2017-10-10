@@ -17,11 +17,7 @@ test('AnimationMachine', assert => {
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
 
-  const animationMachine = AnimationMachine(
-    stage,
-    requestAnimationFrame,
-    cancelAnimationFrame,
-  );
+  const animationMachine = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
 
   const onComponentFrame = sinon.spy();
 
@@ -41,5 +37,5 @@ test('AnimationMachine', assert => {
     assert.end();
   };
 
-  animationMachine.run(onComponentFrame, onComplete);
+  animationMachine.run(stage, onComponentFrame, onComplete);
 });

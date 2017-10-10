@@ -7,7 +7,7 @@
 
 import Debug from 'debug'
 
-import type { AnimationStage, Controls } from './flow-types'
+import type { AnimationStage, Controls, Animation } from './flow-types'
 import { AnimationMachine } from './machines/animation-machine'
 
 const debug = Debug('animatronics:animator');
@@ -28,8 +28,7 @@ export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
 export const playAnimation = (
   stages: AnimationStage[],
   controls: Controls,
-  requestAnimationFrame: Function,
-  cancelAnimationFrame: Function,
+  animation: Animation,
   onComplete: Function,
 ) => {
   debug('starting animation %O', stages);
@@ -53,13 +52,8 @@ export const playAnimation = (
       }
     }
 
-    const animationMachine = AnimationMachine(
-      stage,
-      requestAnimationFrame,
-      cancelAnimationFrame,
-    );
-    controls.setAnimation(animationMachine);
-    animationMachine.run(onComponentFrame, onStageComplete);
+    controls.setAnimation(animation);
+    animation.run(stage, onComponentFrame, onStageComplete);
   };
 
   run(stages, 0);
@@ -68,14 +62,12 @@ export const playAnimation = (
 export const rewindAnimation = (
   stages: AnimationStage[],
   controls: Controls,
-  requestAnimationFrame: Function,
-  cancelAnimationFrame: Function,
+  animation: Animation,
   onComplete: Function,
 ) => playAnimation(
   reverseStages(stages),
   controls,
-  requestAnimationFrame,
-  cancelAnimationFrame,
+  animation,
   onComplete,
 );
 

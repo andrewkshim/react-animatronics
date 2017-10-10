@@ -3,10 +3,8 @@ import sinon from 'sinon'
 import test from 'tape'
 
 import { ControlsMachine } from './machines/controls-machine'
-import {
-  reverseStages,
-  playAnimation,
-} from './animator'
+import { AnimationMachine } from './machines/animation-machine'
+import { reverseStages, playAnimation } from './animator'
 
 test('reverseStages', assert => {
   const stages = [
@@ -49,6 +47,7 @@ test('playAnimation', assert => {
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
   const styleUpdater = sinon.spy();
 
   controls.registerComponent('componentA', {}, styleUpdater);
@@ -56,8 +55,7 @@ test('playAnimation', assert => {
   playAnimation(
     stages,
     controls,
-    requestAnimationFrame,
-    cancelAnimationFrame,
+    animation,
     () => {
       assert.equals(
         styleUpdater.callCount, Math.floor(duration / interval),

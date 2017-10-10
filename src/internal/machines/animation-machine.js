@@ -7,7 +7,7 @@
 
 import BezierEasing from 'bezier-easing'
 
-import type { Time, Animation } from '../flow-types'
+import type { Time, Animation, AnimationStage } from '../flow-types'
 
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
@@ -86,7 +86,6 @@ const runSpringAnimation = (
 }
 
 export const AnimationMachine = (
-  stage: Object,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
 ): Animation => {
@@ -96,7 +95,11 @@ export const AnimationMachine = (
     cancelAnimationFrame,
   );
 
-  const run = (onComponentFrame: Function, onStageComplete: Function) => {
+  const run = (
+    stage: AnimationStage,
+    onComponentFrame: Function,
+    onStageComplete: Function,
+  ) => {
     Object.keys(stage).reduce((updatedComponentStyles, componentName) => {
       const animation: Object = stage[componentName];
       const onFrame: Function = (updatedStyles) => {
