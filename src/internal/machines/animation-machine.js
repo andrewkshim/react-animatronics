@@ -59,7 +59,7 @@ const runSpringAnimation = (
   timeMachine: Time,
   animation: Object,
   onFrame: Function,
-  onStageComplete: Function,
+  onComponentDone: Function,
 ) => {
   const {
     start: startStyles,
@@ -75,7 +75,7 @@ const runSpringAnimation = (
   const _onComplete = (endStyles) => {
     onFrame(endStyles);
     timeMachine.stop();
-    onStageComplete();
+    onComponentDone();
   }
 
   timeMachine
