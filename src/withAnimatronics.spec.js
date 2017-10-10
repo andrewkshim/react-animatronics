@@ -11,11 +11,11 @@ test('withAnimatronics creates a valid React element', assert => {
   assert.end();
 });
 
-test('withAnimatronics supplies runAnimation() to the wrapped component', assert => {
+test('withAnimatronics supplies playAnimation() to the wrapped component', assert => {
   const Base = () => <div/>;
   const Animated = withAnimatronics()(Base);
   const wrapper = shallow(<Animated/>);
-  const runAnimation = wrapper.find(Base).prop('runAnimation');
-  assert.true(typeof runAnimation === 'function');
+  const playAnimation = wrapper.find(Base).prop('playAnimation');
+  assert.true(typeof playAnimation === 'function');
   assert.end();
 });
