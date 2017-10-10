@@ -33,25 +33,23 @@ export const playAnimation = (
 ) => {
   debug('starting animation %O', stages);
 
+  const onComponentFrame = controls.updateStyles;
+
+  const onStageComplete = nextStageNum => () => {
+    if (nextStageNum === stages.length) {
+      onComplete();
+    } else {
+      run(stages, nextStageNum);
+    }
+  };
+
   const run = (stages, currentStageNum) => {
     debug('running animation stage %d', currentStageNum);
-
-    // Flow doesn't play nicely with computed properties / array access.
-    // $FlowFixMe
-    const stage: AnimationStage = stages[currentStageNum];
-
-    const onComponentFrame = controls.updateStyles;
-
-    const onStageComplete = () => {
-      const nextStageNum = currentStageNum + 1;
-      if (nextStageNum === stages.length) {
-        onComplete();
-      } else {
-        run(stages, nextStageNum);
-      }
-    }
-
-    animation.run(stage, onComponentFrame, onStageComplete);
+    animation.run(
+      stages[currentStageNum],
+      onComponentFrame,
+      onStageComplete(currentStageNum + 1),
+    );
   };
 
   run(stages, 0);
