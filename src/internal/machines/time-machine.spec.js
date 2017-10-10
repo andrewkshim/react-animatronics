@@ -73,7 +73,7 @@ test('InfiniteTimeMachine running multiple jobs', assert => {
 test('FiniteTimeMachine', assert => {
   const duration = 500;
   const interval = 90;
-  const expectedCallCount = Math.floor(duration / interval);
+  const expectedCallCount = Math.floor(duration / interval) + 1;
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const job = sinon.spy();
