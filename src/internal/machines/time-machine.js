@@ -59,25 +59,29 @@ export const FiniteTimeMachine = (machine: Time, duration: number): Time => {
   let _startTime: number = 0;
   let _onComplete = () => {};
 
-  const { do: _do, run: _run } = machine;
+  const { do: _do, run: _run, ...rest } = machine;
 
-  machine.do = (job: Function, onFrame?: VoidFn) => {
-    const _job = () => {
-      const elapsedTime: number = Date.now() - _startTime;
-      if (elapsedTime >= duration) {
-        machine.stop();
-        _onComplete();
+  const finiteMachine = {
+    ...rest,
+    do: (job: Function) => {
+      const _job = () => {
+        const elapsedTime: number = Date.now() - _startTime;
+        if (elapsedTime >= duration) {
+          machine.stop();
+          _onComplete();
+        }
+        job(elapsedTime);
       }
-      job(elapsedTime);
-    }
-    return _do(_job, onFrame);
-  }
+      _do(_job);
+      return finiteMachine;
+    },
+    run: (onComplete) => {
+      _startTime = Date.now();
+      _onComplete = onComplete || _onComplete;
+      _run();
+      return finiteMachine;
+    },
+  };
 
-  machine.run = (onComplete) => {
-    _startTime = Date.now();
-    _onComplete = onComplete || _onComplete;
-    return _run();
-  }
-
-  return machine;
+  return finiteMachine;
 };
