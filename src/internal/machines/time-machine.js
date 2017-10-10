@@ -15,14 +15,13 @@ export const InfiniteTimeMachine = (
 
   let _frame: ?number = null;
   let _machineIsStopped: boolean = false;
-  let _job: Function = noop;
-  let _onFrame: VoidFn = noop;
+  let _jobs: Function[] = [];
 
   const runIteration: VoidFn = () => {
     if (_machineIsStopped) return;
 
     _frame = requestAnimationFrame(() => {
-      _job();
+      _jobs.forEach(job => job());
       runIteration();
     });
   }
@@ -30,8 +29,8 @@ export const InfiniteTimeMachine = (
   const machine: Time = {
     isStopped: (): boolean => _machineIsStopped,
 
-    do: (job: Function, onFrame?: VoidFn) => {
-      _job = job;
+    do: (job: Function) => {
+      _jobs.push(job);
       return machine;
     },
 
@@ -47,6 +46,7 @@ export const InfiniteTimeMachine = (
       }
       _frame = null;
       _machineIsStopped = true;
+      _jobs = [];
     }
 
   };
