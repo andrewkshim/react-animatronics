@@ -60,12 +60,13 @@ export const rewindAnimation = (
   controls: Controls,
   animation: Animation,
   onComplete: Function,
-) => playAnimation(
-  reverseStages(stages),
-  controls,
-  animation,
-  onComplete,
-);
+) =>
+  playAnimation(
+    reverseStages(stages),
+    controls,
+    animation,
+    onComplete,
+  );
 
 const Animator = { playAnimation, rewindAnimation };
 
