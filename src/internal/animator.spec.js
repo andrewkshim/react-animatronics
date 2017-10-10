@@ -57,13 +57,58 @@ test('playAnimation with a single stage', assert => {
     controls,
     animation,
     () => {
-      assert.equals(
-        styleUpdater.callCount, Math.floor(duration / interval),
+      assert.ok(
+        styleUpdater.callCount >= Math.floor(duration / interval),
         'calls the style updater the expected number of times'
       );
       assert.deepEquals(
         styleUpdater.lastCall.args[0], { left: '100px' },
         'provides the style updater with the correct end styles'
+      );
+      assert.end();
+    },
+  );
+});
+
+test('playAnimation with a single stage and multiple components', assert => {
+  const interval = 100;
+  const duration = 500;
+  const stages = [
+    {
+      componentA: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+      componentB: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+    }
+  ];
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
+  const cancelAnimationFrame = clearTimeout;
+  const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const styleUpdaterA = sinon.spy();
+  const styleUpdaterB = sinon.spy();
+
+  controls.registerComponent('componentA', {}, styleUpdaterA);
+  controls.registerComponent('componentB', {}, styleUpdaterB);
+
+  playAnimation(
+    stages,
+    controls,
+    animation,
+    () => {
+      assert.deepEquals(
+        styleUpdaterA.lastCall.args[0], { left: '100px' },
+        'provides the style updater for the first component with the correct end styles'
+      );
+      assert.deepEquals(
+        styleUpdaterB.lastCall.args[0], { left: '100px' },
+        'provides the style updater for the second component with the correct end styles'
       );
       assert.end();
     },
@@ -117,3 +162,4 @@ test('playAnimation with multiple stages', { timeout: 1000 }, assert => {
     },
   );
 });
+
