@@ -100,7 +100,7 @@ export const AnimationMachine = (
     onComponentFrame: Function,
     onStageComplete: Function,
   ) => {
-    Object.keys(stage).reduce((updatedComponentStyles, componentName) => {
+    Object.keys(stage).forEach(componentName => {
       const animation: Object = stage[componentName];
       const onFrame: Function = (updatedStyles) => {
         onComponentFrame(componentName, updatedStyles);
@@ -112,7 +112,7 @@ export const AnimationMachine = (
       } else {
         // TODO: Error
       }
-    }, {});
+    });
   }
 
   const stop = () => infiniteMachine.stop();
