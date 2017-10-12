@@ -21,10 +21,10 @@ const withAnimatronics = (
   } = {}
 ) => {
 
-  return BaseComponent => {
+  const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
 
-    const controls = ControlsMachine();
-    const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  return BaseComponent => {
 
     class AnimatorComponent extends React.Component {
       constructor(props) {
