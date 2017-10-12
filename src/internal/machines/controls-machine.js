@@ -5,7 +5,11 @@
  * @module internal/machines/controls-machine
  */
 
+import Debug from 'debug'
+
 import type { Styles, StyleUpdater, DOMNode, Controls } from '../flow-types'
+
+const debug = Debug('animatronics:controls');
 
 export const ControlsMachine = (): Controls => {
   const _nodes: { [string]: DOMNode } = {};
@@ -16,6 +20,7 @@ export const ControlsMachine = (): Controls => {
     node: DOMNode,
     styleUpdater: StyleUpdater,
   ) => {
+    debug('registering component "%s"', componentName,);
     _nodes[componentName] = node;
     _styleUpdaters[componentName] = styleUpdater;
   };
