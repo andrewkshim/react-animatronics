@@ -10,6 +10,7 @@ import Animator from './internal/animator'
 import ContextTypes from './internal/context-types'
 import { ControlsMachine } from './internal/machines/controls-machine'
 import { AnimationMachine } from './internal/machines/animation-machine'
+import { noop } from './internal/utils'
 
 import Polyfills from './internal/polyfills'
 
@@ -44,7 +45,7 @@ const withAnimatronics = (
         };
       }
 
-      _playAnimation() {
+      _playAnimation(onComplete = noop) {
         // TODO: warn when an event might have been passed in
         const rawAnimationStages = createAnimationStages(controls.getNodes());
         const createStages = typeof rawAnimationStages === 'function' ? rawAnimationStages : () => rawAnimationStages;
@@ -52,18 +53,18 @@ const withAnimatronics = (
           createStages(),
           controls,
           animation,
-          () => {},
+          onComplete,
         );
       }
 
-      _rewindAnimation() {
+      _rewindAnimation(onComplete = noop) {
         const rawAnimationStages = createAnimationStages(controls.getNodes());
         const createStages = typeof rawAnimationStages === 'function' ? rawAnimationStages : () => rawAnimationStages;
         Animator.rewindAnimation(
           createStages(),
           controls,
           animation,
-          () => {},
+          onComplete,
         )
       }
 
