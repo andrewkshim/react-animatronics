@@ -44,17 +44,6 @@ const withAnimatronics = (
         };
       }
 
-      _rewindAnimation() {
-        const rawAnimationStages = createAnimationStages(controls.getNodes());
-        const createStages = typeof rawAnimationStages === 'function' ? rawAnimationStages : () => rawAnimationStages;
-        Animator.rewindAnimation(
-          createStages(),
-          controls,
-          animation,
-          () => {},
-        )
-      }
-
       _playAnimation() {
         // TODO: warn when an event might have been passed in
         const rawAnimationStages = createAnimationStages(controls.getNodes());
@@ -65,6 +54,17 @@ const withAnimatronics = (
           animation,
           () => {},
         );
+      }
+
+      _rewindAnimation() {
+        const rawAnimationStages = createAnimationStages(controls.getNodes());
+        const createStages = typeof rawAnimationStages === 'function' ? rawAnimationStages : () => rawAnimationStages;
+        Animator.rewindAnimation(
+          createStages(),
+          controls,
+          animation,
+          () => {},
+        )
       }
 
       _cancelAnimation() {
