@@ -71,6 +71,10 @@ const withAnimatronics = (
         animation.stop();
       }
 
+      componentWillUnmount() {
+        animation.stop();
+      }
+
       render() {
         const { ...props } = this.props;
         return (
