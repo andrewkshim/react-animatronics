@@ -90,16 +90,14 @@ export const AnimationMachine = (
   cancelAnimationFrame: Function,
 ): Animation => {
 
-  const infiniteMachine: Time = InfiniteTimeMachine(
-    requestAnimationFrame,
-    cancelAnimationFrame,
-  );
+  const timeMachines = {};
 
   const run = (
     stage: AnimationStage,
     onComponentFrame: Function,
     onStageComplete: Function,
-  ) => {
+  ): Time => {
+
     const componentNames = Object.keys(stage);
     let numComponentsDone = 0;
 
@@ -112,22 +110,40 @@ export const AnimationMachine = (
 
     componentNames.forEach(componentName => {
       const animation: Object = stage[componentName];
+      timeMachines[componentName] = InfiniteTimeMachine(
+        requestAnimationFrame,
+        cancelAnimationFrame,
+      );
 
       const onFrame: Function = (updatedStyles) => {
         onComponentFrame(componentName, updatedStyles);
       }
 
       if (isUsingTime(animation)) {
-        runTimedAnimation(infiniteMachine, animation, onFrame, onComponentDone);
+        runTimedAnimation(
+          timeMachines[componentName],
+          animation,
+          onFrame,
+          onComponentDone
+        );
       } else if (isUsingSpring(animation)) {
-        runSpringAnimation(infiniteMachine, animation, onFrame, onComponentDone);
+        runSpringAnimation(
+          timeMachines[componentName],
+          animation,
+          onFrame,
+          onComponentDone
+        );
       } else {
         // TODO: Error
       }
     });
   }
 
-  const stop = () => infiniteMachine.stop();
+  const stop = () => {
+    Object.keys(timeMachines).forEach(componentName => {
+      timeMachines[componentName].stop();
+    });
+  }
 
   const machine = { run, stop };
   return machine;
