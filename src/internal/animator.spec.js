@@ -6,29 +6,46 @@ import { ControlsMachine } from './machines/controls-machine'
 import { AnimationMachine } from './machines/animation-machine'
 import { reverseStages, playAnimation } from './animator'
 
-test('reverseStages', assert => {
+test.only('reverseStages', assert => {
   const stages = [
     {
       componentA: {
         duration: 500,
         start: { left: '0px' },
-        end: { left: '0px' },
+        end: { left: '100px' },
       },
-    }
+    },
+    {
+      componentB: {
+        duration: 420,
+        start: { top: '0px' },
+        end: { top: '200px' },
+      },
+    },
   ];
 
   const actual = reverseStages(stages);
   const expected = [
     {
+      componentB: {
+        duration: 420,
+        start: { top: '200px' },
+        end: { top: '0px' },
+      },
+    },
+    {
       componentA: {
         duration: 500,
-        start: { left: '0px' },
+        start: { left: '100px' },
         end: { left: '0px' },
       },
-    }
+    },
   ];
 
-  assert.deepEquals(actual, expected, 'correctly reverses every stage');
+  assert.deepEquals(
+    actual, expected,
+    'correctly reverses every stage and the order of the stages'
+  );
   assert.end();
 });
 
