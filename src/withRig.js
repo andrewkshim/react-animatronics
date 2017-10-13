@@ -28,16 +28,16 @@ const withRig = (
       const { animatronics } = this.context;
       const ref = useStringRefs ? this.refs[componentName] : this._ref;
       const domNode = ReactDOM.findDOMNode(ref);
-      animatronics.registerComponent({
-        domNode,
+      animatronics.registerComponent(
         componentName,
-        setComponentStyle: this._setComponentStyle,
-      });
+        domNode,
+        this._setComponentStyle,
+      );
     }
 
     componentWillUnmount() {
       const { animatronics } = this.context;
-      animatronics.unregisterComponent({ componentName });
+      animatronics.unregisterComponent(componentName);
     }
 
     _setComponentStyle(updatedStyles) {
