@@ -13,17 +13,19 @@ import { AnimationMachine } from './machines/animation-machine'
 const debug = Debug('animatronics:animator');
 
 export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
-  stages.map(stage =>
-    Object.keys(stage).reduce((result, componentName) => {
-      const { start, end, ...rest } = stage[componentName];
-      result[componentName] = {
-        start: end,
-        end: start,
-        ...rest,
-      };
-      return result;
-    }, {})
-  );
+  stages
+    .map(stage =>
+      Object.keys(stage).reduce((result, componentName) => {
+        const { start, end, ...rest } = stage[componentName];
+        result[componentName] = {
+          start: end,
+          end: start,
+          ...rest,
+        };
+        return result;
+      }, {})
+    )
+    .reverse();
 
 export const playAnimation = (
   stages: AnimationStage[],
