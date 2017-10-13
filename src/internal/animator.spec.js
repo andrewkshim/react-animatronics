@@ -6,7 +6,7 @@ import { ControlsMachine } from './machines/controls-machine'
 import { AnimationMachine } from './machines/animation-machine'
 import { reverseStages, playAnimation } from './animator'
 
-test.only('reverseStages', assert => {
+test('reverseStages', assert => {
   const stages = [
     {
       componentA: {
