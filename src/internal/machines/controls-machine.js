@@ -31,6 +31,7 @@ export const ControlsMachine = (): Controls => {
   };
 
   const updateStyles = (componentName: string, styles: Styles) => {
+    // TODO: if the style updater doesn't exist, user might have misspelled rig name
     _styleUpdaters[componentName](styles);
   };
 
