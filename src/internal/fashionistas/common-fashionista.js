@@ -33,9 +33,10 @@ export const isColorString = (str: string): boolean => {
   return !!color;
 }
 
+// replace decimals otherwise it'll get caught by the NON_NUMBER_REGEX
 const isNumberStr = (str: string): boolean => (
   !isNaN(parseFloat(str))
-  && !NON_NUMER_REGEX.test(str)
+  && !NON_NUMER_REGEX.test(str.replace('.', ''))
 );
 
 export const createColorFashion = (raw: string): ColorFashion => ({
