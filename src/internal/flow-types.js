@@ -78,7 +78,8 @@ export type Spring = {
 }
 
 export type Animation = {
-  run: (stage: AnimationStage, onComponentFrame: Function, onStageComplete: Function) => void,
+  play: (stages: AnimationStage[], controls: Controls, onComplete: Function) => void,
+  rewind: (controls: Controls, onComplete: Function) => void,
   stop: () => void,
 }
 

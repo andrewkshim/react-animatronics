@@ -2,40 +2,176 @@
 import sinon from 'sinon'
 import test from 'tape'
 
-import { AnimationMachine } from './animation-machine'
+import { ControlsMachine } from './controls-machine'
+import { reverseStages, AnimationMachine } from './animation-machine'
 
-test('AnimationMachine', assert => {
-  const interval = 125;
-  const duration = 250;
-  const stage = {
-    componentA: {
-      duration,
-      start: { left: '0px' },
-      end: { left: '100px' },
+test('reverseStages', assert => {
+  const stages = [
+    {
+      componentA: {
+        duration: 500,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
     },
-  };
+    {
+      componentB: {
+        duration: 420,
+        start: { top: '0px' },
+        end: { top: '200px' },
+      },
+    },
+  ];
+
+  const actual = reverseStages(stages);
+  const expected = [
+    {
+      componentB: {
+        duration: 420,
+        start: { top: '200px' },
+        end: { top: '0px' },
+      },
+    },
+    {
+      componentA: {
+        duration: 500,
+        start: { left: '100px' },
+        end: { left: '0px' },
+      },
+    },
+  ];
+
+  assert.deepEquals(
+    actual, expected,
+    'correctly reverses every stage and the order of the stages'
+  );
+  assert.end();
+});
+
+test('AnimationMachine.play with a single stage', assert => {
+  const interval = 100;
+  const duration = 500;
+  const stages = [
+    {
+      componentA: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+    }
+  ];
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
+  const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const styleUpdater = sinon.spy();
 
-  const animationMachine = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  controls.registerComponent('componentA', {}, styleUpdater);
 
-  const onComponentFrame = sinon.spy();
+  animation.play(
+    stages,
+    controls,
+    () => {
+      assert.ok(
+        styleUpdater.callCount >= Math.floor(duration / interval),
+        'calls the style updater the expected number of times'
+      );
+      assert.deepEquals(
+        styleUpdater.lastCall.args[0], { left: '100px' },
+        'provides the style updater with the correct end styles'
+      );
+      assert.end();
+    },
+  );
+});
 
-  const onComplete = () => {
-    assert.equals(
-      onComponentFrame.callCount, Math.floor(duration / interval) + 1,
-      'calls onComponentFrame the expected number of times'
-    );
-    assert.deepEquals(
-      onComponentFrame.lastCall.args[0], 'componentA',
-      'calls onComponentFrame for the correct component'
-    );
-    assert.deepEquals(
-      onComponentFrame.lastCall.args[1], { left: '100px' },
-      'calls onComponentFrame with the correct styles'
-    );
-    assert.end();
-  };
+test('AnimationMachine.play with a single stage and multiple components', assert => {
+  const interval = 100;
+  const duration = 500;
+  const stages = [
+    {
+      componentA: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+      componentB: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+    }
+  ];
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
+  const cancelAnimationFrame = clearTimeout;
+  const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const styleUpdaterA = sinon.spy();
+  const styleUpdaterB = sinon.spy();
 
-  animationMachine.run(stage, onComponentFrame, onComplete);
+  controls.registerComponent('componentA', {}, styleUpdaterA);
+  controls.registerComponent('componentB', {}, styleUpdaterB);
+
+  animation.play(
+    stages,
+    controls,
+    () => {
+      assert.deepEquals(
+        styleUpdaterA.lastCall.args[0], { left: '100px' },
+        'provides the style updater for the first component with the correct end styles'
+      );
+      assert.deepEquals(
+        styleUpdaterB.lastCall.args[0], { left: '100px' },
+        'provides the style updater for the second component with the correct end styles'
+      );
+      assert.end();
+    },
+  );
+});
+
+test('AnimationMachine.play with multiple stages', { timeout: 1000 }, assert => {
+  const interval = 100;
+  const duration = 200;
+  const stages = [
+    {
+      componentA: {
+        duration,
+        start: { left: '0px' },
+        end: { left: '100px' },
+      },
+    },
+    {
+      componentA: {
+        duration,
+        start: { left: '100px' },
+        end: { left: '200px' },
+      },
+    },
+    {
+      componentA: {
+        duration,
+        start: { left: '200px' },
+        end: { left: '300px' },
+      },
+    },
+  ];
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
+  const cancelAnimationFrame = clearTimeout;
+  const controls = ControlsMachine();
+  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const styleUpdater = sinon.spy();
+
+  controls.registerComponent('componentA', {}, styleUpdater);
+
+  animation.play(
+    stages,
+    controls,
+    () => {
+      assert.deepEquals(
+        styleUpdater.lastCall.args[0], { left: '300px' },
+        'provides the style updater with the correct end styles'
+      );
+      assert.end();
+    },
+  );
 });

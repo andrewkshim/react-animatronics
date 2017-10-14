@@ -6,12 +6,15 @@
  */
 
 import BezierEasing from 'bezier-easing'
+import Debug from 'debug'
 
-import type { Time, Animation, AnimationStage } from '../flow-types'
+import type { Time, Controls, Animation, AnimationStage } from '../flow-types'
 
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 import { SpringMachine } from './spring-machine'
+
+const debug = Debug('animatronics:animation');
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
@@ -20,6 +23,21 @@ const isUsingTime = (animation: Object): boolean =>
 
 const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
+
+export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
+  stages
+    .map(stage =>
+      Object.keys(stage).reduce((result, componentName) => {
+        const { start, end, ...rest } = stage[componentName];
+        result[componentName] = {
+          start: end,
+          end: start,
+          ...rest,
+        };
+        return result;
+      }, {})
+    )
+    .reverse();
 
 export const calculateEasingProgress = (
   easingFn: Function,
@@ -90,13 +108,17 @@ export const AnimationMachine = (
   cancelAnimationFrame: Function,
 ): Animation => {
 
-  const timeMachines = {};
+  const _state: { timeMachines: { [string]: Time }, previousStages: AnimationStage[] } = {
+    timeMachines: {},
+    previousStages: [],
+  };
 
-  const run = (
+  const _runStage = (
     stage: AnimationStage,
     onComponentFrame: Function,
     onStageComplete: Function,
-  ): Time => {
+  ): void => {
+    debug('running animation stage %O', stage);
 
     const componentNames = Object.keys(stage);
     let numComponentsDone = 0;
@@ -110,7 +132,7 @@ export const AnimationMachine = (
 
     componentNames.forEach(componentName => {
       const animation: Object = stage[componentName];
-      timeMachines[componentName] = InfiniteTimeMachine(
+      _state.timeMachines[componentName] = InfiniteTimeMachine(
         requestAnimationFrame,
         cancelAnimationFrame,
       );
@@ -121,14 +143,14 @@ export const AnimationMachine = (
 
       if (isUsingTime(animation)) {
         runTimedAnimation(
-          timeMachines[componentName],
+          _state.timeMachines[componentName],
           animation,
           onFrame,
           onComponentDone
         );
       } else if (isUsingSpring(animation)) {
         runSpringAnimation(
-          timeMachines[componentName],
+          _state.timeMachines[componentName],
           animation,
           onFrame,
           onComponentDone
@@ -139,12 +161,47 @@ export const AnimationMachine = (
     });
   }
 
-  const stop = () => {
-    Object.keys(timeMachines).forEach(componentName => {
-      timeMachines[componentName].stop();
+  const play = (
+    stages: AnimationStage[],
+    controls: Controls,
+    onComplete: Function,
+  ) => {
+    // TODO: invariant, can't have any previousStages
+    _state.previousStages = stages;
+
+    const _onStageComplete = nextStageNum => () => {
+      if (nextStageNum === stages.length) {
+        onComplete();
+      } else {
+        _runStage(
+          stages[nextStageNum],
+          controls.updateStyles,
+          _onStageComplete(nextStageNum + 1),
+        );
+      }
+    };
+
+    _runStage(
+      stages[0],
+      controls.updateStyles,
+      _onStageComplete(1),
+    );
+  }
+
+  const rewind = (controls: Controls, onComplete: Function) => {
+    const stages = reverseStages(_state.previousStages);
+    play(stages, controls, () => {
+      _state.previousStages = [];
+      onComplete();
     });
   }
 
-  const machine = { run, stop };
+  const stop = () => {
+    Object.keys(_state.timeMachines).forEach(componentName => {
+      _state.timeMachines[componentName].stop();
+    });
+  }
+
+  const machine = { play, rewind, stop };
   return machine;
 };

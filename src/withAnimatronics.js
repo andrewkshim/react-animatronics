@@ -6,7 +6,6 @@
 
 import React from 'react'
 
-import Animator from './internal/animator'
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
 import { ControlsMachine } from './internal/machines/controls-machine'
@@ -50,6 +49,8 @@ const withAnimatronics = (
         animationName = Constants.DEFAULT_ANIMATION_NAME,
         onComplete = noop
       ) {
+        onComplete = typeof animationName === 'function' ? animationName : onComplete;
+
         // TODO: warn when an event might have been passed in
         const rawAnimationStages = createAnimationStages(controls.getNodes());
         const stages = rawAnimationStages[animationName] || rawAnimationStages;
@@ -59,18 +60,15 @@ const withAnimatronics = (
           throw new Error('stages is not an array');
         }
 
-        Animator.playAnimation(
-          stages,
-          controls,
-          animation,
-          onComplete,
-        );
+        animation.play(stages, controls, onComplete);
       }
 
       _rewindAnimation(
         animationName = Constants.DEFAULT_ANIMATION_NAME,
         onComplete = noop,
       ) {
+        onComplete = typeof animationName === 'function' ? animationName : onComplete;
+
         const rawAnimationStages = createAnimationStages(controls.getNodes());
         const stages = rawAnimationStages[animationName] || rawAnimationStages;
 
@@ -79,12 +77,7 @@ const withAnimatronics = (
           throw new Error('stages is not an array');
         }
 
-        Animator.rewindAnimation(
-          stages,
-          controls,
-          animation,
-          onComplete,
-        )
+        animation.rewind(controls, onComplete);
       }
 
       _cancelAnimation() {
