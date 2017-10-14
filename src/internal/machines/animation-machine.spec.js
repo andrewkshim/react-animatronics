@@ -2,6 +2,7 @@
 import sinon from 'sinon'
 import test from 'tape'
 
+import Constants from '../constants'
 import { ControlsMachine } from './controls-machine'
 import { reverseStages, AnimationMachine } from './animation-machine'
 
@@ -63,13 +64,17 @@ test('AnimationMachine.play with a single stage', assert => {
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
-  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const animation = AnimationMachine(
+    () => stages,
+    requestAnimationFrame,
+    cancelAnimationFrame
+  );
   const styleUpdater = sinon.spy();
 
   controls.registerComponent('componentA', {}, styleUpdater);
 
   animation.play(
-    stages,
+    Constants.DEFAULT_ANIMATION_NAME,
     controls,
     () => {
       assert.ok(
@@ -105,7 +110,11 @@ test('AnimationMachine.play with a single stage and multiple components', assert
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
-  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const animation = AnimationMachine(
+    () => stages,
+    requestAnimationFrame,
+    cancelAnimationFrame
+  );
   const styleUpdaterA = sinon.spy();
   const styleUpdaterB = sinon.spy();
 
@@ -113,7 +122,7 @@ test('AnimationMachine.play with a single stage and multiple components', assert
   controls.registerComponent('componentB', {}, styleUpdaterB);
 
   animation.play(
-    stages,
+    Constants.DEFAULT_ANIMATION_NAME,
     controls,
     () => {
       assert.deepEquals(
@@ -158,13 +167,17 @@ test('AnimationMachine.play with multiple stages', { timeout: 1000 }, assert => 
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
-  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+  const animation = AnimationMachine(
+    () => stages,
+    requestAnimationFrame,
+    cancelAnimationFrame
+  );
   const styleUpdater = sinon.spy();
 
   controls.registerComponent('componentA', {}, styleUpdater);
 
   animation.play(
-    stages,
+    Constants.DEFAULT_ANIMATION_NAME,
     controls,
     () => {
       assert.deepEquals(
