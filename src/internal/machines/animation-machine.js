@@ -25,12 +25,24 @@ const isUsingTime = (animation: Object): boolean =>
 const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
 
+export const findLongestDelay = (stage: AnimationStage): number =>
+  Object.keys(stage)
+    .map(key => stage[key])
+    .map(s => s.delay || 0)
+    .reduce(
+      (longest, delay) => (delay > longest) ? delay : longest,
+      0
+    );
+
 export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
   stages
-    .map(stage =>
-      Object.keys(stage).reduce((result, componentName) => {
-        const { start, end, ...rest } = stage[componentName];
+    .map(stage => Object.keys(stage)
+      .reverse()
+      .reduce((result, componentName) => {
+        const longestDelay = findLongestDelay(stage);
+        const { start, end, delay, ...rest } = stage[componentName];
         result[componentName] = {
+          delay: longestDelay - (delay || 0),
           start: end,
           end: start,
           ...rest,

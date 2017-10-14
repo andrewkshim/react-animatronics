@@ -6,46 +6,100 @@ import Constants from '../constants'
 import { ControlsMachine } from './controls-machine'
 import { reverseStages, AnimationMachine } from './animation-machine'
 
+test('findLongestDelay', assert => {
+  const stage = {
+    componentA: {
+      duration: 500,
+      delay: 100,
+      start: { left: '0px' },
+      end: { left: '100px' },
+    },
+    componentB: {
+      duration: 500,
+      delay: 700,
+      start: { left: '0px' },
+      end: { left: '100px' },
+    },
+  };
+  assert.equals(findLongestDelay(stage), 700, 'correctly finds the longest delay');
+  assert.end();
+});
+
 test('reverseStages', assert => {
-  const stages = [
-    {
-      componentA: {
-        duration: 500,
-        start: { left: '0px' },
-        end: { left: '100px' },
-      },
-    },
-    {
-      componentB: {
-        duration: 420,
-        start: { top: '0px' },
-        end: { top: '200px' },
-      },
-    },
-  ];
-
-  const actual = reverseStages(stages);
-  const expected = [
-    {
-      componentB: {
-        duration: 420,
-        start: { top: '200px' },
-        end: { top: '0px' },
-      },
-    },
-    {
-      componentA: {
-        duration: 500,
-        start: { left: '100px' },
-        end: { left: '0px' },
-      },
-    },
-  ];
-
   assert.deepEquals(
-    actual, expected,
+    reverseStages([
+      {
+        componentA: {
+          duration: 500,
+          start: { left: '0px' },
+          end: { left: '100px' },
+        },
+      },
+      {
+        componentB: {
+          duration: 420,
+          start: { top: '0px' },
+          end: { top: '200px' },
+        },
+      },
+    ]),
+    [
+      {
+        componentB: {
+          delay: 0,
+          duration: 420,
+          start: { top: '200px' },
+          end: { top: '0px' },
+        },
+      },
+      {
+        componentA: {
+          delay: 0,
+          duration: 500,
+          start: { left: '100px' },
+          end: { left: '0px' },
+        },
+      },
+    ],
     'correctly reverses every stage and the order of the stages'
   );
+
+  assert.deepEquals(
+    reverseStages([
+      {
+        componentA: {
+          delay: 100,
+          duration: 500,
+          start: { left: '0px' },
+          end: { left: '100px' },
+        },
+        componentB: {
+          delay: 620,
+          duration: 420,
+          start: { top: '0px' },
+          end: { top: '200px' },
+        },
+      },
+    ]),
+    [
+      {
+        componentA: {
+          delay: 520,
+          duration: 500,
+          start: { left: '100px' },
+          end: { left: '0px' },
+        },
+        componentB: {
+          delay: 0,
+          duration: 420,
+          start: { top: '200px' },
+          end: { top: '0px' },
+        },
+      },
+    ],
+    'correctly reverses every delay'
+  );
+
   assert.end();
 });
 
