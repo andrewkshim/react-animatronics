@@ -18,9 +18,8 @@ export const InfiniteTimeMachine = (
   let _jobs: Function[] = [];
 
   const runIteration: VoidFn = () => {
-    if (_machineIsStopped) return;
-
     _frame = requestAnimationFrame(() => {
+      if (_machineIsStopped) return;
       _jobs.forEach(job => job());
       runIteration();
     });
