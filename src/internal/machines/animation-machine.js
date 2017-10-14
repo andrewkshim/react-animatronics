@@ -240,7 +240,7 @@ export default (
     controls: ControlsMachine,
     onComplete: Function
   ) => {
-    if (!_state.stages[animationName]) {
+    if (!_state.stages) {
       // TODO: better error message
       throw new Error('rewind does not have stages');
     }
