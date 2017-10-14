@@ -77,10 +77,11 @@ export type Spring = {
   next: (onNext: Function, onComplete: Function) => void,
 }
 
-export type Animation = {
+export type AnimationMachine = {
   play: (animationName: string, controls: Controls, onComplete: Function) => void,
   rewind: (animationName: string, controls: Controls, onComplete: Function) => void,
   stop: () => void,
+  setCreateAnimationStages: (createAnimationStages: Function) => void,
 }
 
 export type Controls = {

@@ -8,7 +8,7 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import type { Time, Controls, Animation, AnimationStage } from '../flow-types'
+import type { Time, Controls, AnimationMachine, Animation, AnimationStage } from '../flow-types'
 
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
@@ -120,7 +120,7 @@ export default (
   createAnimationStages: Function,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
-): Animation => {
+): AnimationMachine => {
 
   const _state: Object = {
     timeMachines: null,
