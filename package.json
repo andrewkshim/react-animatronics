@@ -29,6 +29,7 @@
     "flow-bin": "^0.56.0",
     "jsdom": "^11.2.0",
     "react-test-renderer": "^15.6.1",
+    "react-transition-group": "^2.2.1",
     "sinon": "^3.3.0",
     "tape": "^4.8.0",
     "webpack": "^3.6.0",
