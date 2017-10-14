@@ -1,7 +1,7 @@
 {
   "name": "react-animatronics",
   "version": "0.0.1",
-  "description": "Declarative animation library for React components",
+  "description": "Declarative, coordinated animations for React components",
   "main": "lib/index.js",
   "author": "Andrew Shim",
   "license": "MIT",
