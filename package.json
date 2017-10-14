@@ -6,7 +6,8 @@
   "author": "Andrew Shim",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/babel src --out-dir lib --ignore spec.js",
+    "build": "./node_modules/.bin/babel src --out-dir lib --ignore spec.js,test.js",
+    "examples": "./node_modules/.bin/webpack-dev-server --config examples/webpack.config.js",
     "example:basic": "./node_modules/.bin/webpack-dev-server --config examples/basic/webpack.config.js",
     "example:welcome": "./node_modules/.bin/webpack-dev-server --config examples/welcome/webpack.config.js",
     "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
