@@ -51,22 +51,36 @@ test('createUnitFashion creates a valid UnitFashion', assert => {
   assert.end();
 });
 
-test('parseStyle creates the correct Fashions', assert => {
-  const actualColorFashion = parseStyle('white');
-  const expectedColorFashion = createColorFashion('white');
-  assert.deepEquals(actualColorFashion, expectedColorFashion);
+test('parseStyle', assert => {
+  assert.deepEquals(
+    parseStyle('white'),
+    createColorFashion('white'),
+    'correctly creates a color fashion'
+  );
 
-  const actualNumberFashion = parseStyle(42);
-  const expectedNumberFashion = createNumberFashion(42);
-  assert.deepEquals(actualNumberFashion, expectedNumberFashion);
+  assert.deepEquals(
+    parseStyle(42),
+    createNumberFashion(42),
+    'correctly creates a number fashion'
+  );
 
-  const actualTransformFashion = parseStyle('rotateX(90deg) translateY(100px)');
-  const expectedTransformFashion = createTransformFashion('rotateX(90deg) translateY(100px)');
-  assert.deepEquals(actualTransformFashion, expectedTransformFashion);
+  assert.deepEquals(
+    parseStyle('rotateX(90deg) translateY(100px)'),
+    createTransformFashion('rotateX(90deg) translateY(100px)'),
+    'correctly creates a transform fashion'
+  );
 
-  const actualUnitFashion = parseStyle('240rem');
-  const expectedUnitFashion = createUnitFashion('240rem');
-  assert.deepEquals(actualUnitFashion, expectedUnitFashion);
+  assert.deepEquals(
+    parseStyle('scale(1.5)').styles[0],
+    createNumberFashion(1.5),
+    'correctly creates a transform fashion with a decimal value'
+  );
+
+  assert.deepEquals(
+    parseStyle('240rem'),
+    createUnitFashion('240rem'),
+    'correctly creates a unit fashion'
+  );
 
   assert.end();
 });

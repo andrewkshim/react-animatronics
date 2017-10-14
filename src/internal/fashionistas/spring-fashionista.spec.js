@@ -33,18 +33,28 @@ test('interpolateFashion', assert => {
   assert.end();
 });
 
-test('reconstructStyles', assert => {
-  const startStyles = { left: '0px', top: '0px' };
-  const endStyles = { left: '100px', top: '100px' };
-  const styleNames = ['left', 'top'];
-  const springValues = [0.4, 0.7];
-  const reconstructed = reconstructStyles(
-    startStyles,
-    endStyles,
-    styleNames,
-    springValues,
+test.only('reconstructStyles', assert => {
+  assert.deepEquals(
+    reconstructStyles(
+      { left: '0px', top: '0px' },
+      { left: '100px', top: '100px' },
+      ['left', 'top'],
+      [0.4, 0.7],
+    ),
+    { left: '40px', top: '70px' },
+    'correctly reconstructs positional styles'
   );
 
-  assert.deepEquals(reconstructed, { left: '40px', top: '70px' });
+  assert.deepEquals(
+    reconstructStyles(
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.5)' },
+      ['transform'],
+      [0.5],
+    ),
+    { transform: 'scale(1.25)' },
+    'correctly reconstructs transform styles'
+  );
+
   assert.end();
 });
