@@ -58,7 +58,16 @@ export type StyleUpdater = (styles: Styles) => void;
 
 export type DOMNode = Object;
 
-export type AnimationStage = Object;
+export type Animation = {
+  duration?: number,
+  delay?: number,
+  stiffness?: number,
+  damping?: number,
+  start: Object,
+  end: Object,
+}
+
+export type AnimationStage = { [string]: Animation };
 
 
 //==========================================================
