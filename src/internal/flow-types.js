@@ -81,7 +81,7 @@ export type TimeMachine = {
   stop: VoidFn,
 };
 
-export type Spring = {
+export type SpringMachine = {
   isStopped: ()=> boolean,
   next: (onNext: Function, onComplete: Function) => void,
 }

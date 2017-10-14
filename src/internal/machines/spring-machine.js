@@ -5,7 +5,7 @@
  * @module internal/machines/spring-machine
  */
 
-import type { VoidFn, Styles, Spring } from '../flow-types'
+import type { VoidFn, Styles, SpringMachine } from '../flow-types'
 
 import Constants from '../constants'
 import { noop } from '../utils'
@@ -49,7 +49,7 @@ export default (
   endStyles: Styles,
   stiffness: number,
   damping: number,
-): Spring => {
+): SpringMachine => {
 
   const styleNames: string[] = Object.keys(startStyles);
   const endValues: number[] = styleNames.map(() => 1);
