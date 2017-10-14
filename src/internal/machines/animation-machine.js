@@ -113,6 +113,7 @@ export const AnimationMachine = (
   const _state: Object = {
     timeMachines: null,
     stages: null,
+    createAnimationStages,
   };
 
   const _runStage = (
@@ -192,7 +193,7 @@ export const AnimationMachine = (
     controls: Controls,
     onComplete: Function,
   ) => {
-    const rawStages = createAnimationStages(controls.getNodes());
+    const rawStages = _state.createAnimationStages(controls.getNodes());
     _state.stages = Array.isArray(rawStages) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawStages } : rawStages;
 
     const animationStages = _state.stages[animationName];
@@ -242,6 +243,10 @@ export const AnimationMachine = (
     _state.stages = null;
   }
 
-  const machine = { play, rewind, stop };
+  const setCreateAnimationStages = updatedCreateAnimationStages => {
+    _state.createAnimationStages = updatedCreateAnimationStages;
+  }
+
+  const machine = { play, rewind, stop, setCreateAnimationStages };
   return machine;
 };

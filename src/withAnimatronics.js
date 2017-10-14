@@ -50,6 +50,15 @@ const withAnimatronics = (
         };
       }
 
+      componentWillReceiveProps(nextProps) {
+        const { createAnimationStages } = nextProps;
+        if (typeof createAnimationStages === 'function') {
+          animation.setCreateAnimationStages(createAnimationStages);
+        } else {
+          // TODO: better error handling
+        }
+      }
+
       componentWillUnmount() {
         animation.stop();
       }
