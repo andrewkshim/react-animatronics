@@ -17,6 +17,12 @@ import { reconstructStyles, interpolateValue } from '../fashionistas/spring-fash
 // prevent slow springs from running.
 const MIN_ITERATIONS: number = 10;
 
+// Keep track of how many times the spring looked like it has stopped but don't actually
+// stop it unless we've seen it stop a minimum number of times so we don't prematurely
+// end the animation. Sometimes the spring will look like it has stopped when it has
+// more iterations to go.
+const MIN_STOPS: number = 5;
+
 const hasStopped = (velocity: number): boolean =>
   Math.abs(velocity) < 0.01;
 
@@ -49,8 +55,9 @@ export const SpringMachine = (
   const endValues: number[] = styleNames.map(() => 1);
 
   let _prevTime = Date.now();
-  let _numIterations = 0;
   let _accumulatedTime = 0;
+  let _numIterations = 0;
+  let _numStops = 0;
   let _values = styleNames.map(() => 0);
   let _velocities = styleNames.map(() => 0);
   let _intermediateValues = styleNames.map(() => 0);
@@ -98,9 +105,13 @@ export const SpringMachine = (
 
   const next = (onNext: Function = noop, onComplete: Function = noop) => {
     if (isStopped()) {
-      const updatedStyles = reconstructStyles(startStyles, endStyles, styleNames, endValues);
-      onComplete(updatedStyles);
-      return;
+      if (_numStops === MIN_STOPS) {
+        const updatedStyles = reconstructStyles(startStyles, endStyles, styleNames, endValues);
+        onComplete(updatedStyles);
+        return;
+      } else {
+        _numStops++;
+      }
     }
     const currentTime = Date.now();
     const timeSinceLastFrame = currentTime - _prevTime;
