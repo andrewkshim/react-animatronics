@@ -15,10 +15,6 @@ test('interpolateFashion', assert => {
   const startColor = parseBasicStyle('black');
   const endColor = parseBasicStyle('white');
   const interpolatedColor = interpolateFashion(startColor, endColor, 0.5);
-  // HACK: Flow will complain about the disjoint type since it can't tell
-  // that interpolatedColor is a ColorFashion unless we have the isColorCheck
-  // before calling value.name since it'll think that "value" could also be
-  // a number which wouldn't have a "name" fn.
   assert.equals(
     interpolatedColor.isColorType && interpolatedColor.value.name(), 'gray',
     'correctly interpolates colors'
