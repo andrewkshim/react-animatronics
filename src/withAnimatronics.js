@@ -23,7 +23,12 @@ const withAnimatronics = (
 ) => {
 
   const controls = ControlsMachine();
-  const animation = AnimationMachine(requestAnimationFrame, cancelAnimationFrame);
+
+  const animation = AnimationMachine(
+    createAnimationStages,
+    requestAnimationFrame,
+    cancelAnimationFrame,
+  );
 
   return BaseComponent => {
 
@@ -45,46 +50,28 @@ const withAnimatronics = (
         };
       }
 
-      _playAnimation(
-        animationName = Constants.DEFAULT_ANIMATION_NAME,
-        onComplete = noop
-      ) {
-        onComplete = typeof animationName === 'function' ? animationName : onComplete;
-
-        // TODO: warn when an event might have been passed in
-        const rawAnimationStages = createAnimationStages(controls.getNodes());
-        const stages = rawAnimationStages[animationName] || rawAnimationStages;
-
-        // TODO: better error handling
-        if (!Array.isArray(stages)) {
-          throw new Error('stages is not an array');
-        }
-
-        animation.play(stages, controls, onComplete);
-      }
-
-      _rewindAnimation(
-        animationName = Constants.DEFAULT_ANIMATION_NAME,
-        onComplete = noop,
-      ) {
-        onComplete = typeof animationName === 'function' ? animationName : onComplete;
-
-        const rawAnimationStages = createAnimationStages(controls.getNodes());
-        const stages = rawAnimationStages[animationName] || rawAnimationStages;
-
-        // TODO: better error handling
-        if (!Array.isArray(stages)) {
-          throw new Error('stages is not an array');
-        }
-
-        animation.rewind(controls, onComplete);
-      }
-
-      _cancelAnimation() {
+      componentWillUnmount() {
         animation.stop();
       }
 
-      componentWillUnmount() {
+      _playAnimation(animationName = Constants.DEFAULT_ANIMATION_NAME, onComplete = noop) {
+        if (typeof animationName === 'function') {
+          onComplete = animationName;
+          animationName = Constants.DEFAULT_ANIMATION_NAME;
+        }
+        // TODO: warn when an event might have been passed in
+        animation.play(animationName, controls, onComplete);
+      }
+
+      _rewindAnimation(animationName = Constants.DEFAULT_ANIMATION_NAME, onComplete = noop) {
+        if (typeof animationName === 'function') {
+          onComplete = animationName;
+          animationName = Constants.DEFAULT_ANIMATION_NAME;
+        }
+        animation.rewind(animationName, controls, onComplete);
+      }
+
+      _cancelAnimation() {
         animation.stop();
       }
 

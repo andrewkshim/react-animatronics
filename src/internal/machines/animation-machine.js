@@ -10,6 +10,7 @@ import Debug from 'debug'
 
 import type { Time, Controls, Animation, AnimationStage } from '../flow-types'
 
+import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 import { SpringMachine } from './spring-machine'
@@ -104,13 +105,14 @@ const runSpringAnimation = (
 }
 
 export const AnimationMachine = (
+  createAnimationStages: Function,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
 ): Animation => {
 
-  const _state: { timeMachines: { [string]: Time }, previousStages: AnimationStage[] } = {
-    timeMachines: {},
-    previousStages: [],
+  const _state = {
+    timeMachines: null,
+    stages: null,
   };
 
   const _runStage = (
@@ -119,6 +121,8 @@ export const AnimationMachine = (
     onStageComplete: Function,
   ): void => {
     debug('running animation stage %O', stage);
+
+    _state.timeMachines = {};
 
     const componentNames = Object.keys(stage);
     let numComponentsDone = 0;
@@ -161,45 +165,77 @@ export const AnimationMachine = (
     });
   }
 
+  const _onStageComplete = (
+    nextStageNum,
+    animationStages,
+    onComponentFrame,
+    onComplete
+  ): void => () => {
+    if (nextStageNum === animationStages.length) {
+      onComplete();
+    } else {
+      _runStage(
+        animationStages[nextStageNum],
+        onComponentFrame,
+        _onStageComplete(
+          nextStageNum + 1,
+          animationStages,
+          onComponentFrame,
+          onComplete
+        ),
+      );
+    }
+  };
+
   const play = (
-    stages: AnimationStage[],
+    animationName: string,
     controls: Controls,
     onComplete: Function,
   ) => {
-    // TODO: invariant, can't have any previousStages
-    _state.previousStages = stages;
+    const rawStages = createAnimationStages(controls.getNodes());
+    _state.stages = Array.isArray(rawStages) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawStages } : rawStages;
 
-    const _onStageComplete = nextStageNum => () => {
-      if (nextStageNum === stages.length) {
-        onComplete();
-      } else {
-        _runStage(
-          stages[nextStageNum],
-          controls.updateStyles,
-          _onStageComplete(nextStageNum + 1),
-        );
-      }
-    };
+    const animationStages = _state.stages[animationName];
 
     _runStage(
-      stages[0],
+      animationStages[0],
       controls.updateStyles,
-      _onStageComplete(1),
+      _onStageComplete(
+        1,
+        animationStages,
+        controls.updateStyles,
+        onComplete
+      ),
     );
   }
 
-  const rewind = (controls: Controls, onComplete: Function) => {
-    const stages = reverseStages(_state.previousStages);
-    play(stages, controls, () => {
-      _state.previousStages = [];
-      onComplete();
-    });
+  const rewind = (
+    animationName: string,
+    controls: Controls,
+    onComplete: Function
+  ) => {
+    const animationStages = reverseStages(_state.stages[animationName]);
+
+    _runStage(
+      animationStages[0],
+      controls.updateStyles,
+      _onStageComplete(
+        1,
+        animationStages,
+        controls.updateStyles,
+        onComplete
+      ),
+    );
   }
 
   const stop = () => {
+    if (!_state.timeMachines) return;
+
     Object.keys(_state.timeMachines).forEach(componentName => {
       _state.timeMachines[componentName].stop();
     });
+    _state.timeMachines = null;
+    _state.stages = null;
   }
 
   const machine = { play, rewind, stop };
