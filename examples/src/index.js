@@ -3,7 +3,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Transition from 'react-transition-group/Transition'
 import chroma from 'chroma-js'
-import { compose } from 'recompose'
 
 import BasicExample from './basic'
 import SpringsExample from './springs'
