@@ -33,7 +33,7 @@ test('interpolateFashion', assert => {
   assert.end();
 });
 
-test.only('reconstructStyles', assert => {
+test('reconstructStyles', assert => {
   assert.deepEquals(
     reconstructStyles(
       { left: '0px', top: '0px' },
