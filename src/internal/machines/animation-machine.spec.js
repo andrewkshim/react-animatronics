@@ -4,7 +4,7 @@ import test from 'tape'
 
 import Constants from '../constants'
 import { ControlsMachine } from './controls-machine'
-import { reverseStages, AnimationMachine } from './animation-machine'
+import AnimationMachine, { findLongestDelay, reverseStages } from './animation-machine'
 
 test('findLongestDelay', assert => {
   const stage = {

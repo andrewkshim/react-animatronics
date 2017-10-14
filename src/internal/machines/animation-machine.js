@@ -116,7 +116,7 @@ const runSpringAnimation = (
     .run();
 }
 
-export const AnimationMachine = (
+export default (
   createAnimationStages: Function,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
