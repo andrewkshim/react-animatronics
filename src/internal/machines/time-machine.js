@@ -5,13 +5,13 @@
  * @module internal/machines/time-machine
  */
 
-import type { VoidFn, Time } from '../flow-types'
+import type { VoidFn, TimeMachine } from '../flow-types'
 import { noop } from '../utils'
 
 export const InfiniteTimeMachine = (
   requestAnimationFrame: (fn: VoidFn) => void,
   cancelAnimationFrame: (frame: number) => void,
-): Time => {
+): TimeMachine => {
 
   let _frame: ?number = null;
   let _machineIsStopped: boolean = false;
@@ -25,7 +25,7 @@ export const InfiniteTimeMachine = (
     });
   }
 
-  const machine: Time = {
+  const machine: TimeMachine = {
     isStopped: (): boolean => _machineIsStopped,
 
     do: (job: Function) => {
@@ -53,7 +53,7 @@ export const InfiniteTimeMachine = (
   return machine;
 };
 
-export const FiniteTimeMachine = (machine: Time, duration: number): Time => {
+export const FiniteTimeMachine = (machine: TimeMachine, duration: number): TimeMachine => {
 
   let _startTime: number = 0;
   let _onComplete = () => {};

@@ -8,7 +8,7 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import type { Time, Controls, AnimationMachine, Animation, AnimationStage } from '../flow-types'
+import type { TimeMachine, Controls, AnimationMachine, Animation, AnimationStage } from '../flow-types'
 
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
@@ -60,7 +60,7 @@ export const calculateEasingProgress = (
   easingFn(elapsedTime / (duration === 0 ? elapsedTime : duration));
 
 const runTimedAnimation = (
-  timeMachine: Time,
+  timeMachine: TimeMachine,
   animation: Object,
   onFrame: Function,
   onComponentDone: Function,
@@ -72,7 +72,7 @@ const runTimedAnimation = (
     easingFn = DEFAULT_EASING_FN,
   } = animation;
 
-  const finiteMachine: Time = FiniteTimeMachine(timeMachine, duration);
+  const finiteMachine: TimeMachine = FiniteTimeMachine(timeMachine, duration);
 
   finiteMachine
     .do(elapsedTime => {
@@ -87,7 +87,7 @@ const runTimedAnimation = (
 }
 
 const runSpringAnimation = (
-  timeMachine: Time,
+  timeMachine: TimeMachine,
   animation: Object,
   onFrame: Function,
   onComponentDone: Function,

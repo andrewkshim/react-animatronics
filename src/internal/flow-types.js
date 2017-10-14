@@ -74,10 +74,10 @@ export type AnimationStage = { [string]: Animation };
 // Machine
 //==========================================================
 
-export type Time = {
+export type TimeMachine = {
   isStopped: () => boolean,
-  do: (job: Function, onFrame?: VoidFn) => Time,
-  run: (onComplete?: VoidFn) => Time,
+  do: (job: Function, onFrame?: VoidFn) => TimeMachine,
+  run: (onComplete?: VoidFn) => TimeMachine,
   stop: VoidFn,
 };
 
