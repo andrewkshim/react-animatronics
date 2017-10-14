@@ -7,11 +7,11 @@
 
 import Debug from 'debug'
 
-import type { Styles, StyleUpdater, DOMNode, Controls } from '../flow-types'
+import type { Styles, StyleUpdater, DOMNode, ControlsMachine } from '../flow-types'
 
 const debug = Debug('animatronics:controls');
 
-export default (): Controls => {
+export default (): ControlsMachine => {
   const _nodes: { [string]: DOMNode } = {};
   const _styleUpdaters: { [string]: StyleUpdater } = {};
 
@@ -42,7 +42,7 @@ export default (): Controls => {
 
   const getNodes = () => _nodes;
 
-  const machine: Controls = {
+  const machine: ControlsMachine = {
     registerComponent,
     unregisterComponent,
     updateStyles,

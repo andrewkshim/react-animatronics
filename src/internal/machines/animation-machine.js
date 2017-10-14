@@ -8,7 +8,7 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import type { TimeMachine, Controls, AnimationMachine, Animation, AnimationStage } from '../flow-types'
+import type { TimeMachine, ControlsMachine, AnimationMachine, Animation, AnimationStage } from '../flow-types'
 
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
@@ -215,7 +215,7 @@ export default (
 
   const play = (
     animationName: string,
-    controls: Controls,
+    controls: ControlsMachine,
     onComplete: Function,
   ) => {
     const rawStages = _state.createAnimationStages(controls.getNodes());
@@ -237,7 +237,7 @@ export default (
 
   const rewind = (
     animationName: string,
-    controls: Controls,
+    controls: ControlsMachine,
     onComplete: Function
   ) => {
     if (!_state.stages[animationName]) {
