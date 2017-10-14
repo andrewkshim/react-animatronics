@@ -110,7 +110,7 @@ export const AnimationMachine = (
   cancelAnimationFrame: Function,
 ): Animation => {
 
-  const _state = {
+  const _state: Object = {
     timeMachines: null,
     stages: null,
   };
@@ -170,7 +170,7 @@ export const AnimationMachine = (
     animationStages,
     onComponentFrame,
     onComplete
-  ): void => () => {
+  ): Function => () => {
     if (nextStageNum === animationStages.length) {
       onComplete();
     } else {
@@ -214,6 +214,10 @@ export const AnimationMachine = (
     controls: Controls,
     onComplete: Function
   ) => {
+    if (!_state.stages[animationName]) {
+      // TODO: better error message
+      throw new Error('rewind does not have stages');
+    }
     const animationStages = reverseStages(_state.stages[animationName]);
 
     _runStage(
