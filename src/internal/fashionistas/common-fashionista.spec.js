@@ -71,6 +71,7 @@ test('parseStyle', assert => {
   );
 
   assert.deepEquals(
+    // $FlowFixMe: flow doesn't know that this will only create a transform fashion
     parseStyle('scale(1.5)').styles[0],
     createNumberFashion(1.5),
     'correctly creates a transform fashion with a decimal value'
