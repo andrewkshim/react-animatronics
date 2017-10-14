@@ -61,20 +61,20 @@ test('withRig sets the ref to the DOM node', assert => {
   }
 
   const Rigged = withRig('base', { useStringRefs: true })(Base);
-  let actualDomNode;
+  let actualDOMNode;
 
   const wrapper = mount(<Rigged/>, {
     context: {
       animatronics: {
         registerComponent: (componentName, domNode, styleUpdater) => {
-          actualDomNode = domNode;
+          actualDOMNode = domNode;
         },
         unregisterComponent: () => {},
       },
     },
   });
 
-  const expectedDomNode = wrapper.find('div').node;
-  assert.equal(actualDomNode, expectedDomNode);
+  const expectedDOMNode = wrapper.find('div').getDOMNode();
+  assert.equal(actualDOMNode, expectedDOMNode);
   assert.end();
 });
