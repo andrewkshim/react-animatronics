@@ -147,8 +147,9 @@ export default (
       }
     };
 
-    componentNames.forEach(componentName => {
+    const runComponentStage = componentName => {
       const animation: Object = stage[componentName];
+
       _state.timeMachines[componentName] = InfiniteTimeMachine(
         requestAnimationFrame,
         cancelAnimationFrame,
@@ -174,6 +175,18 @@ export default (
         );
       } else {
         // TODO: Error
+      }
+
+    }
+
+    componentNames.forEach(componentName => {
+      const animation: Object = stage[componentName];
+      // Intentionally ignoring 0 (in addition to null and undefined) even though
+      // setTimeout(fn, 0) would affect the execution timing.
+      if (!animation.delay) {
+        runComponentStage(componentName);
+      } else {
+        setTimeout(() => runComponentStage(componentName), animation.delay);
       }
     });
   }
