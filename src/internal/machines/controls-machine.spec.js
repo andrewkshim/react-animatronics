@@ -2,7 +2,7 @@
 import test from 'tape'
 import sinon from 'sinon'
 
-import { ControlsMachine } from './controls-machine'
+import ControlsMachine from './controls-machine'
 
 test('ControlsMachine', assert => {
   const machine = ControlsMachine();

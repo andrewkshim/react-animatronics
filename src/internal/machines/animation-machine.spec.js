@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import test from 'tape'
 
 import Constants from '../constants'
-import { ControlsMachine } from './controls-machine'
+import ControlsMachine from './controls-machine'
 import AnimationMachine, { findLongestDelay, reverseStages } from './animation-machine'
 
 test('findLongestDelay', assert => {

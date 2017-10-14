@@ -8,7 +8,7 @@ import React from 'react'
 
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
-import { ControlsMachine } from './internal/machines/controls-machine'
+import ControlsMachine from './internal/machines/controls-machine'
 import AnimationMachine from './internal/machines/animation-machine'
 import { noop } from './internal/utils'
 

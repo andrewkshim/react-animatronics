@@ -11,7 +11,7 @@ import type { Styles, StyleUpdater, DOMNode, Controls } from '../flow-types'
 
 const debug = Debug('animatronics:controls');
 
-export const ControlsMachine = (): Controls => {
+export default (): Controls => {
   const _nodes: { [string]: DOMNode } = {};
   const _styleUpdaters: { [string]: StyleUpdater } = {};
 
