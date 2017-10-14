@@ -13,7 +13,7 @@ import type { Time, Controls, AnimationMachine, Animation, AnimationStage } from
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
-import { SpringMachine } from './spring-machine'
+import SpringMachine from './spring-machine'
 
 const debug = Debug('animatronics:animation');
 

@@ -2,7 +2,7 @@
 import sinon from 'sinon'
 import test from 'tape'
 
-import { SpringMachine } from './spring-machine'
+import SpringMachine from './spring-machine'
 
 test('SpringMachine', assert => {
   const startStyles = { left: '0px' };

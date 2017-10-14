@@ -44,7 +44,7 @@ const calculateValue = (currentValue: number, velocity: number): number =>
 
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
-export const SpringMachine = (
+export default (
   startStyles: Styles,
   endStyles: Styles,
   stiffness: number,
