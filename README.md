@@ -124,7 +124,7 @@ const Square = withControl('square')(
   )
 );
 
-# Using object spread.
+// Using object spread.
 const Square = withControl('square')(
   ({ animatronicStyles }) => (
     <div
