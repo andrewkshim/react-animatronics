@@ -50,8 +50,8 @@ export default withAnimatronics(
         circleA: {
           duration,
           start: {
-              top: `${ topA }px`,
-              left: `${ leftA }px`,
+            top: `${ topA }px`,
+            left: `${ leftA }px`,
           },
           end: {
             top: `${ topB }px`,
@@ -61,8 +61,8 @@ export default withAnimatronics(
         circleB: {
           duration,
           start: {
-              top: `${ topB }px`,
-              left: `${ leftB }px`,
+            top: `${ topB }px`,
+            left: `${ leftB }px`,
           },
           end: {
             top: `${ topC }px`,
