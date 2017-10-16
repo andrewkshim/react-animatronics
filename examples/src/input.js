@@ -11,7 +11,7 @@ const COLORS = [
   COLOR_C,
 ];
 
-class Letters extends React.Component {
+const Letters = withAnimatronics(() => [])(class extends React.Component {
 
   constructor(props) {
     super(props);
@@ -77,9 +77,8 @@ class Letters extends React.Component {
       }</div>
     );
   }
-}
 
-const AnimatedLetters = withAnimatronics(() => [])(Letters);
+});
 
 class Input extends React.Component {
 
@@ -126,7 +125,7 @@ class Input extends React.Component {
           marginTop: '2.5%',
           marginLeft: '2.5%',
         }}>
-          <AnimatedLetters
+          <Letters
             didAnimate={ didAnimate }
             text={ text }
             createAnimationStages={() => [
