@@ -16,7 +16,7 @@ const withRig = (
   } = {}
 ) => BaseComponent => {
 
-  class Rig extends React.Component {
+  class ControlledComponent extends React.Component {
     constructor(props) {
       super(props);
       this.state = { style: {} };
@@ -67,9 +67,9 @@ const withRig = (
     }
   }
 
-  Rig.contextTypes = ContextTypes;
+  ControlledComponent.contextTypes = ContextTypes;
 
-  return Rig;
+  return ControlledComponent;
 };
 
 export default withRig;
