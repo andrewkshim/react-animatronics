@@ -32,7 +32,7 @@ const withAnimatronics = (
 
   return BaseComponent => {
 
-    class AnimatorComponent extends React.Component {
+    class AnimatronicsComponent extends React.Component {
       constructor(props) {
         super(props);
         this.isAnimatronic = true;
@@ -97,9 +97,9 @@ const withAnimatronics = (
       }
     };
 
-    AnimatorComponent.childContextTypes = ContextTypes;
+    AnimatronicsComponent.childContextTypes = ContextTypes;
 
-    return AnimatorComponent;
+    return AnimatronicsComponent;
 
   };
 
