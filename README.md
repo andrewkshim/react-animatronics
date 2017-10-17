@@ -8,12 +8,14 @@ for your React components.
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Full Documentation](#full-documentation)
+- [API Documentation](#docs)
+- [Examples](#examples)
+- [Alternative Libraries](#alternative-libraries)
 
 
 ## Installation
 
-```
+```bash
 # npm
 npm install --save react-animatronics
 
@@ -22,13 +24,18 @@ yarn add react-animatronics
 ```
 
 
+<!--
+============================================================
+Usage
+============================================================
+-->
 ## Usage
 
-React Animatronics provides higher-order components that let you describe
+React Animatronics provides [higher-order components][hocs] that let you describe
 animations involving multiple components scattered throughout your component
 hierarchy.
 
-A quick example:
+A quick, basic example:
 
 ```js
 import React from 'react'
@@ -59,7 +66,7 @@ const App = withAnimatronics(
 )(
   ({ playAnimation }) => (
     <div>
-      <button onClick={() => playAnimation()}>Play animation!</button>
+      <button onClick={() => playAnimation()}>Play animation</button>
       <Square/>
     </div>
   )
@@ -71,66 +78,104 @@ button will cause the square to animate for 500ms to a height of
 200px.
 
 
-## Full Documentation
+<!--
+============================================================
+API Documentation
+============================================================
+-->
+## <a name='docs'></a> API Documentation
+
+```js
+import { withControl, withAnimatronics } from 'react-animatronics'
+```
+
+Jump to the docs:
 
 - [withControl](#withControl)
 - [withAnimatronics](#withAnimatronics)
 
 
-### <a name='withControl'></a> `withControl(string): (ReactComponent) => (ReactComponent)`
+<!--
+------------------------------------------------------------
+withControl
+------------------------------------------------------------
+-->
+### <a name='withControl'></a> withControl
+
+```
+withControl(string): (ReactComponent) => (ReactComponent)
+```
 
 `withControl` is a function that returns another function. It takes a string as
 its only argument. The returned function takes a React component as its only
 argument and returns a final React component (i.e. it's a higher-order
-component). That final component is a "controlled component".
+component). That final component is a **controlled component**.
 
-The string is what you use to reference the component in
+The string is the name you use to reference the component in
 [`withAnimatronics`](#withAnimatronics):
 
 ```js
-const ControlledComponent = withControl('helloWorld')(
+const higherOrderComponent = withControl('helloWorld');
+const ControlledComponent = higherOrderComponent(
   ({ animatronicStyles }) => <div style={ animatronicStyles }/>
 );
 
+// The helloWorld property in this object corresponds to the 'helloWorld'
+// string passed into withControl and the associated animation will be applied
+// to the ControlledComponent.
 const App = withAnimatronics(() => [
   {
-    // The helloWorld in this object refers to the 'helloWorld' string
-    // passed into withControl.
     helloWorld: {
       duration: 500,
       start: { left: '100px' },
-      end: { left: '200px' },
+      end: { left: '200px' }
     }
   }
 ])(() => <ControlledComponent/>);
 ```
 
-The component you pass in will receive an additional prop called
-`animatronicStyles`. This is an object that contains the style
-values for the current animation frame, and you'll probably want to
-use those styles in your component. You see this in the above example,
-but here's another example for good measure:
+We'll go into more detail on [`withAnimatronics`](#withAnimatronics) later, for
+now, it's only important to know that the string you put into `withControl`
+will be used in `withAnimatronics`.
+
+The component you pass into the higher-order component will receive an
+additional prop called `animatronicStyles`. This is an object that contains the
+interpolated style values for the current animation frame. The styles that get
+included are determined by what you declare in the `start` and `end` of your
+animation — this is another `withAnimatronics` detail we'll go into later.
+
+Here are some ways you can use the `animatronicStyles` in your components:
 
 ```js
-const Square = withControl('square')(
+// If you just want to use the animatronicStyles.
+const MyComponent = withControl('square')(
+  ({ animatronicStyles }) => (
+    <div
+      style={ animatronicStyles }
+    />
+  )
+);
+
+// If you have styles you want to keep static, you can use specific
+// values from animatronicStyles while keeping other styles unchanged.
+const MyComponent = withControl('square')(
   ({ animatronicStyles }) => (
     <div
       style={{
-        height: animatronicStyles.height || '100px',
-        width: '100px',
+        top: animatronicStyles.top,
         backgroundColor: 'blue'
       }}
     />
   )
 );
 
-// Using object spread.
-const Square = withControl('square')(
+// If you always want the animatronicStyles to take precedence, you
+// can use object spread.
+const MyComponent = withControl('square')(
   ({ animatronicStyles }) => (
     <div
       style={{
-        height: '100px',
-        width: '100px',
+        top: '100px',
         backgroundColor: 'blue',
         ...animatronicStyles
       }}
@@ -139,28 +184,59 @@ const Square = withControl('square')(
 );
 ```
 
-### <a name='withAnimatronics'></a> `withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)`
+
+<!--
+------------------------------------------------------------
+withAnimatronics
+------------------------------------------------------------
+-->
+### <a name='withAnimatronics'></a> withAnimatronics
+
+```js
+withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)
+```
+
+This is a big section with lots of subsections, so it gets its own table of
+contents:
+
+- [Animation Sequences](#animation-sequences)
+- [Multiple, Named Animation Sequences](#multiple-named-animation-sequences)
+- [Executing your Animations](#executing-your-animations)
+  - [playAnimation](#playAnimation)
+  - [rewindAnimation](#rewindAnimation)
+- [More Animation Options](#more-animation-options)
+  - [Custom Easing Functions](#custom-easing-functions)
+  - [Spring Animations](#spring-animations)
+  - [Animation Options Summary](#animation-options-summary)
+
 
 `withAnimatronics` is a function that takes a single, function argument. It
-returns a function that is a higher-order component.
+returns a function that is a higher-order component. The higher-order component
+returns a final component that is an **animatronics component**.
 
 ```js
 const higherOrderComponent = withAnimatronics(() => {});
-const FinalComponent = higherOrderComponent(YourComponent);
+const AnimatronicsComponent = higherOrderComponent(YourComponent);
 
-# Or, on one line.
-const FinalComponent = withAnimatronics(() => {})(YourComponent);
+// Or, on one line.
+const AnimatronicsComponent  = withAnimatronics(() => {})(YourComponent);
 ```
 
-The `FinalComponent` is an "animatronics component" that knows how to run
-animations involving any of its descendant [controlled components](#withControl).
+The animatronics component knows how to run animations involving any of its
+descendant [controlled components](#withControl).
 
 The function you pass into `withAnimatronics` must return "animation sequences",
 which are described in the next section.
 
+
+<!--
+------------------------------------------------------------
+Animation Sequences
+------------------------------------------------------------
+-->
 #### Animation Sequences
 
-The function you pass into `withAnimatronics` is called `createAnimationSequence()`
+The function you pass into `withAnimatronics` is internally named `createAnimationSequence()`
 because it returns one or more "animation sequences":
 
 ```js
@@ -172,7 +248,7 @@ const higherOrderComponent = withAnimatronics(createAnimationSequence);
 ```
 
 An animation sequence is an array of objects, where each object represents
-a single "phase" of the animation. Each phase describes the styles for your
+a single **phase** of the animation. Each phase describes the styles for your
 controlled components and how to animate those styles:
 
 ```js
@@ -216,6 +292,19 @@ const createAnimationSequence = () => {
 const higherOrderComponent = withAnimatronics(createAnimationSequence);
 ```
 
+In the above example, we're only returning one animation sequence which means
+you'll only be able to execute that one sequence. Sometimes you'll want to define
+multiple animation sequences so can you execute one of those sequences depending
+on what state your components are in.
+
+We cover defining multiple animation sequences in the next section.
+
+
+<!--
+------------------------------------------------------------
+Multiple, Named Animation Sequences
+------------------------------------------------------------
+-->
 #### <a name='multiple-named-animation-sequences'></a> Multiple, Named Animation Sequences
 
 When `createAnimationSequence` returns an array, you can only use that
@@ -233,11 +322,16 @@ const createAnimationSequence = () => {
 }
 ```
 
-You can then choose to execute either `"animationSequence1"` or `"animationSequence2"`
-when it comes time to run your animations. As far as running your animations goes,
-that's in the next section.
+You can then choose to execute either `"animationSequence1"` or
+`"animationSequence2"` (or whatever you decide to name them) when it comes time
+to run your animations. This brings us to the next section.
 
 
+<!--
+------------------------------------------------------------
+Executing your Animations
+------------------------------------------------------------
+-->
 #### Executing your Animations
 
 Once you've setup [`withControl`](#withControl) and [`withAnimatronics`](#withAnimatronics),
@@ -254,10 +348,23 @@ const higherOrderComponent = withAnimatronics(createAnimationSequence);
 // the higherOrderComponent.
 const YourComponent = ({ playAnimation, rewindAnimation }) => <div/>;
 
-const FinalComponent = higherOrderComponent(YourComponent);
+const AnimatronicsComponent = higherOrderComponent(YourComponent);
 ```
 
-##### <a name='playAnimation'></a> `playAnimation(string?, Function?): void`
+To execute your animations normally, you can call `playAnimation`. In less
+common cases, you may want to rewind the last animation with `rewindAnimation`.
+
+
+<!--
+------------------------------------------------------------
+playAnimation
+------------------------------------------------------------
+-->
+##### <a name='playAnimation'></a> playAnimation
+
+```js
+playAnimation(string?, Function?): void
+```
 
 `playAnimation` starts your animations. It's an overloaded function that takes
 two optional arguments and returns nothing (how un-functional). It has four
@@ -291,7 +398,17 @@ playAnimation('name', () => {
 
 The string `'name'` refers to the name of the animation sequence you want to run.
 
-##### <a name='rewindAnimation'></a> `rewindAnimation(Function?): void`
+
+<!--
+------------------------------------------------------------
+rewindAnimation
+------------------------------------------------------------
+-->
+##### <a name='rewindAnimation'></a> rewindAnimation
+
+```js
+rewindAnimation(Function?): void
+```
 
 `rewindAnimation` reverses the last played animation. It will run the animation
 sequence backwards starting from the last phase, and in each phase, it will
@@ -306,6 +423,7 @@ The callback function executes when the animation completes. It takes no argumen
 and returns nothing:
 
 ```js
+// You must always call playAnimation at least once before calling rewindAnimation.
 playAnimation();
 
 rewindAnimation(() => {
@@ -313,6 +431,12 @@ rewindAnimation(() => {
 });
 ```
 
+
+<!--
+------------------------------------------------------------
+More Animation Options
+------------------------------------------------------------
+-->
 #### More Animation Options
 
 All previous examples have shown timed animations with specified
@@ -328,7 +452,13 @@ All previous examples have shown timed animations with specified
 
 But you have more options available to you.
 
-##### Custom Easing Function
+
+<!--
+------------------------------------------------------------
+Custom Easing Functions
+------------------------------------------------------------
+-->
+##### Custom Easing Functions
 
 In each animation frame, the styles will progress from their `start` to `end` values
 using a default easing function, but you can provide a custom easing function:
@@ -345,10 +475,16 @@ import { BezierEasing } from 'react-animatronics'
 ```
 
 The `BezierEasing` function in this library is exported directly from the
-[bezier-easing][5] library and it included for convenience. The default easing
-is `BezierEasing(0.4, 0.0, 0.2, 1)` which is the [standard ease-in-out][6] from
+[bezier-easing][bezier] library and it included for convenience. The default easing
+is `BezierEasing(0.4, 0.0, 0.2, 1)` which is the [standard ease-in-out][material] from
 Material Design.
 
+
+<!--
+------------------------------------------------------------
+Spring Animations
+------------------------------------------------------------
+-->
 ##### Spring Animations
 
 If you're a fan of springs, you can do:
@@ -362,13 +498,19 @@ If you're a fan of springs, you can do:
 }
 ```
 
-This will animate your components just like [react-motion][7] does.
+This will animate your components just like [react-motion][motion] does.
 
 If you specify a `stiffness` you must also include a `damping`, and
 you cannot include a `duration` or `easingFn`.
 
 In other words, your animations can use either time _or_ springs, not both.
 
+
+<!--
+------------------------------------------------------------
+Animation Options Summary
+------------------------------------------------------------
+-->
 ##### Animation Options Summary
 
 Timed animations attributes:
@@ -393,11 +535,48 @@ Spring animations attributes:
 }
 ```
 
-### More Examples
 
-You can find more examples in the [`examples/`](./examples) folder.
+<!--
+------------------------------------------------------------
+Examples
+------------------------------------------------------------
+-->
+### Examples
+
+You can find running examples under [`examples/src/`](./examples/src).
+
+To run the examples:
+
+```bash
+# clone the repo
+git@github.com:andrewkshim/react-animatronics.git
+
+# go into the repo
+cd react-animatronics
+
+# install the dependencies
+yarn install
+
+# run the examples
+yarn run examples
+
+# open localhost:8080 in your browser
+```
+
+### Alternative Libraries
+
+- [react-transition-group][transition]
+- [react-motion][motion]
 
 
-[5]:https://github.com/gre/bezier-easing
-[6]:https://material.io/guidelines/motion/duration-easing.html
-[7]:https://github.com/chenglou/react-motion
+<!--
+------------------------------------------------------------
+Links
+------------------------------------------------------------
+-->
+[bezier]:https://github.com/gre/bezier-easing
+[hocs]:https://reactjs.org/docs/higher-order-components.html
+[material]:https://material.io/guidelines/motion/duration-easing.html
+[motion]:https://github.com/chenglou/react-motion
+[recompose]:https://github.com/acdlite/recompose
+[transition]:https://github.com/reactjs/react-transition-group
