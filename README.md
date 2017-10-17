@@ -201,11 +201,6 @@ withAnimatronics
 withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)
 ```
 
-This is a big section with lots of subsections, so it gets its own table of
-contents:
-
-
-
 `withAnimatronics` is a function that takes a single, function argument. It
 returns a function that is a higher-order component. The higher-order component
 returns a final component that is an **animatronics component**.
