@@ -9,6 +9,17 @@ for your React components.
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Documentation](#docs)
+  - [withControl](#withControl)
+  - [withAnimatronics](#withAnimatronics)
+    - [Animation Sequences](#animation-sequences)
+    - [Multiple, Named Animation Sequences](#multiple-named-animation-sequences)
+    - [Executing your Animations](#executing-your-animations)
+      - [playAnimation](#playAnimation)
+      - [rewindAnimation](#rewindAnimation)
+    - [More Animation Options](#more-animation-options)
+      - [Custom Easing Functions](#custom-easing-functions)
+      - [Spring Animations](#spring-animations)
+      - [Animation Options Summary](#animation-options-summary)
 - [Examples](#examples)
 - [Alternative Libraries](#alternative-libraries)
 
@@ -88,12 +99,6 @@ API Documentation
 ```js
 import { withControl, withAnimatronics } from 'react-animatronics'
 ```
-
-Jump to the docs:
-
-- [withControl](#withControl)
-- [withAnimatronics](#withAnimatronics)
-
 
 <!--
 ------------------------------------------------------------
@@ -199,15 +204,6 @@ withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)
 This is a big section with lots of subsections, so it gets its own table of
 contents:
 
-- [Animation Sequences](#animation-sequences)
-- [Multiple, Named Animation Sequences](#multiple-named-animation-sequences)
-- [Executing your Animations](#executing-your-animations)
-  - [playAnimation](#playAnimation)
-  - [rewindAnimation](#rewindAnimation)
-- [More Animation Options](#more-animation-options)
-  - [Custom Easing Functions](#custom-easing-functions)
-  - [Spring Animations](#spring-animations)
-  - [Animation Options Summary](#animation-options-summary)
 
 
 `withAnimatronics` is a function that takes a single, function argument. It
