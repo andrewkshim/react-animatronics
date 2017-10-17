@@ -452,9 +452,8 @@ examples:
 }
 ```
 
-This doesn't cover everything. There may be some styles that this library
-won't handle correctly. If you run into any, please [file an issue][issue]
-and let me know.
+There may be some styles that this library won't handle correctly. If you run
+into any, please [file an issue][issue] and let me know.
 
 
 <!--
