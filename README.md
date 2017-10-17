@@ -16,6 +16,7 @@ for your React components.
     - [Executing your Animations](#executing-your-animations)
       - [playAnimation](#playAnimation)
       - [rewindAnimation](#rewindAnimation)
+    - [What can be Animated?](#what-can-be-animated)
     - [More Animation Options](#more-animation-options)
       - [Custom Easing Functions](#custom-easing-functions)
       - [Spring Animations](#spring-animations)
@@ -125,7 +126,7 @@ const ControlledComponent = higherOrderComponent(
   ({ animatronicStyles }) => <div style={ animatronicStyles }/>
 );
 
-// The helloWorld property in this object corresponds to the 'helloWorld'
+// The helloWorld property in the object below corresponds to the 'helloWorld'
 // string passed into withControl and the associated animation will be applied
 // to the ControlledComponent.
 const App = withAnimatronics(() => [
@@ -139,9 +140,9 @@ const App = withAnimatronics(() => [
 ])(() => <ControlledComponent/>);
 ```
 
-We'll go into more detail on [`withAnimatronics`](#withAnimatronics) later, for
-now, it's only important to know that the string you put into `withControl`
-will be used in `withAnimatronics`.
+We'll go into more detail on `withAnimatronics` later. For now, it's only
+important to know that the string you put into `withControl` will be used in
+`withAnimatronics`.
 
 The component you pass into the higher-order component will receive an
 additional prop called `animatronicStyles`. This is an object that contains the
@@ -153,7 +154,7 @@ Here are some ways you can use the `animatronicStyles` in your components:
 
 ```js
 // If you just want to use the animatronicStyles.
-const MyComponent = withControl('square')(
+const YourComponent = withControl('square')(
   ({ animatronicStyles }) => (
     <div
       style={ animatronicStyles }
@@ -163,7 +164,7 @@ const MyComponent = withControl('square')(
 
 // If you have styles you want to keep static, you can use specific
 // values from animatronicStyles while keeping other styles unchanged.
-const MyComponent = withControl('square')(
+const YourComponent = withControl('square')(
   ({ animatronicStyles }) => (
     <div
       style={{
@@ -176,7 +177,7 @@ const MyComponent = withControl('square')(
 
 // If you always want the animatronicStyles to take precedence, you
 // can use object spread.
-const MyComponent = withControl('square')(
+const YourComponent = withControl('square')(
   ({ animatronicStyles }) => (
     <div
       style={{
@@ -216,7 +217,7 @@ const AnimatronicsComponent  = withAnimatronics(() => {})(YourComponent);
 The animatronics component knows how to run animations involving any of its
 descendant [controlled components](#withControl).
 
-The function you pass into `withAnimatronics` must return "animation sequences",
+The function you pass into `withAnimatronics` must return **animation sequences**,
 which are described in the next section.
 
 
@@ -315,7 +316,7 @@ const createAnimationSequence = () => {
 
 You can then choose to execute either `"animationSequence1"` or
 `"animationSequence2"` (or whatever you decide to name them) when it comes time
-to run your animations. This brings us to the next section.
+to run your animations, which brings us to the next section.
 
 
 <!--
@@ -421,6 +422,39 @@ rewindAnimation(() => {
   console.log('Animation done rewinding');
 });
 ```
+
+
+<!--
+------------------------------------------------------------
+What can be Animated?
+------------------------------------------------------------
+-->
+#### <a name='what-can-be-animated'></a> What can be Animated?
+
+React Animatronics can handle a bunch of different style values. Here are some
+examples:
+
+```js
+{
+  duration: 500,
+  start: {
+    height: '100px',
+    left: '200em', // any unit will work
+    opacity: 0, // numbers will work too
+    transform: 'scale(0.5)' // transforms will animate too!
+  },
+  end: {
+    height: '200px',
+    left: '100em',
+    opacity: 1,
+    transform: 'scale(1.2)'
+  }
+}
+```
+
+This doesn't cover everything. There may be some styles that this library
+won't handle correctly. If you run into any, please [file an issue][issue]
+and let me know.
 
 
 <!--
@@ -567,6 +601,7 @@ Links
 -->
 [bezier]:https://github.com/gre/bezier-easing
 [hocs]:https://reactjs.org/docs/higher-order-components.html
+[issue]:https://github.com/andrewkshim/react-animatronics/issues/new
 [material]:https://material.io/guidelines/motion/duration-easing.html
 [motion]:https://github.com/chenglou/react-motion
 [recompose]:https://github.com/acdlite/recompose
