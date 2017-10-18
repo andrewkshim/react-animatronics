@@ -67,7 +67,7 @@ export type Animation = {
   end: Object,
 }
 
-export type AnimationStage = { [string]: Animation };
+export type AnimationPhase = { [string]: Animation };
 
 
 //==========================================================

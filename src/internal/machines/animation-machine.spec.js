@@ -4,10 +4,10 @@ import test from 'tape'
 
 import Constants from '../constants'
 import ControlsMachine from './controls-machine'
-import AnimationMachine, { findLongestDelay, reverseStages } from './animation-machine'
+import AnimationMachine, { findLongestDelay, reversePhases } from './animation-machine'
 
 test('findLongestDelay', assert => {
-  const stage = {
+  const phase = {
     componentA: {
       duration: 500,
       delay: 100,
@@ -21,13 +21,13 @@ test('findLongestDelay', assert => {
       end: { left: '100px' },
     },
   };
-  assert.equals(findLongestDelay(stage), 700, 'correctly finds the longest delay');
+  assert.equals(findLongestDelay(phase), 700, 'correctly finds the longest delay');
   assert.end();
 });
 
-test('reverseStages', assert => {
+test('reversePhases', assert => {
   assert.deepEquals(
-    reverseStages([
+    reversePhases([
       {
         componentA: {
           duration: 500,
@@ -61,11 +61,11 @@ test('reverseStages', assert => {
         },
       },
     ],
-    'correctly reverses every stage and the order of the stages'
+    'correctly reverses every phase and the order of the phases'
   );
 
   assert.deepEquals(
-    reverseStages([
+    reversePhases([
       {
         componentA: {
           delay: 100,
@@ -103,10 +103,10 @@ test('reverseStages', assert => {
   assert.end();
 });
 
-test('AnimationMachine.play with a single stage', assert => {
+test('AnimationMachine.play with a single phase', assert => {
   const interval = 100;
   const duration = 500;
-  const stages = [
+  const sequence = [
     {
       componentA: {
         duration,
@@ -119,7 +119,7 @@ test('AnimationMachine.play with a single stage', assert => {
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
   const animation = AnimationMachine(
-    () => stages,
+    () => sequence,
     requestAnimationFrame,
     cancelAnimationFrame
   );
@@ -144,10 +144,10 @@ test('AnimationMachine.play with a single stage', assert => {
   );
 });
 
-test('AnimationMachine.play with a single stage and multiple components', assert => {
+test('AnimationMachine.play with a single phase and multiple components', assert => {
   const interval = 100;
   const duration = 500;
-  const stages = [
+  const sequence = [
     {
       componentA: {
         duration,
@@ -165,7 +165,7 @@ test('AnimationMachine.play with a single stage and multiple components', assert
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
   const animation = AnimationMachine(
-    () => stages,
+    () => sequence,
     requestAnimationFrame,
     cancelAnimationFrame
   );
@@ -192,10 +192,10 @@ test('AnimationMachine.play with a single stage and multiple components', assert
   );
 });
 
-test('AnimationMachine.play with multiple stages', { timeout: 1000 }, assert => {
+test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => {
   const interval = 100;
   const duration = 200;
-  const stages = [
+  const sequence = [
     {
       componentA: {
         duration,
@@ -222,7 +222,7 @@ test('AnimationMachine.play with multiple stages', { timeout: 1000 }, assert => 
   const cancelAnimationFrame = clearTimeout;
   const controls = ControlsMachine();
   const animation = AnimationMachine(
-    () => stages,
+    () => sequence,
     requestAnimationFrame,
     cancelAnimationFrame
   );

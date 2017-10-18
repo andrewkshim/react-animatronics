@@ -5,7 +5,7 @@ import { mount } from 'enzyme'
 
 import { withAnimatronics, withRig } from '../src'
 
-test('runs each animation stage', assert => {
+test('runs each animation phase', assert => {
   class Base extends React.Component {
     render() {
       return <div/>;

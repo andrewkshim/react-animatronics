@@ -8,7 +8,7 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import type { TimeMachine, ControlsMachine, AnimationMachine, Animation, AnimationStage } from '../flow-types'
+import type { TimeMachine, ControlsMachine, AnimationMachine, Animation, AnimationPhase } from '../flow-types'
 
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
@@ -25,22 +25,22 @@ const isUsingTime = (animation: Object): boolean =>
 const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
 
-export const findLongestDelay = (stage: AnimationStage): number =>
-  Object.keys(stage)
-    .map(key => stage[key])
+export const findLongestDelay = (phase: AnimationPhase): number =>
+  Object.keys(phase)
+    .map(key => phase[key])
     .map(s => s.delay || 0)
     .reduce(
       (longest, delay) => (delay > longest) ? delay : longest,
       0
     );
 
-export const reverseStages = (stages: AnimationStage[]): AnimationStage[] =>
-  stages
-    .map(stage => Object.keys(stage)
+export const reversePhases = (phases: AnimationPhase[]): AnimationPhase[] =>
+  phases
+    .map(phase => Object.keys(phase)
       .reverse()
       .reduce((result, componentName) => {
-        const longestDelay = findLongestDelay(stage);
-        const { start, end, delay, ...rest } = stage[componentName];
+        const longestDelay = findLongestDelay(phase);
+        const { start, end, delay, ...rest } = phase[componentName];
         result[componentName] = {
           delay: longestDelay - (delay || 0),
           start: end,
@@ -124,31 +124,31 @@ export default (
 
   const _state: Object = {
     timeMachines: null,
-    stages: null,
+    phases: null,
     createAnimationSequences,
   };
 
-  const _runStage = (
-    stage: AnimationStage,
+  const _runPhase = (
+    phase: AnimationPhase,
     onComponentFrame: Function,
-    onStageComplete: Function,
+    onPhaseComplete: Function,
   ): void => {
-    debug('running animation stage %O', stage);
+    debug('running animation phase %O', phase);
 
     _state.timeMachines = {};
 
-    const componentNames = Object.keys(stage);
+    const componentNames = Object.keys(phase);
     let numComponentsDone = 0;
 
     const onComponentDone = () => {
       numComponentsDone++;
       if (numComponentsDone === componentNames.length) {
-        onStageComplete();
+        onPhaseComplete();
       }
     };
 
-    const runComponentStage = componentName => {
-      const animation: Object = stage[componentName];
+    const runComponentPhase = componentName => {
+      const animation: Object = phase[componentName];
 
       _state.timeMachines[componentName] = InfiniteTimeMachine(
         requestAnimationFrame,
@@ -180,32 +180,32 @@ export default (
     }
 
     componentNames.forEach(componentName => {
-      const animation: Object = stage[componentName];
+      const animation: Object = phase[componentName];
       // Intentionally ignoring 0 (in addition to null and undefined) even though
       // setTimeout(fn, 0) would affect the execution timing.
       if (!animation.delay) {
-        runComponentStage(componentName);
+        runComponentPhase(componentName);
       } else {
-        setTimeout(() => runComponentStage(componentName), animation.delay);
+        setTimeout(() => runComponentPhase(componentName), animation.delay);
       }
     });
   }
 
-  const _onStageComplete = (
-    nextStageNum,
-    animationStages,
+  const _onPhaseComplete = (
+    nextPhaseNum,
+    animationPhases,
     onComponentFrame,
     onComplete
   ): Function => () => {
-    if (nextStageNum === animationStages.length) {
+    if (nextPhaseNum === animationPhases.length) {
       onComplete();
     } else {
-      _runStage(
-        animationStages[nextStageNum],
+      _runPhase(
+        animationPhases[nextPhaseNum],
         onComponentFrame,
-        _onStageComplete(
-          nextStageNum + 1,
-          animationStages,
+        _onPhaseComplete(
+          nextPhaseNum + 1,
+          animationPhases,
           onComponentFrame,
           onComplete
         ),
@@ -218,17 +218,17 @@ export default (
     controls: ControlsMachine,
     onComplete: Function,
   ) => {
-    const rawStages = _state.createAnimationSequences(controls.getNodes());
-    _state.stages = Array.isArray(rawStages) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawStages } : rawStages;
+    const rawPhases = _state.createAnimationSequences(controls.getNodes());
+    _state.phases = Array.isArray(rawPhases) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawPhases } : rawPhases;
 
-    const animationStages = _state.stages[animationName];
+    const animationPhases = _state.phases[animationName];
 
-    _runStage(
-      animationStages[0],
+    _runPhase(
+      animationPhases[0],
       controls.updateStyles,
-      _onStageComplete(
+      _onPhaseComplete(
         1,
-        animationStages,
+        animationPhases,
         controls.updateStyles,
         onComplete
       ),
@@ -240,18 +240,18 @@ export default (
     controls: ControlsMachine,
     onComplete: Function
   ) => {
-    if (!_state.stages) {
+    if (!_state.phases) {
       // TODO: better error message
-      throw new Error('rewind does not have stages');
+      throw new Error('rewind does not have phases');
     }
-    const animationStages = reverseStages(_state.stages[animationName]);
+    const animationPhases = reversePhases(_state.phases[animationName]);
 
-    _runStage(
-      animationStages[0],
+    _runPhase(
+      animationPhases[0],
       controls.updateStyles,
-      _onStageComplete(
+      _onPhaseComplete(
         1,
-        animationStages,
+        animationPhases,
         controls.updateStyles,
         onComplete
       ),
@@ -265,11 +265,11 @@ export default (
       _state.timeMachines[componentName].stop();
     });
     _state.timeMachines = null;
-    _state.stages = null;
+    _state.phases = null;
   }
 
-  const setCreateAnimationSequences = updatedCreateAnimationStages => {
-    _state.createAnimationSequences = updatedCreateAnimationStages;
+  const setCreateAnimationSequences = updatedCreateAnimationPhases => {
+    _state.createAnimationSequences = updatedCreateAnimationPhases;
   }
 
   const machine = { play, rewind, stop, setCreateAnimationSequences };
