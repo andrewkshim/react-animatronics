@@ -3,6 +3,8 @@
 React Animatronics lets you write declarative, coordinated animations
 for your React components.
 
+[![Build Status](https://travis-ci.org/andrewkshim/react-animatronics.svg?branch=master)](https://travis-ci.org/andrewkshim/react-animatronics)
+
 
 ## Table of Contents
 
