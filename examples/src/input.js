@@ -1,8 +1,8 @@
 import React from 'react'
 
-import Example from './components/Example'
-import Circle from './components/Circle'
-import { SERIF_FONT, COLOR_A, COLOR_B, COLOR_C } from './styles'
+import Example from './internal/components/Example'
+import Circle from './internal/components/Circle'
+import { SERIF_FONT, COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
 import { withAnimatronics, withRig } from '../../src'
 
 const COLORS = [

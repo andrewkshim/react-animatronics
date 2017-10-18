@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Circle from './components/Circle'
-import Example from './components/Example'
-import { COLOR_A, COLOR_B, COLOR_C } from './styles'
+import Circle from './internal/components/Circle'
+import Example from './internal/components/Example'
+import { COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
 import { withAnimatronics, withRig } from '../../src'
 
 const CircleA = withRig('circleA')(Circle);

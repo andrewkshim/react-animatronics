@@ -16,7 +16,7 @@ import {
   LRG_FONT_SIZE,
   MED_FONT_SIZE,
   SML_FONT_SIZE,
-} from './styles'
+} from './internal/styles'
 
 import { withRig, withAnimatronics, BezierEasing } from '../../src'
 

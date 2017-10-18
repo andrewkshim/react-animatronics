@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 // Need to make this a class component because we use the refs in the animations.
 class Circle extends React.Component {

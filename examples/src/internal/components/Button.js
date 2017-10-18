@@ -1,7 +1,7 @@
 import React from 'react'
 import chroma from 'chroma-js'
 
-import { withAnimatronics, withRig, BezierEasing } from '../../../src'
+import { withAnimatronics, withRig, BezierEasing } from '../../../../src'
 
 // TODO: reorganize styles
 
