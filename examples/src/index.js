@@ -409,9 +409,7 @@ class App extends React.Component {
 
 }
 
-const AnimatedApp = withAnimatronics(() => (
-  []
-))(App);
+const AnimatedApp = withAnimatronics(() => [])(App);
 
 ReactDOM.render(
   <AnimatedApp/>,
