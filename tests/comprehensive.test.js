@@ -1,5 +1,3 @@
-import './internal/setup.test'
-
 import React from 'react'
 import sinon from 'sinon'
 import test from 'tape'
