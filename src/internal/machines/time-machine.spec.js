@@ -50,7 +50,6 @@ test('InfiniteTimeMachine running multiple jobs', assert => {
     numIterations++;
     spyB();
     if (numIterations === expectedCallCount) {
-      console.log(numIterations);
       infiniteMachine.stop();
       assert.equals(
         spyA.callCount, (expectedCallCount / 2),
