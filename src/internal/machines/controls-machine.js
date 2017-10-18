@@ -32,7 +32,7 @@ export default (): ControlsMachine => {
 
   const updateStyles = (componentName: string, styles: Styles) => {
     if (!_styleUpdaters[componentName]) {
-      // TODO: if the style updater doesn't exist, user might have misspelled rig name
+      // TODO: if the style updater doesn't exist, user might have misspelled control name
       // TODO: better error message
       console.warn('_styleUpdates does not have componentName', componentName);
     } else {

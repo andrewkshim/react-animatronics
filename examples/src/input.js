@@ -3,7 +3,7 @@ import React from 'react'
 import Example from './internal/components/Example'
 import Circle from './internal/components/Circle'
 import { SERIF_FONT, COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
-import { withAnimatronics, withRig } from '../../src'
+import { withAnimatronics, withControl } from '../../src'
 
 const COLORS = [
   COLOR_A,
@@ -37,7 +37,7 @@ const Letters = withAnimatronics(() => [])(class extends React.Component {
     const { didLettersAnimate } = this.state;
     const letters = text.split('');
     const components = letters.map((letter, index) =>
-       withRig(`${ letter }-${ index }`)(Circle)
+       withControl(`${ letter }-${ index }`)(Circle)
     );
     return (
       <div style={{
@@ -150,7 +150,7 @@ class Input extends React.Component {
 
 }
 
-const RiggedInput = withRig('input')( Input );
+const ControlledInput = withControl('input')( Input );
 
 class InputExample extends React.Component {
 
@@ -161,7 +161,7 @@ class InputExample extends React.Component {
         playAnimation={ playAnimation }
         rewindAnimation={ rewindAnimation }
       >
-        <RiggedInput/>
+        <ControlledInput/>
       </Example>
     );
   }

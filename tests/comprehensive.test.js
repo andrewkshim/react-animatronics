@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import test from 'tape'
 import { mount } from 'enzyme'
 
-import { withAnimatronics, withRig } from '../src'
+import { withAnimatronics, withControl } from '../src'
 
 test('runs each animation phase', assert => {
   class Base extends React.Component {
@@ -12,8 +12,8 @@ test('runs each animation phase', assert => {
     }
   }
 
-  const Rigged = withRig('base', { useStringRefs: true })(Base);
-  const App = () => <Rigged/>;
+  const Controlled = withControl('base', { useStringRefs: true })(Base);
+  const App = () => <Controlled/>;
 
   const createAnimationSequences = () => {
     return [

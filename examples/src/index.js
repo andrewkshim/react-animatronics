@@ -18,7 +18,7 @@ import {
   SML_FONT_SIZE,
 } from './internal/styles'
 
-import { withRig, withAnimatronics, BezierEasing } from '../../src'
+import { withControl, withAnimatronics, BezierEasing } from '../../src'
 
 const BASIC = 'basic';
 const SPRINGS = 'springs';
@@ -68,7 +68,7 @@ const Logo = () => (
   </a>
 )
 
-const ClickWave = withRig('clickWave')(({ animatronicStyles, clickX, clickY }) => (
+const ClickWave = withControl('clickWave')(({ animatronicStyles, clickX, clickY }) => (
   <div
     style={{
       position: 'absolute',
@@ -207,9 +207,9 @@ class ExampleItem extends React.Component {
 
 }
 
-const createAnimatedHighlight = example => withRig(`${ example }Highlight`)(ExampleItemHighlight);
+const createAnimatedHighlight = example => withControl(`${ example }Highlight`)(ExampleItemHighlight);
 
-const createAnimatedItem = example => withRig(example)(withAnimatronics(() => ({
+const createAnimatedItem = example => withControl(example)(withAnimatronics(() => ({
   selected: [
     {
       [`${ example }Highlight`]: {

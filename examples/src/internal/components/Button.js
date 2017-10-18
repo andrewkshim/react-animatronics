@@ -1,7 +1,7 @@
 import React from 'react'
 import chroma from 'chroma-js'
 
-import { withAnimatronics, withRig, BezierEasing } from '../../../../src'
+import { withAnimatronics, withControl, BezierEasing } from '../../../../src'
 
 // TODO: reorganize styles
 
@@ -16,7 +16,7 @@ const CLICK_WAVE_COLOR = PRIMARY_COLOR;
 const CLICK_WAVE_DIMENSION = 600; // px
 const CLICK_WAVE_DURATION = 750; // ms
 
-const ClickWave = withRig('wave')(
+const ClickWave = withControl('wave')(
   ({ animatronicStyles, clickX, clickY }) => (
     <div
       style={{

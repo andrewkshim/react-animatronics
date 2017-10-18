@@ -2,5 +2,5 @@
  * React Animatronics: coordinated, declarative animations for React components.
  */
 export withAnimatronics from './withAnimatronics'
-export withRig from './withRig'
+export withControl from './withControl'
 export BezierEasing from 'bezier-easing'

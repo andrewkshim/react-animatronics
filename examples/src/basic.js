@@ -4,11 +4,11 @@ import PropTypes from 'prop-types'
 import Circle from './internal/components/Circle'
 import Example from './internal/components/Example'
 import { COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
-import { withAnimatronics, withRig } from '../../src'
+import { withAnimatronics, withControl } from '../../src'
 
-const CircleA = withRig('circleA')(Circle);
-const CircleB = withRig('circleB')(Circle);
-const CircleC = withRig('circleC')(Circle);
+const CircleA = withControl('circleA')(Circle);
+const CircleB = withControl('circleB')(Circle);
+const CircleC = withControl('circleC')(Circle);
 
 const BasicExample = ({ playAnimation, rewindAnimation }) => (
   <Example playAnimation={ playAnimation } rewindAnimation={ rewindAnimation }>

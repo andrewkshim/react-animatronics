@@ -1,6 +1,6 @@
 /**
  * TODO: improve docs
- * withRig: (componentName, options) => higher-order component
+ * withControl: (componentName, options) => higher-order component
  * @module internal/context-types
  */
 
@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 
 import ContextTypes from './internal/context-types'
 
-const withRig = (
+const withControl = (
   componentName,
   {
     useStringRefs = false,
@@ -72,4 +72,4 @@ const withRig = (
   return ControlledComponent;
 };
 
-export default withRig;
+export default withControl;
