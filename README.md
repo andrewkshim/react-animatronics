@@ -231,15 +231,15 @@ Animation Sequences
 -->
 #### Animation Sequences
 
-The function you pass into `withAnimatronics` is internally named `createAnimationSequence()`
-because it returns one or more "animation sequences":
+The function you pass into `withAnimatronics` is internally named `createAnimationSequences()`
+because it returns one or more **animation sequences**:
 
 ```js
-const createAnimationSequence = () => {
+const createAnimationSequences = () => {
   return animationSequence;
 };
 
-const higherOrderComponent = withAnimatronics(createAnimationSequence);
+const higherOrderComponent = withAnimatronics(createAnimationSequences);
 ```
 
 An animation sequence is an array of objects, where each object represents
@@ -280,11 +280,11 @@ const phase2 = {
 const animationSequence = [ phase1, phase2 ];
 
 // Bringing in the code from the previous example to put it all together.
-const createAnimationSequence = () => {
+const createAnimationSequences = () => {
   return animationSequence;
 };
 
-const higherOrderComponent = withAnimatronics(createAnimationSequence);
+const higherOrderComponent = withAnimatronics(createAnimationSequences);
 ```
 
 In the above example, we're only returning one animation sequence which means
@@ -302,14 +302,14 @@ Multiple, Named Animation Sequences
 -->
 #### <a name='multiple-named-animation-sequences'></a> Multiple, Named Animation Sequences
 
-When `createAnimationSequence` returns an array, you can only use that
+When `createAnimationSequences` returns an array, you can only use that
 one animation sequence. For more complex use cases, you may want to describe
-multiple, named animation sequences. To do this, you can have `createAnimationSequence`
+multiple, named animation sequences. To do this, you can have `createAnimationSequences`
 return an object where the keys are arbitrary names and the values are
 animation sequence arrays.
 
 ```
-const createAnimationSequence = () => {
+const createAnimationSequences = () => {
   return {
     animationSequence1: [ /* ... */ ],
     animationSequence2: [ /* ... */ ],
@@ -336,8 +336,8 @@ The component you pass into the `withAnimatronics` higher-order component can ex
 animations via two props:
 
 ```js
-const createAnimationSequence = () => [];
-const higherOrderComponent = withAnimatronics(createAnimationSequence);
+const createAnimationSequences = () => [];
+const higherOrderComponent = withAnimatronics(createAnimationSequences);
 
 // YourComponent receives playAnimation and rewindAnimation as props from
 // the higherOrderComponent.
