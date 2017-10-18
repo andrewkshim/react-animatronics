@@ -11,8 +11,8 @@
     "example:basic": "./node_modules/.bin/webpack-dev-server --config examples/basic/webpack.config.js",
     "example:welcome": "./node_modules/.bin/webpack-dev-server --config examples/welcome/webpack.config.js",
     "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
-    "specs": "./node_modules/.bin/tape -r babel-register -r ./tests/setup.test './src/**/*.spec.js'",
     "tests:integration": "./node_modules/.bin/tape -r babel-register tests/integration.test.js",
+    "specs": "./node_modules/.bin/tape -r babel-register -r ./tests/setup './src/**/*.spec.js'",
     "lint": "./node_modules/.bin/flow status"
   },
   "dependencies": {
