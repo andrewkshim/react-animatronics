@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import test from 'tape'
 import { mount } from 'enzyme'
 
-import { withAnimatronics, withRig } from './index'
+import { withAnimatronics, withRig } from '../src'
 
 test('runs each animation stage', assert => {
   class Base extends React.Component {
@@ -15,8 +15,6 @@ test('runs each animation stage', assert => {
   const Rigged = withRig('base', { useStringRefs: true })(Base);
   const App = () => <Rigged/>;
 
-  const onStage1Complete = sinon.spy();
-  const onStage2Complete = sinon.spy();
   const createAnimationStages = () => {
     return [
       {
@@ -32,8 +30,7 @@ test('runs each animation stage', assert => {
       },
       {
         base: {
-          stiffness: 120,
-          damping: 50,
+          duration: 300,
           start: {
             top: '10px',
           },
@@ -45,22 +42,15 @@ test('runs each animation stage', assert => {
     ];
   };
 
-  let wrapper;
+  const startTime = Date.now();
   const Animated = withAnimatronics(createAnimationStages)(App);
-  wrapper = mount(<Animated/>);
-  const runAnimation = wrapper.find(App).prop('runAnimation');
-  runAnimation(
+  const wrapper = mount(<Animated/>);
+  const playAnimation = wrapper.find(App).prop('playAnimation');
+  playAnimation(
     () => {
-      assert.true(onStage1Complete.calledOnce);
-      assert.true(onStage2Complete.calledOnce);
+      const elapsedTime = Date.now() - startTime;
+      assert.true(elapsedTime >= 550, 'the animation took the expected amount of time');
       assert.end();
     },
-    (stageIndex) => {
-      if (stageIndex === 0) {
-        onStage1Complete();
-      } else if (stageIndex === 1) {
-        onStage2Complete();
-      }
-    }
   );
 })
