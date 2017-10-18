@@ -128,7 +128,7 @@ class Input extends React.Component {
           <Letters
             didAnimate={ didAnimate }
             text={ text }
-            createAnimationStages={() => [
+            createAnimationSequences={() => [
               text.split('').reduce(
                 (result, letter, index) => {{
                   result[`${ letter }-${ index }`] = {

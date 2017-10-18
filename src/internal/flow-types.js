@@ -90,7 +90,7 @@ export type AnimationMachine = {
   play: (animationName: string, controls: ControlsMachine, onComplete: Function) => void,
   rewind: (animationName: string, controls: ControlsMachine, onComplete: Function) => void,
   stop: () => void,
-  setCreateAnimationStages: (createAnimationStages: Function) => void,
+  setCreateAnimationSequences: (createAnimationSequences: Function) => void,
 }
 
 export type ControlsMachine = {

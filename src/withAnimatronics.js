@@ -1,6 +1,6 @@
 /**
  * TODO: improve docs
- * withAnimatronics: (createAnimationStages, options) => higher-order component
+ * withAnimatronics: (createAnimationSequences, options) => higher-order component
  * @module withAnimatronics
  */
 
@@ -15,7 +15,7 @@ import { noop } from './internal/utils'
 import Polyfills from './internal/polyfills'
 
 const withAnimatronics = (
-  createAnimationStages,
+  createAnimationSequences,
   {
     requestAnimationFrame = Polyfills.DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
@@ -25,7 +25,7 @@ const withAnimatronics = (
   const controls = ControlsMachine();
 
   const animation = AnimationMachine(
-    createAnimationStages,
+    createAnimationSequences,
     requestAnimationFrame,
     cancelAnimationFrame,
   );
@@ -51,9 +51,9 @@ const withAnimatronics = (
       }
 
       componentWillReceiveProps(nextProps) {
-        const { createAnimationStages } = nextProps;
-        if (typeof createAnimationStages === 'function') {
-          animation.setCreateAnimationStages(createAnimationStages);
+        const { createAnimationSequences } = nextProps;
+        if (typeof createAnimationSequences === 'function') {
+          animation.setCreateAnimationSequences(createAnimationSequences);
         } else {
           // TODO: better error handling
         }

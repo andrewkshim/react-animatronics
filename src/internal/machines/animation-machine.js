@@ -117,7 +117,7 @@ const runSpringAnimation = (
 }
 
 export default (
-  createAnimationStages: Function,
+  createAnimationSequences: Function,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
 ): AnimationMachine => {
@@ -125,7 +125,7 @@ export default (
   const _state: Object = {
     timeMachines: null,
     stages: null,
-    createAnimationStages,
+    createAnimationSequences,
   };
 
   const _runStage = (
@@ -218,7 +218,7 @@ export default (
     controls: ControlsMachine,
     onComplete: Function,
   ) => {
-    const rawStages = _state.createAnimationStages(controls.getNodes());
+    const rawStages = _state.createAnimationSequences(controls.getNodes());
     _state.stages = Array.isArray(rawStages) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawStages } : rawStages;
 
     const animationStages = _state.stages[animationName];
@@ -268,10 +268,10 @@ export default (
     _state.stages = null;
   }
 
-  const setCreateAnimationStages = updatedCreateAnimationStages => {
-    _state.createAnimationStages = updatedCreateAnimationStages;
+  const setCreateAnimationSequences = updatedCreateAnimationStages => {
+    _state.createAnimationSequences = updatedCreateAnimationStages;
   }
 
-  const machine = { play, rewind, stop, setCreateAnimationStages };
+  const machine = { play, rewind, stop, setCreateAnimationSequences };
   return machine;
 };

@@ -15,7 +15,7 @@ test('runs each animation stage', assert => {
   const Rigged = withRig('base', { useStringRefs: true })(Base);
   const App = () => <Rigged/>;
 
-  const createAnimationStages = () => {
+  const createAnimationSequences = () => {
     return [
       {
         base: {
@@ -43,7 +43,7 @@ test('runs each animation stage', assert => {
   };
 
   const startTime = Date.now();
-  const Animated = withAnimatronics(createAnimationStages)(App);
+  const Animated = withAnimatronics(createAnimationSequences)(App);
   const wrapper = mount(<Animated/>);
   const playAnimation = wrapper.find(App).prop('playAnimation');
   playAnimation(
