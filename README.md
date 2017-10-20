@@ -15,7 +15,7 @@ for your React components.
 - [API Documentation](#docs)
   - [withControl](#withControl)
   - [withAnimatronics](#withAnimatronics)
-    - [createAnimationSequences](#createAnimationSequences)
+    - [createAnimationSequences](#createanimationsequences)
     - [Executing your Animations](#executing-your-animations)
       - [playAnimation](#playAnimation)
       - [rewindAnimation](#rewindAnimation)
