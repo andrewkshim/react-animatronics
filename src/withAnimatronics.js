@@ -8,7 +8,7 @@ import React from 'react'
 
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
-import ControlsMachine from './internal/machines/controls-machine'
+import ComponentsMachine from './internal/machines/components-machine'
 import AnimationMachine from './internal/machines/animation-machine'
 import { noop } from './internal/utils'
 
@@ -22,7 +22,7 @@ const withAnimatronics = (
   } = {}
 ) => {
 
-  const controls = ControlsMachine();
+  const components = ComponentsMachine();
 
   const animation = AnimationMachine(
     createAnimationSequences,
@@ -44,8 +44,8 @@ const withAnimatronics = (
       getChildContext() {
         return {
           animatronics: {
-            registerComponent: controls.registerComponent,
-            unregisterComponent: controls.unregisterComponent,
+            registerComponent: components.registerComponent,
+            unregisterComponent: components.unregisterComponent,
           }
         };
       }
@@ -69,7 +69,7 @@ const withAnimatronics = (
           animationName = Constants.DEFAULT_ANIMATION_NAME;
         }
         // TODO: warn when an event might have been passed in
-        animation.play(animationName, controls, onComplete);
+        animation.play(animationName, components, onComplete);
       }
 
       _rewindAnimation(animationName = Constants.DEFAULT_ANIMATION_NAME, onComplete = noop) {
@@ -77,7 +77,7 @@ const withAnimatronics = (
           onComplete = animationName;
           animationName = Constants.DEFAULT_ANIMATION_NAME;
         }
-        animation.rewind(animationName, controls, onComplete);
+        animation.rewind(animationName, components, onComplete);
       }
 
       _cancelAnimation() {

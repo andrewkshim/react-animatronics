@@ -2,10 +2,10 @@
 import test from 'tape'
 import sinon from 'sinon'
 
-import ControlsMachine from './controls-machine'
+import ComponentsMachine from './components-machine'
 
-test('ControlsMachine', assert => {
-  const machine = ControlsMachine();
+test('ComponentsMachine', assert => {
+  const machine = ComponentsMachine();
   const styleUpdater = sinon.spy();
 
   machine.registerComponent('componentA', {}, styleUpdater);

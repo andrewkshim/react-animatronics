@@ -87,13 +87,13 @@ export type SpringMachine = {
 }
 
 export type AnimationMachine = {
-  play: (animationName: string, controls: ControlsMachine, onComplete: Function) => void,
-  rewind: (animationName: string, controls: ControlsMachine, onComplete: Function) => void,
+  play: (animationName: string, components: ComponentsMachine, onComplete: Function) => void,
+  rewind: (animationName: string, components: ComponentsMachine, onComplete: Function) => void,
   stop: () => void,
   setCreateAnimationSequences: (createAnimationSequences: Function) => void,
 }
 
-export type ControlsMachine = {
+export type ComponentsMachine = {
   registerComponent: (componentName: string, node: DOMNode, styleUpdater: StyleUpdater) => void,
   unregisterComponent: (componentName: string) => void,
   updateStyles: (componentName: string, styles: Styles) => void,

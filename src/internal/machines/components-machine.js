@@ -1,17 +1,17 @@
 // @flow
 /**
- * ControlsMachine: manages all of the component controls for withAnimatronics.
+ * ComponentsMachine: manages all of the component controls for withAnimatronics.
  *
- * @module internal/machines/controls-machine
+ * @module internal/machines/components-machine
  */
 
 import Debug from 'debug'
 
-import type { Styles, StyleUpdater, DOMNode, ControlsMachine } from '../flow-types'
+import type { Styles, StyleUpdater, DOMNode, ComponentsMachine } from '../flow-types'
 
 const debug = Debug('animatronics:controls');
 
-export default (): ControlsMachine => {
+export default (): ComponentsMachine => {
   const _nodes: { [string]: DOMNode } = {};
   const _styleUpdaters: { [string]: StyleUpdater } = {};
 
@@ -20,7 +20,7 @@ export default (): ControlsMachine => {
     node: DOMNode,
     styleUpdater: StyleUpdater,
   ) => {
-    debug('registering component "%s"', componentName,);
+    debug('registering component "%s"', componentName);
     _nodes[componentName] = node;
     _styleUpdaters[componentName] = styleUpdater;
   };
@@ -42,7 +42,7 @@ export default (): ControlsMachine => {
 
   const getNodes = () => _nodes;
 
-  const machine: ControlsMachine = {
+  const machine: ComponentsMachine = {
     registerComponent,
     unregisterComponent,
     updateStyles,

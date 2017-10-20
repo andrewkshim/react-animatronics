@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import test from 'tape'
 
 import Constants from '../constants'
-import ControlsMachine from './controls-machine'
+import ComponentMachine from './components-machine'
 import AnimationMachine, { findLongestDelay, reversePhases } from './animation-machine'
 
 test('findLongestDelay', assert => {
@@ -117,7 +117,7 @@ test('AnimationMachine.play with a single phase', assert => {
   ];
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
-  const controls = ControlsMachine();
+  const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
@@ -125,11 +125,11 @@ test('AnimationMachine.play with a single phase', assert => {
   );
   const styleUpdater = sinon.spy();
 
-  controls.registerComponent('componentA', {}, styleUpdater);
+  components.registerComponent('componentA', {}, styleUpdater);
 
   animation.play(
     Constants.DEFAULT_ANIMATION_NAME,
-    controls,
+    components,
     () => {
       assert.ok(
         styleUpdater.callCount >= Math.floor(duration / interval),
@@ -163,7 +163,7 @@ test('AnimationMachine.play with a single phase and multiple components', assert
   ];
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
-  const controls = ControlsMachine();
+  const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
@@ -172,12 +172,12 @@ test('AnimationMachine.play with a single phase and multiple components', assert
   const styleUpdaterA = sinon.spy();
   const styleUpdaterB = sinon.spy();
 
-  controls.registerComponent('componentA', {}, styleUpdaterA);
-  controls.registerComponent('componentB', {}, styleUpdaterB);
+  components.registerComponent('componentA', {}, styleUpdaterA);
+  components.registerComponent('componentB', {}, styleUpdaterB);
 
   animation.play(
     Constants.DEFAULT_ANIMATION_NAME,
-    controls,
+    components,
     () => {
       assert.deepEquals(
         styleUpdaterA.lastCall.args[0], { left: '100px' },
@@ -220,7 +220,7 @@ test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => 
   ];
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
-  const controls = ControlsMachine();
+  const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
@@ -228,11 +228,11 @@ test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => 
   );
   const styleUpdater = sinon.spy();
 
-  controls.registerComponent('componentA', {}, styleUpdater);
+  components.registerComponent('componentA', {}, styleUpdater);
 
   animation.play(
     Constants.DEFAULT_ANIMATION_NAME,
-    controls,
+    components,
     () => {
       assert.deepEquals(
         styleUpdater.lastCall.args[0], { left: '300px' },
