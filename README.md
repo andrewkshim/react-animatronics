@@ -15,8 +15,7 @@ for your React components.
 - [API Documentation](#docs)
   - [withControl](#withControl)
   - [withAnimatronics](#withAnimatronics)
-    - [Animation Sequences](#animation-sequences)
-    - [Multiple, Named Animation Sequences](#multiple-named-animation-sequences)
+    - [createAnimationSequences](#createAnimationSequences)
     - [Executing your Animations](#executing-your-animations)
       - [playAnimation](#playAnimation)
       - [rewindAnimation](#rewindAnimation)
@@ -221,42 +220,66 @@ const AnimatronicsComponent  = withAnimatronics(() => {})(YourComponent);
 The animatronics component knows how to run animations involving any of its
 descendant [controlled components](#withControl).
 
-The function you pass into `withAnimatronics` must return **animation sequences**,
-which are described in the next section.
+The function you pass into `withAnimatronics` is internally named `createAnimationSequences`,
+and it's described in the next section.
 
 
 <!--
 ------------------------------------------------------------
-Animation Sequences
+createAnimationSequences
 ------------------------------------------------------------
 -->
-#### Animation Sequences
+#### createAnimationSequences
 
-The function you pass into `withAnimatronics` is internally named `createAnimationSequences()`
-because it returns one or more **animation sequences**:
+The function you pass into `withAnimatronics` is internally named `createAnimationSequences`
+because it must return one or more **animation sequences**. We'll go into animation sequences
+shortly, but there's an important detail about `createAnimationSequences` I don't want to miss
+since it can help you build interesting animations.
+
+When `createAnimationSequences` executes, it'll be called with an object that maps the
+names of your [controlled components](#withControl) to their DOM nodes:
 
 ```js
-const createAnimationSequences = () => {
-  return animationSequence;
+const Square = withControl('mySquare')(
+  () => <div/>
+);
+
+const Circle = withControl('myCircle')(
+  () => <div/>
+);
+
+const createAnimationSequences = (nodes) => {
+  const { mySquare, myCircle } = nodes;
+  const { left: squareLeft, top: squareTop } = mySquare.getBoundingClientRect();
+  const { left: circleLeft, top: circleTop } = myCircle.getBoundingClientRect();
+
+  // use the DOM properties to create your animation sequences
+  const animationSequences = /* ... */;
+  return animationSequences;
 };
 
 const higherOrderComponent = withAnimatronics(createAnimationSequences);
 ```
+
+This makes it so you can find the exact positions of your elements and create
+animation sequences that are adjusted to where your elements are at the moment
+you execute the animation. Keep this in mind as we talk about animation
+sequences next.
 
 An animation sequence is an array of objects, where each object represents
 a single **phase** of the animation. Each phase describes the styles for your
 controlled components and how to animate those styles:
 
 ```js
-// Phase 1 describes two components (square and circle) simultaneously animating
+// Phase 1 describes two components (mySquare and myCircle) simultaneously animating
 // their top positions from 0px to 100px for a 500ms duration.
 const phase1 = {
-  square: {
+  mySquare: {
     duration: 500,
     start: { top: '0px' },
     end: { top: '100px' },
   },
-  circle: {
+  myCircle: {
     duration: 500,
     start: { top: '0px' },
     end: { top: '100px' },
@@ -266,12 +289,12 @@ const phase1 = {
 // Phase 2 describes the same two components both animating their top positions
 // further from 100px to 200px for a 500ms duration.
 const phase2 = {
-  square: {
+  mySquare: {
     duration: 500,
     start: { top: '100px' },
     end: { top: '200px' },
   },
-  circle: {
+  myCircle: {
     duration: 500,
     start: { top: '100px' },
     end: { top: '200px' },
@@ -280,7 +303,7 @@ const phase2 = {
 // The order of the phases gets determined by their position in the sequence.
 const animationSequence = [ phase1, phase2 ];
 
-// Bringing in the code from the previous example to put it all together.
+// This animationSequence is what you need to return in createAnimationSequences.
 const createAnimationSequences = () => {
   return animationSequence;
 };
@@ -288,26 +311,49 @@ const createAnimationSequences = () => {
 const higherOrderComponent = withAnimatronics(createAnimationSequences);
 ```
 
-In the above example, we're only returning one animation sequence which means
-you'll only be able to execute that one sequence. Sometimes you'll want to define
-multiple animation sequences so can you execute one of those sequences depending
-on what state your components are in.
+In the above example, we're constructing static phases, but we could also construct
+phases based on the DOM nodes of our controlled components:
 
-We cover defining multiple animation sequences in the next section.
+```js
+const Square = withControl('mySquare')(
+  () => <div/>
+);
 
+const Circle = withControl('myCircle')(
+  () => <div/>
+);
 
-<!--
-------------------------------------------------------------
-Multiple, Named Animation Sequences
-------------------------------------------------------------
--->
-#### <a name='multiple-named-animation-sequences'></a> Multiple, Named Animation Sequences
+// The following animation sequence will cause myCircle and mySquare to
+// switch positions.
+const createAnimationSequences = (nodes) => {
+  const { mySquare, myCircle } = nodes;
+  const { left: squareLeft, top: squareTop } = mySquare.getBoundingClientRect();
+  const { left: circleLeft, top: circleTop } = myCircle.getBoundingClientRect();
+  return [
+    mySquare: {
+      duration: 500,
+      start: { left: `${ squareLeft }px`, top: `${ squareTop }px` },
+      end: { left: `${ circleLeft }px`, top: `${ circleTop }px` }
+    },
+    myCircle: {
+      duration: 500,
+      start: { left: `${ circleLeft }px`, top: `${ circleTop }px` }
+      end: { left: `${ squareLeft }px`, top: `${ squareTop }px` },
+    }
+  ];
+};
 
-When `createAnimationSequences` returns an array, you can only use that
-one animation sequence. For more complex use cases, you may want to describe
-multiple, named animation sequences. To do this, you can have `createAnimationSequences`
-return an object where the keys are arbitrary names and the values are
-animation sequence arrays.
+const higherOrderComponent = withAnimatronics(createAnimationSequences);
+```
+
+In all the previous examples, we've had `createAnimationSequences` return
+a single animation sequence which means we can only ever run that one sequence
+when we [execute our animation](#executing-your-animations). However, you'll
+sometimes want to define multiple, named sequences and decide at runtime
+which one you want to execute.
+
+To do this, you can have `createAnimationSequences` return an object where the
+keys are arbitrary names and the values are animation sequence arrays.
 
 ```
 const createAnimationSequences = () => {
@@ -371,10 +417,10 @@ forms:
 3. `playAnimation(() => {})` — takes a single, callback function argument.
 4. `playAnimation('name', () => {})` — takes two arguments, a string and then a callback function.
 
-If you aren't using [multiple, named animation sequences](#multiple-named-animation-sequences),
-you don't need to pass a string argument — you can call `playAnimation` with no
-arguments or a single, callback function. The callback function will execute
-when the animation completes. It takes no arguments and returns nothing:
+If you aren't using multiple, named animation sequences, you don't need to pass
+a string argument — you can call `playAnimation` with no arguments or a single,
+callback function. The callback function will execute when the animation
+completes. It takes no arguments and returns nothing:
 
 ```js
 playAnimation(() => {
