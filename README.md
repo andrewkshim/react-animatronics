@@ -5,6 +5,7 @@ for your React components.
 
 [![build status](https://img.shields.io/travis/andrewkshim/react-animatronics/master.svg?style=flat-square)](https://travis-ci.org/andrewkshim/react-animatronics)
 [![npm version](https://img.shields.io/npm/v/react-animatronics.svg?style=flat-square)](https://www.npmjs.com/package/react-animatronics)
+[![license](https://img.shields.io/github/license/andrewkshim/react-animatronics.svg)](https://github.com/andrewkshim/react-animatronics/blob/master/LICENSE)
 
 
 ## Table of Contents
