@@ -14,7 +14,7 @@ export const noop = (): void => {};
 export const isStatelessComponent = (Component: Object): boolean => !Component.prototype.render;
 
 export const makeError = (...messages: string[]): Error => {
-  const err = new Error(messages.join('\n'));
+  const err = new Error(messages.join(' '));
   const actualStack = err.stack.split('\n');
   const poppedStack = actualStack
     .slice(0, messages.length)
