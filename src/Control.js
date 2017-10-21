@@ -13,7 +13,9 @@ class Control extends React.Component {
     const { name, children, useStringRefs } = this.props;
     const enhance = withControl(name, { useStringRefs });
     class BaseComponent extends React.Component {
-      render() { return this.props.children; }
+      render() {
+        return this.props.children;
+      }
     }
     const ControlledComponent = enhance(BaseComponent);
     return <ControlledComponent children={ children }/>;
