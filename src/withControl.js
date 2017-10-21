@@ -1,3 +1,4 @@
+// @flow
 /**
  * @module withControl
  */
@@ -5,26 +6,52 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import type { Ref, Element, ComponentType } from 'react'
+import type { Styles } from './internal/flow-types'
+
 import ContextTypes from './internal/context-types'
 import { isStatelessComponent } from './internal/utils'
 
-const withControl = (
-  name,
-  { useStringRefs = false } = {}
-) => BaseComponent => {
+type Options = {
+  useStringRefs?: boolean,
+};
 
-  class ControlledComponent extends React.Component {
-    constructor(props) {
+type Props = {};
+
+type State = {
+  style: Object,
+};
+
+const withControl = (
+  name: string,
+  { useStringRefs = false }: Options = {}
+) => (BaseComponent: ComponentType<{}>): ComponentType<Props> => {
+
+  type Base = Element<typeof BaseComponent>;
+
+  class ControlledComponent extends React.Component<Props, State> {
+    _ref: ?Base
+    _onRef: Function
+    _setComponentStyle: Function
+
+    constructor(props: Props) {
       super(props);
       this.state = { style: {} };
+      this._ref = null;
       this._onRef = this._onRef.bind(this);
       this._setComponentStyle = this._setComponentStyle.bind(this);
     }
 
     componentDidMount() {
       const { animatronics } = this.context;
-      const ref = useStringRefs ? this.refs[name] : this._ref;
+
+      const ref: ?Base = useStringRefs
+        ? this.refs[name]
+        : this._ref;
+
+      // $FlowFixMe: flow thinks the ref is an object type for some reason
       const domNode = ReactDOM.findDOMNode(ref);
+
       animatronics.registerComponent(
         name,
         domNode,
@@ -37,7 +64,7 @@ const withControl = (
       animatronics.unregisterComponent(name);
     }
 
-    _setComponentStyle(updatedStyles) {
+    _setComponentStyle(updatedStyles: Styles) {
       this.setState(state => ({
         style: {
           ...state.style,
@@ -46,7 +73,7 @@ const withControl = (
       }));
     }
 
-    _onRef(ref) {
+    _onRef(ref: ?Base) {
       this._ref = ref;
     }
 
