@@ -14,6 +14,9 @@ test('Animatronics', assert => {
     </Animatronics>
   );
 
-  assert.equals(wrapper.find('AnimatronicsComponent').length, 1);
+  assert.equals(
+    wrapper.find('AnimatronicsComponent').length, 1,
+    'contains the underlying withAnimatronics component'
+  );
   assert.end();
 });
