@@ -13,12 +13,12 @@ class Animatronics extends React.Component {
     const enhance = withAnimatronics(createAnimationSequences);
     class BaseComponent extends React.Component {
       render() {
-        const { children, ...props } = this.props;
+        const { ...props } = this.props;
         return React.cloneElement(children, props);
       }
     }
     const AnimatronicsComponent = enhance(BaseComponent);
-    return <AnimatronicsComponent children={ children }/>;
+    return <AnimatronicsComponent/>;
   }
 }
 
