@@ -3,7 +3,7 @@ import test from 'tape'
 
 import { makeError } from './utils'
 
-test.only('utils.makeError', assert => {
+test('utils.makeError', assert => {
   const err = makeError('hello', 'world');
   assert.equals(
     err.message, 'hello\nworld',
