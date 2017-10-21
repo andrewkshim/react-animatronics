@@ -84,13 +84,12 @@ const withAnimatronics = (
       }
 
       render() {
-        const { ...props } = this.props;
         return (
           <BaseComponent
             playAnimation={ this._playAnimation }
             rewindAnimation={ this._rewindAnimation }
             cancelAnimation={ this._cancelAnimation }
-            { ...props }
+            { ...this.props }
           />
         );
       }
@@ -99,7 +98,6 @@ const withAnimatronics = (
     AnimatronicsComponent.childContextTypes = ContextTypes;
 
     return AnimatronicsComponent;
-
   };
 
 };
