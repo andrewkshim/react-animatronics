@@ -97,11 +97,7 @@ const withAnimatronics = (
 
       componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
-        if (typeof createAnimationSequences === 'function') {
-          animation.setCreateAnimationSequences(createAnimationSequences);
-        } else {
-          // TODO: better error handling
-        }
+        animation.setCreateAnimationSequences(createAnimationSequences);
       }
 
       componentWillUnmount() {
