@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 
 import withAnimatronics from './withAnimatronics'
 
-test('withAnimatronics creates a valid React element', assert => {
+test('withAnimatronics', assert => {
   const createAnimationSequences = () => [
     {
       base: {
@@ -16,9 +16,16 @@ test('withAnimatronics creates a valid React element', assert => {
   ];
 
   const Animated = withAnimatronics(createAnimationSequences)(() => <div/>);
-
   const element = React.createElement(Animated);
-  assert.true(React.isValidElement(element));
+
+  assert.true(React.isValidElement(element), 'creates a valid React element');
+
+  assert.throws(
+    () => withAnimatronics(),
+    /expects its first argument to be a function/,
+    'correctly throws when provided incorrect arguments'
+  );
+
   assert.end();
 });
 
