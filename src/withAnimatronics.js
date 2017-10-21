@@ -105,7 +105,9 @@ const withAnimatronics = (
 
       componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
-        animation.setCreateAnimationSequences(createAnimationSequences);
+        if (createAnimationSequences != null) {
+          animation.setCreateAnimationSequences(createAnimationSequences);
+        }
       }
 
       componentWillUnmount() {
