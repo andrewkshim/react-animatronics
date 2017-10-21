@@ -27,10 +27,10 @@ const withControl = (
   { useStringRefs = false }: Options = {}
 ) => (BaseComponent: ComponentType<{}>): ComponentType<Props> => {
 
-  type Base = Element<typeof BaseComponent>;
+  type BaseRef = Element<typeof BaseComponent>;
 
   class ControlledComponent extends React.Component<Props, State> {
-    _ref: ?Base
+    _ref: ?BaseRef
     _onRef: Function
     _setComponentStyle: Function
 
@@ -45,7 +45,7 @@ const withControl = (
     componentDidMount() {
       const { animatronics } = this.context;
 
-      const ref: ?Base = useStringRefs
+      const ref: ?BaseRef = useStringRefs
         ? this.refs[name]
         : this._ref;
 
@@ -73,7 +73,7 @@ const withControl = (
       }));
     }
 
-    _onRef(ref: ?Base) {
+    _onRef(ref: ?BaseRef) {
       this._ref = ref;
     }
 
