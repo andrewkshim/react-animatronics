@@ -8,6 +8,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import ContextTypes from './internal/context-types'
+import { isStatelessComponent } from './internal/utils'
 
 const withControl = (
   name,
@@ -54,14 +55,16 @@ const withControl = (
     render() {
       const { ...props } = this.props;
       const { style } = this.state;
-      const ref = useStringRefs ? name : this._onRef;
-      return (
-        <BaseComponent
-          ref={ ref }
-          animatronicStyles={ style }
-          { ...props }
-        />
-      );
+
+      const baseProps = {
+        animatronicStyles: style,
+        ...props,
+      };
+      if (!isStatelessComponent(BaseComponent)) {
+        baseProps.ref = useStringRefs ? name : this._onRef;
+      }
+
+      return <BaseComponent { ...baseProps }/>;
     }
   }
 
