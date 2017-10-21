@@ -1,7 +1,5 @@
 /**
- * TODO: improve docs
- * withControl: (name, options) => higher-order component
- * @module internal/context-types
+ * @module withControl
  */
 
 import React from 'react'

@@ -1,6 +1,4 @@
 /**
- * TODO: improve docs
- * withAnimatronics: (createAnimationSequences, options) => higher-order component
  * @module withAnimatronics
  */
 
