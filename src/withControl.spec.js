@@ -5,7 +5,7 @@ import { shallow } from 'enzyme'
 import withControl from './withControl'
 import Control from './Control'
 
-test.only('withControl', assert => {
+test('withControl', assert => {
   const Controlled = withControl('base', { useStringRefs: true })(() => <div/>);
   const wrapper = shallow(
     <Controlled/>,
