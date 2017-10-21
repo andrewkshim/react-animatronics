@@ -30,6 +30,14 @@ const withAnimatronics = (
     cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
   }: Options = {}
 ) => {
+  if (IS_DEVELOPMENT) {
+    if (typeof createAnimationSequences !== 'function') {
+      throw makeError(
+        `withAnimatronics() expects its first argument to be a function,`,
+        `but it received: ${ createAnimationSequences }.`,
+      );
+    }
+  }
 
   const components = ComponentsMachine();
 
