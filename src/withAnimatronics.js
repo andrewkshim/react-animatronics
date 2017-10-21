@@ -52,13 +52,10 @@ const withAnimatronics = (
         throw makeError(
           `playAnimation() expects its first argument to be the string name of`,
           `your animation, but it received: ${ animationName }. You might be`,
-          `passing playAnimation directly into an event handler e.g.`,
-          `\n`,
+          `passing playAnimation directly into an event handler e.g.\n`,
           `    onClick={playAnimation}`,
-          `\n`,
-          `but that will pass in the event as the first argument, so you should`,
-          `instead be calling playAnimation directly e.g.`,
-          `\n`,
+          `\nbut that will pass in the event as the first argument, so you should`,
+          `instead be calling playAnimation directly e.g.\n`,
           `    onClick={() => playAnimation()}`,
           `\n`,
         );
