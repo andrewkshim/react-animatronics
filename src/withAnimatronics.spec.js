@@ -1,6 +1,6 @@
 import React from 'react'
 import test from 'tape'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 
 import withAnimatronics from './withAnimatronics'
 
@@ -14,7 +14,7 @@ test('withAnimatronics creates a valid React element', assert => {
 test('withAnimatronics supplies playAnimation() to the wrapped component', assert => {
   const Base = () => <div/>;
   const Animated = withAnimatronics()(Base);
-  const wrapper = shallow(<Animated/>);
+  const wrapper = mount(<Animated/>);
   const playAnimation = wrapper.find(Base).prop('playAnimation');
   assert.true(typeof playAnimation === 'function');
   assert.end();
