@@ -1,8 +1,11 @@
+// @flow
 /**
  * @module withAnimatronics
  */
 
 import React from 'react'
+
+import type { VoidFn } from './internal/flow-types'
 
 import AnimationMachine from './internal/machines/animation-machine'
 import ComponentsMachine from './internal/machines/components-machine'
@@ -11,12 +14,21 @@ import ContextTypes from './internal/context-types'
 import Polyfills from './internal/polyfills'
 import { noop } from './internal/utils'
 
+type Options = {
+  requestAnimationFrame?: Function,
+  cancelAnimationFrame?: Function,
+};
+
+type Props = {
+  createAnimationSequences?: Function,
+};
+
 const withAnimatronics = (
-  createAnimationSequences,
+  createAnimationSequences: Function,
   {
     requestAnimationFrame = Polyfills.DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
-  } = {}
+  }: Options = {}
 ) => {
 
   const components = ComponentsMachine();
@@ -27,15 +39,38 @@ const withAnimatronics = (
     cancelAnimationFrame,
   );
 
-  return BaseComponent => {
+  const playAnimation = (
+    animationName: string = Constants.DEFAULT_ANIMATION_NAME,
+    onComplete: VoidFn = noop
+  ) => {
+    if (typeof animationName === 'function') {
+      onComplete = animationName;
+      animationName = Constants.DEFAULT_ANIMATION_NAME;
+    }
+    // TODO: warn when an event might have been passed in
+    animation.play(animationName, components, onComplete);
+  }
 
-    class AnimatronicsComponent extends React.Component {
-      constructor(props) {
+  const rewindAnimation = (
+    animationName: string = Constants.DEFAULT_ANIMATION_NAME,
+    onComplete: VoidFn = noop
+  ) => {
+    if (typeof animationName === 'function') {
+      onComplete = animationName;
+      animationName = Constants.DEFAULT_ANIMATION_NAME;
+    }
+    animation.rewind(animationName, components, onComplete);
+  }
+
+  const cancelAnimation = () => {
+    animation.stop();
+  }
+
+  return (BaseComponent: Object): Object => {
+
+    class AnimatronicsComponent extends React.Component<Props> {
+      constructor(props: Props) {
         super(props);
-        this.isAnimatronic = true;
-        this._playAnimation = this._playAnimation.bind(this);
-        this._rewindAnimation = this._rewindAnimation.bind(this);
-        this._cancelAnimation = this._cancelAnimation.bind(this);
       }
 
       getChildContext() {
@@ -47,7 +82,7 @@ const withAnimatronics = (
         };
       }
 
-      componentWillReceiveProps(nextProps) {
+      componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
         if (typeof createAnimationSequences === 'function') {
           animation.setCreateAnimationSequences(createAnimationSequences);
@@ -60,7 +95,10 @@ const withAnimatronics = (
         animation.stop();
       }
 
-      _playAnimation(animationName = Constants.DEFAULT_ANIMATION_NAME, onComplete = noop) {
+      _playAnimation(
+        animationName: string = Constants.DEFAULT_ANIMATION_NAME,
+        onComplete: VoidFn = noop
+      ) {
         if (typeof animationName === 'function') {
           onComplete = animationName;
           animationName = Constants.DEFAULT_ANIMATION_NAME;
@@ -69,24 +107,13 @@ const withAnimatronics = (
         animation.play(animationName, components, onComplete);
       }
 
-      _rewindAnimation(animationName = Constants.DEFAULT_ANIMATION_NAME, onComplete = noop) {
-        if (typeof animationName === 'function') {
-          onComplete = animationName;
-          animationName = Constants.DEFAULT_ANIMATION_NAME;
-        }
-        animation.rewind(animationName, components, onComplete);
-      }
-
-      _cancelAnimation() {
-        animation.stop();
-      }
 
       render() {
         return (
           <BaseComponent
-            playAnimation={ this._playAnimation }
-            rewindAnimation={ this._rewindAnimation }
-            cancelAnimation={ this._cancelAnimation }
+            playAnimation={ playAnimation }
+            rewindAnimation={ rewindAnimation }
+            cancelAnimation={ cancelAnimation }
             { ...this.props }
           />
         );
