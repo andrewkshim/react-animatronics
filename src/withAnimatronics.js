@@ -6,13 +6,12 @@
 
 import React from 'react'
 
+import AnimationMachine from './internal/machines/animation-machine'
+import ComponentsMachine from './internal/machines/components-machine'
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
-import ComponentsMachine from './internal/machines/components-machine'
-import AnimationMachine from './internal/machines/animation-machine'
-import { noop } from './internal/utils'
-
 import Polyfills from './internal/polyfills'
+import { noop } from './internal/utils'
 
 const withAnimatronics = (
   createAnimationSequences,
