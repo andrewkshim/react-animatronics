@@ -12,7 +12,7 @@ import ComponentsMachine from './internal/machines/components-machine'
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
 import Polyfills from './internal/polyfills'
-import { noop } from './internal/utils'
+import { IS_DEVELOPMENT, makeError, noop } from './internal/utils'
 
 type Options = {
   requestAnimationFrame?: Function,
@@ -47,7 +47,23 @@ const withAnimatronics = (
       onComplete = animationName;
       animationName = Constants.DEFAULT_ANIMATION_NAME;
     }
-    // TODO: warn when an event might have been passed in
+    if (IS_DEVELOPMENT) {
+      if (typeof animationName !== 'string') {
+        throw makeError(
+          `playAnimation() expects its first argument to be the string name of`,
+          `your animation, but it received: ${ animationName }. You might be`,
+          `passing playAnimation directly into an event handler e.g.`,
+          `\n`,
+          `    onClick={playAnimation}`,
+          `\n`,
+          `but that will pass in the event as the first argument, so you should`,
+          `instead be calling playAnimation directly e.g.`,
+          `\n`,
+          `    onClick={() => playAnimation()}`,
+          `\n`,
+        );
+      }
+    }
     animation.play(animationName, components, onComplete);
   }
 
