@@ -108,19 +108,6 @@ const withAnimatronics = (
         animation.stop();
       }
 
-      _playAnimation(
-        animationName: string = Constants.DEFAULT_ANIMATION_NAME,
-        onComplete: VoidFn = noop
-      ) {
-        if (typeof animationName === 'function') {
-          onComplete = animationName;
-          animationName = Constants.DEFAULT_ANIMATION_NAME;
-        }
-        // TODO: warn when an event might have been passed in
-        animation.play(animationName, components, onComplete);
-      }
-
-
       render() {
         return (
           <BaseComponent
