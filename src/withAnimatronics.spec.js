@@ -46,7 +46,7 @@ test('withAnimatronics.playAnimation', assert => {
   assert.throws(
     () => playAnimation({}),
     /expects its first argument to be the string name of your animation/,
-    'playAnimation() correctly throws when provided incorrect arguments',
+    'correctly throws when provided incorrect arguments',
   );
 
   assert.end();
