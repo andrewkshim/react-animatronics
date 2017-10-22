@@ -335,8 +335,6 @@ export default (
           onFrame,
           onComponentDone
         );
-      } else {
-        // TODO: Error
       }
 
     }
@@ -382,7 +380,9 @@ export default (
   ) => {
     const nodes = components.getNodes();
     const rawPhases = _state.createAnimationSequences(components.getNodes());
-    _state.phases = Array.isArray(rawPhases) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawPhases } : rawPhases;
+    _state.phases = Array.isArray(rawPhases)
+      ? { [Constants.DEFAULT_ANIMATION_NAME]: rawPhases }
+      : rawPhases;
 
     const animationPhases = _state.phases[animationName];
 
@@ -408,8 +408,12 @@ export default (
     onComplete: Function
   ) => {
     if (!_state.phases) {
-      // TODO: better error message
-      throw new Error('rewind does not have phases');
+      throw makeError(
+        `You attempted to run 'rewindAnimation' before running 'playAnimation',`,
+        `but that doesn't make sense to react-animatronics, there's nothing to`,
+        `rewind if you haven't played before. If you want to run an animation in`,
+        `reverse, you should change or add an animation sequence to 'withAnimatronics'.`
+      );
     }
     const animationPhases = reversePhases(_state.phases[animationName]);
 
