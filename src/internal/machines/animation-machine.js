@@ -19,11 +19,143 @@ const debug = Debug('animatronics:animation');
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
+const stringify = obj => JSON.stringify(obj, null, 2);
+
 const isUsingTime = (animation: Object): boolean =>
   animation.duration != null;
 
 const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
+
+export const throwIfAnimationNotValid = animation => {
+  if (isUsingTime(animation) && isUsingSpring(animation)) {
+    throw makeError(
+      `The following animation declaration is incorrect:`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `Animations must specify either [duration] OR [stiffness, damping],`,
+      `they cannot specify all three at once because animating with a`,
+      `duration is very different from animating with a spring.`
+    );
+  } else if (animation.duration != null && animation.stiffness != null) {
+    throw makeError(
+      `You declared an animation with both a 'duration' and a 'stiffness':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `You should either:`,
+      `\n`,
+      `    1) remove the 'stiffness'`,
+      `\n`,
+      `    OR`,
+      `\n`,
+      `    2) remove the 'duration' and add a 'damping'`,
+      `\n`,
+      `since animations must either use time or spring, but not both.`,
+    );
+  } else if (animation.duration != null && animation.damping != null) {
+    throw makeError(
+      `You declared an animation with both a 'duration' and a 'damping':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `You should either:`,
+      `\n`,
+      `    1) remove the 'damping'`,
+      `\n`,
+      `    OR`,
+      `\n`,
+      `    2) remove the 'duration' and add a 'stiffness'`,
+      `\n`,
+      `since animations must either use time or spring, but not both.`,
+    );
+  } else if (animation.stiffness != null & animation.damping == null) {
+    throw makeError(
+      `You declared an animation with a 'stiffness' but not a 'damping':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `Spring animations must specify both a stiffness and damping,`,
+      `so add a 'damping' value to your animation for springy goodness.`
+    );
+  } else if (animation.stiffness == null & animation.damping != null) {
+    throw makeError(
+      `You declared an animation with a 'damping' but not a 'stiffness':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `Spring animations must specify both a stiffness and damping,`,
+      `so add a 'stiffness' value to your animation for springy goodness.`
+    );
+  } else if (animation.duration != null && typeof animation.duration !== 'number') {
+    throw makeError(
+      `You declared an animation with an invalid 'duration':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'duration' must always be a number (in milliseconds).`
+    );
+  } else if (animation.stiffness != null && typeof animation.stiffness !== 'number') {
+    throw makeError(
+      `You declared an animation with an invalid 'stiffness':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'stiffness' must always be a number.`
+    );
+  } else if (animation.damping != null && typeof animation.damping !== 'number') {
+    throw makeError(
+      `You declared an animation with an invalid 'damping':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'damping' must always be a number.`
+    );
+  } else if (animation.start != null && animation.end == null) {
+    throw makeError(
+      `You declared an animation with a 'start' but not an 'end':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `Animations must always have an 'end'. They, unlike people, should`,
+      `always know where life is going to take them.`
+    );
+  } else if (animation.start == null && animation.end != null) {
+    throw makeError(
+      `You declared an animation with an 'end' but not a 'start':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `Animations must always have a 'start'. They, unlike chickens or eggs,`,
+      `should know exactly where the start is.`
+    );
+  } else if (animation.start != null && typeof animation.start !== 'object') {
+    throw makeError(
+      `You declared an animation with an invalid 'start':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'start' must always be a plain object.`
+    );
+  } else if (animation.end != null && typeof animation.end !== 'object') {
+    throw makeError(
+      `You declared an animation with an invalid 'end':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'end' must always be a plain object.`
+    );
+  } else if (animation.delay != null && typeof animation.delay !== 'number') {
+    throw makeError(
+      `You declared an animation with an invalid 'delay':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `The 'delay' must always be a number (in milliseconds).`
+    );
+  }
+}
 
 export const findLongestDelay = (phase: AnimationPhase): number =>
   Object.keys(phase)

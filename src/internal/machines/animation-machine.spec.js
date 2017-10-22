@@ -4,7 +4,142 @@ import test from 'tape'
 
 import Constants from '../constants'
 import ComponentMachine from './components-machine'
-import AnimationMachine, { findLongestDelay, reversePhases } from './animation-machine'
+
+import AnimationMachine, {
+  throwIfAnimationNotValid,
+  findLongestDelay,
+  reversePhases,
+} from './animation-machine'
+
+test.only('throwIfAnimationNotValid', assert => {
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      stiffness: 200,
+      damping: 20,
+    }),
+    /must specify either/,
+    'should throw when animation is both timed and spring'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      stiffness: 20,
+    }),
+    /with both a 'duration' and a 'stiffness'/,
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      damping: 20,
+    }),
+    /with both a 'duration' and a 'damping'/,
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 'foobar',
+    }),
+    /'duration' must always be a number/,
+    'should throw when the duration is not a number'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      stiffness: 'foobar',
+      damping: 20,
+    }),
+    /'stiffness' must always be a number/,
+    'should throw when the stiffness is not a number'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      stiffness: 200,
+      damping: 'foobar',
+    }),
+    /'damping' must always be a number/,
+    'should throw when the damping is not a number'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      stiffness: 200,
+    }),
+    /with a 'stiffness' but not a 'damping'/,
+    'should throw when a spring animation has stiffness but not damping'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      damping: 20,
+    }),
+    /with a 'damping' but not a 'stiffness'/,
+    'should throw when a spring animation has damping but not stiffness'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      start: {},
+    }),
+    /with a 'start' but not an 'end'/,
+    'should throw when an animation has a start but no end'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      end: {},
+    }),
+    /with an 'end' but not a 'start'/,
+    'should throw when an animation has an end but no start'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      start: 'foobar',
+      end: {},
+    }),
+    /'start' must always be a plain object/,
+    'should throw when start is not an object'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      start: {},
+      end: 'foobar',
+    }),
+    /'end' must always be a plain object/,
+    'should throw when end is not an object'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      delay: 'foobar',
+      start: {},
+      end: {},
+    }),
+    /'delay' must always be a number/,
+    'should throw when delay is not a number'
+  );
+
+  assert.doesNotThrow(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      start: {},
+      end: {},
+    }),
+    'should not throw when the animation is valid'
+  );
+
+  assert.end();
+});
 
 test('findLongestDelay', assert => {
   const phase = {
