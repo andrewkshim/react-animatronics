@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 
 import Control from './Control'
 
-test.only('Control', assert => {
+test('Control', assert => {
 
   class Base extends React.Component {
  
