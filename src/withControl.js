@@ -10,7 +10,7 @@ import type { Ref, Element, ComponentType } from 'react'
 import type { Styles } from './internal/flow-types'
 
 import ContextTypes from './internal/context-types'
-import { isStatelessComponent } from './internal/utils'
+import { IS_DEVELOPMENT, isStatelessComponent, makeError } from './internal/utils'
 
 type Options = {
   useStringRefs?: boolean,
@@ -51,6 +51,17 @@ const withControl = (
 
       // $FlowFixMe: flow thinks the ref is an object type for some reason
       const domNode = ReactDOM.findDOMNode(ref);
+
+      if (IS_DEVELOPMENT) {
+        if (!animatronics) {
+          throw makeError(
+            `Can't find the right context in the following controlled component: ${ name }.`,
+            `This likely means you forgot to use an animatronics component. Check to see that`,
+            `you're using either <Animatronics/> or withAnimatronics() and that your controlled`,
+            `component is a descendant of it.`
+          );
+        }
+      }
 
       animatronics.registerComponent(
         name,
