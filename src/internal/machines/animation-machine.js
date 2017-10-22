@@ -8,7 +8,14 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import type { TimeMachine, ComponentsMachine, AnimationMachine, Animation, AnimationPhase } from '../flow-types'
+import type {
+  Animation,
+  AnimationMachine,
+  AnimationPhase,
+  ComponentsMachine,
+  DOMNode,
+  TimeMachine,
+} from '../flow-types'
 
 import Constants from '../constants'
 import { IS_DEVELOPMENT, makeError } from '../utils'
@@ -28,7 +35,7 @@ const isUsingTime = (animation: Object): boolean =>
 const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
 
-export const throwIfAnimationNotValid = animation => {
+export const throwIfAnimationNotValid = (animation: Animation) => {
   if (isUsingTime(animation) && isUsingSpring(animation)) {
     throw makeError(
       `The following animation declaration is incorrect:`,
@@ -71,7 +78,7 @@ export const throwIfAnimationNotValid = animation => {
       `\n`,
       `since animations must either use time or spring, but not both.`,
     );
-  } else if (animation.stiffness != null & animation.damping == null) {
+  } else if (animation.stiffness != null && animation.damping == null) {
     throw makeError(
       `You declared an animation with a 'stiffness' but not a 'damping':`,
       `\n`,
@@ -80,7 +87,7 @@ export const throwIfAnimationNotValid = animation => {
       `Spring animations must specify both a stiffness and damping,`,
       `so add a 'damping' value to your animation for springy goodness.`
     );
-  } else if (animation.stiffness == null & animation.damping != null) {
+  } else if (animation.stiffness == null && animation.damping != null) {
     throw makeError(
       `You declared an animation with a 'damping' but not a 'stiffness':`,
       `\n`,
@@ -158,7 +165,7 @@ export const throwIfAnimationNotValid = animation => {
   }
 }
 
-export const throwIfPhaseNotValid = (nodes, phase) => {
+export const throwIfPhaseNotValid = (phase: AnimationPhase, nodes: { [string]: DOMNode }) => {
   const validComponents = new Set(Object.keys(nodes));
   Object.keys(phase).forEach(componentName => {
     if (!validComponents.has(componentName)) {
@@ -373,10 +380,15 @@ export default (
     components: ComponentsMachine,
     onComplete: Function,
   ) => {
+    const nodes = components.getNodes();
     const rawPhases = _state.createAnimationSequences(components.getNodes());
     _state.phases = Array.isArray(rawPhases) ? { [Constants.DEFAULT_ANIMATION_NAME]: rawPhases } : rawPhases;
 
     const animationPhases = _state.phases[animationName];
+
+    if (IS_DEVELOPMENT) {
+      animationPhases.forEach(phase => throwIfPhaseNotValid(phase, nodes));
+    }
 
     _runPhase(
       animationPhases[0],

@@ -1,4 +1,3 @@
-// @flow
 import sinon from 'sinon'
 import test from 'tape'
 
@@ -146,12 +145,12 @@ test('throwIfPhaseNotValid', assert => {
   assert.throws(
     () => {
       throwIfPhaseNotValid(
-        { foo: null },
         { bar: {
           duration: 100,
           start: { left: '100px' },
           end: { left: '200px' }
-        } }
+        } },
+        { foo: null }
       );
     },
     /isn't aware of any component with that name/
