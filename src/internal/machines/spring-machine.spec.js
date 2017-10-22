@@ -7,7 +7,7 @@ import SpringMachine from './spring-machine'
 
 test('SpringMachine', assert => {
   const { setInterval, clearInterval, tick } = lolex.createClock();
-  const maxExpectedIterations = 200;
+  const maxExpectedIterations = 200; // empirically determined
   const interval = 10;
   const startStyles = { left: '0px' };
   const expectedEndStyles = { left: '100px' };
