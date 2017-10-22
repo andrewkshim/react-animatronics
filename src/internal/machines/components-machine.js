@@ -31,9 +31,9 @@ export default (): ComponentsMachine => {
   };
 
   const updateStyles = (componentName: string, styles: Styles) => {
-    // Can assume that the correct style updater is available since we validate
-    // the animation declarations in animation-machine.
-    _styleUpdaters[componentName](styles);
+    if (_styleUpdaters[componentName]) {
+      _styleUpdaters[componentName](styles);
+    }
   };
 
   const getNodes = () => _nodes;
