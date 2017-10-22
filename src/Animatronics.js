@@ -21,8 +21,7 @@ class Animatronics extends React.Component<Props> {
     const enhance = withAnimatronics(createAnimationSequences);
     class BaseComponent extends React.Component<{}> {
       render() {
-        const { ...props } = this.props;
-        return React.cloneElement(children, props);
+        return React.cloneElement(children, this.props);
       }
     }
     const AnimatronicsComponent = enhance(BaseComponent);
