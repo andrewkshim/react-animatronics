@@ -30,7 +30,7 @@ class Control extends React.Component<Props> {
     const enhance = withControl(name, { useStringRefs });
     class BaseComponent extends React.Component<{}> {
       render() {
-        return children;
+        return React.cloneElement(children, this.props);
       }
     }
     const ControlledComponent = enhance(BaseComponent);
