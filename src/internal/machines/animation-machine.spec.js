@@ -7,11 +7,12 @@ import ComponentMachine from './components-machine'
 
 import AnimationMachine, {
   throwIfAnimationNotValid,
+  throwIfPhaseNotValid,
   findLongestDelay,
   reversePhases,
 } from './animation-machine'
 
-test.only('throwIfAnimationNotValid', assert => {
+test('throwIfAnimationNotValid', assert => {
   assert.throws(
     () => throwIfAnimationNotValid({
       duration: 100,
@@ -138,6 +139,23 @@ test.only('throwIfAnimationNotValid', assert => {
     'should not throw when the animation is valid'
   );
 
+  assert.end();
+});
+
+test('throwIfPhaseNotValid', assert => {
+  assert.throws(
+    () => {
+      throwIfPhaseNotValid(
+        { foo: null },
+        { bar: {
+          duration: 100,
+          start: { left: '100px' },
+          end: { left: '200px' }
+        } }
+      );
+    },
+    /isn't aware of any component with that name/
+  );
   assert.end();
 });
 
