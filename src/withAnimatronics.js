@@ -17,6 +17,9 @@ import { IS_DEVELOPMENT, makeError, noop } from './internal/utils'
 type Options = {
   requestAnimationFrame?: Function,
   cancelAnimationFrame?: Function,
+  setTimeout?: Function,
+  clearTimeout?: Function,
+  now?: Function,
 };
 
 type Props = {
