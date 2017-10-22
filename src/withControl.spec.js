@@ -12,6 +12,22 @@ test('withControl creates a valid React element', assert => {
   assert.end();
 });
 
+test('withControl throws a well-formed error when it does not have the correct context', assert => {
+  class Base extends React.Component {
+    render() {
+      return <div/>;
+    }
+  }
+  const Rigged = withControl('base', { useStringRefs: true })(Base);
+  assert.throws(
+    () => {
+      mount(<Rigged/>, { context: {} });
+    },
+    /forgot to use an animatronics component/,
+  );
+  assert.end();
+});
+
 test('withControl registers the component when mounted', assert => {
   class Base extends React.Component {
     render() {
