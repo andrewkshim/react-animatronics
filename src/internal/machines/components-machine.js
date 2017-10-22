@@ -31,13 +31,9 @@ export default (): ComponentsMachine => {
   };
 
   const updateStyles = (componentName: string, styles: Styles) => {
-    if (!_styleUpdaters[componentName]) {
-      // TODO: if the style updater doesn't exist, user might have misspelled control name
-      // TODO: better error message
-      console.warn('_styleUpdates does not have componentName', componentName);
-    } else {
-      _styleUpdaters[componentName](styles);
-    }
+    // Can assume that the correct style updater is available since we validate
+    // the animation declarations in animation-machine.
+    _styleUpdaters[componentName](styles);
   };
 
   const getNodes = () => _nodes;
