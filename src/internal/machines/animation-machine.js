@@ -11,6 +11,7 @@ import Debug from 'debug'
 import type { TimeMachine, ComponentsMachine, AnimationMachine, Animation, AnimationPhase } from '../flow-types'
 
 import Constants from '../constants'
+import { IS_DEVELOPMENT, makeError } from '../utils'
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 import SpringMachine from './spring-machine'
@@ -155,6 +156,28 @@ export const throwIfAnimationNotValid = animation => {
       `The 'delay' must always be a number (in milliseconds).`
     );
   }
+}
+
+export const throwIfPhaseNotValid = (nodes, phase) => {
+  const validComponents = new Set(Object.keys(nodes));
+  Object.keys(phase).forEach(componentName => {
+    if (!validComponents.has(componentName)) {
+      throw makeError(
+        `You've declared an animation for the controlled component: '${ componentName }',`,
+        `but react-animatronics isn't aware of any component with that name.`,
+        `If you don't know why this is happening, check for the following:`,
+        `\n`,
+        `    1) Any misspelled names in withAnimatronics`,
+        `\n`,
+        `    2) Any misspelled names in withControl`,
+        `\n`,
+        `    3) If the component you want to animate should be wrapped by withControl`,
+        `\n`
+      );
+    }
+    const animation = phase[componentName];
+    throwIfAnimationNotValid(animation);
+  });
 }
 
 export const findLongestDelay = (phase: AnimationPhase): number =>
