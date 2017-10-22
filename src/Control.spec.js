@@ -4,8 +4,25 @@ import { mount } from 'enzyme'
 
 import Control from './Control'
 
-test('Control', assert => {
-  const Base = () => <div/>;
+test.only('Control', assert => {
+
+  class Base extends React.Component {
+ 
+    componentDidMount() {
+      const { animatronicStyles } = this.props;
+
+      assert.deepEquals(
+        animatronicStyles, {},
+        'passes initial styles to its child'
+      );
+
+    }
+
+    render() {
+      return <div/>;
+    }
+
+  }
 
   const wrapper = mount(
     <Control name='base'>
