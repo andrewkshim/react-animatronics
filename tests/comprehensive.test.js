@@ -1,4 +1,5 @@
 import React from 'react'
+import lolex from 'lolex'
 import sinon from 'sinon'
 import test from 'tape'
 import { mount } from 'enzyme'
@@ -42,8 +43,21 @@ test('runs each animation phase', assert => {
     ];
   };
 
+  const interval = 10;
+  const { Date, setTimeout, clearTimeout, tick } = lolex.createClock();
+  const requestAnimationFrame = fn => { setTimeout(fn, interval) };
+  const cancelAnimationFrame = clearTimeout;
   const startTime = Date.now();
-  const Animated = withAnimatronics(createAnimationSequences)(App);
+  const Animated = withAnimatronics(
+    createAnimationSequences,
+    {
+      requestAnimationFrame,
+      cancelAnimationFrame,
+      setTimeout,
+      clearTimeout,
+      now: Date.now,
+    }
+  )(App);
   const wrapper = mount(<Animated/>);
   const playAnimation = wrapper.find(App).prop('playAnimation');
   playAnimation(
@@ -53,4 +67,6 @@ test('runs each animation phase', assert => {
       assert.end();
     },
   );
+
+  tick(550);
 })

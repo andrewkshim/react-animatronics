@@ -28,6 +28,9 @@ const withAnimatronics = (
   {
     requestAnimationFrame = Polyfills.DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
+    setTimeout = window.setTimeout,
+    clearTimeout = window.clearTimeout,
+    now = Date.now,
   }: Options = {}
 ) => {
   if (IS_DEVELOPMENT) {
@@ -45,6 +48,9 @@ const withAnimatronics = (
     createAnimationSequences,
     requestAnimationFrame,
     cancelAnimationFrame,
+    setTimeout,
+    clearTimeout,
+    now,
   );
 
   const playAnimation = (

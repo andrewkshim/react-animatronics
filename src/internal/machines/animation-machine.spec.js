@@ -1,3 +1,4 @@
+import lolex from 'lolex'
 import sinon from 'sinon'
 import test from 'tape'
 
@@ -267,13 +268,17 @@ test('AnimationMachine.play with a single phase', assert => {
       },
     }
   ];
+  const { setTimeout, clearTimeout, Date, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
-    cancelAnimationFrame
+    cancelAnimationFrame,
+    setTimeout,
+    clearTimeout,
+    Date.now,
   );
   const styleUpdater = sinon.spy();
 
@@ -294,6 +299,8 @@ test('AnimationMachine.play with a single phase', assert => {
       assert.end();
     },
   );
+
+  tick(duration);
 });
 
 test('AnimationMachine.play with a single phase and multiple components', assert => {
@@ -313,13 +320,17 @@ test('AnimationMachine.play with a single phase and multiple components', assert
       },
     }
   ];
+  const { setTimeout, clearTimeout, Date, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
-    cancelAnimationFrame
+    cancelAnimationFrame,
+    setTimeout,
+    clearTimeout,
+    Date.now,
   );
   const styleUpdaterA = sinon.spy();
   const styleUpdaterB = sinon.spy();
@@ -342,9 +353,11 @@ test('AnimationMachine.play with a single phase and multiple components', assert
       assert.end();
     },
   );
+
+  tick(duration);
 });
 
-test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => {
+test('AnimationMachine.play with multiple phases', assert => {
   const interval = 100;
   const duration = 200;
   const sequence = [
@@ -370,13 +383,17 @@ test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => 
       },
     },
   ];
+  const { setTimeout, clearTimeout, Date, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const components = ComponentMachine();
   const animation = AnimationMachine(
     () => sequence,
     requestAnimationFrame,
-    cancelAnimationFrame
+    cancelAnimationFrame,
+    setTimeout,
+    clearTimeout,
+    Date.now,
   );
   const styleUpdater = sinon.spy();
 
@@ -393,4 +410,6 @@ test('AnimationMachine.play with multiple phases', { timeout: 1000 }, assert => 
       assert.end();
     },
   );
+
+  tick(duration * sequence.length);
 });

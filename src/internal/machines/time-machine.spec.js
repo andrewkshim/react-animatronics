@@ -1,4 +1,5 @@
 // @flow
+import lolex from 'lolex'
 import sinon from 'sinon'
 import test from 'tape'
 
@@ -7,6 +8,7 @@ import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 test('InfiniteTimeMachine running a single job', assert => {
   const expectedCallCount = 5;
   const interval = 100;
+  const { setTimeout, clearTimeout, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const spy = sinon.spy();
@@ -28,11 +30,14 @@ test('InfiniteTimeMachine running a single job', assert => {
   infiniteMachine
     .do(job)
     .run();
+
+  tick((expectedCallCount + 1) * interval);
 });
 
 test('InfiniteTimeMachine running multiple jobs', assert => {
   const expectedCallCount = 10;
   const interval = 20;
+  const { setTimeout, clearTimeout, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const spyA = sinon.spy();
@@ -67,18 +72,21 @@ test('InfiniteTimeMachine running multiple jobs', assert => {
     .do(jobA)
     .do(jobB)
     .run();
+
+  tick(expectedCallCount * interval);
 });
 
 test('FiniteTimeMachine', assert => {
   const duration = 500;
   const interval = 90;
   const expectedCallCount = Math.floor(duration / interval) + 1;
+  const { setTimeout, clearTimeout, Date, tick } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const job = sinon.spy();
 
   const infiniteMachine = InfiniteTimeMachine(requestAnimationFrame, cancelAnimationFrame);
-  const finiteMachine = FiniteTimeMachine(infiniteMachine, duration);
+  const finiteMachine = FiniteTimeMachine(infiniteMachine, duration, Date.now);
 
   const onComplete = () => {
     assert.true(finiteMachine.isStopped(), 'the machine knows when it is stopped');
@@ -89,4 +97,6 @@ test('FiniteTimeMachine', assert => {
   finiteMachine
     .do(job)
     .run(onComplete);
+
+  tick(duration + interval);
 });

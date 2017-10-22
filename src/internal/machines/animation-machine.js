@@ -7,6 +7,7 @@
 
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
+import lolex from 'lolex'
 
 import type {
   Animation,
@@ -22,6 +23,8 @@ import { IS_DEVELOPMENT, makeError } from '../utils'
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 import SpringMachine from './spring-machine'
+
+const clock = lolex.createClock();
 
 const debug = Debug('animatronics:animation');
 
@@ -226,6 +229,7 @@ const runTimedAnimation = (
   animation: Object,
   onFrame: Function,
   onComponentDone: Function,
+  now: () => number,
 ) => {
   const {
     start: startStyles,
@@ -234,7 +238,11 @@ const runTimedAnimation = (
     easingFn = DEFAULT_EASING_FN,
   } = animation;
 
-  const finiteMachine: TimeMachine = FiniteTimeMachine(timeMachine, duration);
+  const finiteMachine: TimeMachine = FiniteTimeMachine(
+    timeMachine,
+    duration,
+    now,
+  );
 
   finiteMachine
     .do(elapsedTime => {
@@ -282,11 +290,15 @@ export default (
   createAnimationSequences: Function,
   requestAnimationFrame: Function,
   cancelAnimationFrame: Function,
+  setTimeout: Function,
+  clearTimeout: Function,
+  now: () => number,
 ): AnimationMachine => {
 
   const _state: Object = {
     timeMachines: null,
     phases: null,
+    timeouts: null,
     createAnimationSequences,
   };
 
@@ -298,6 +310,7 @@ export default (
     debug('running animation phase %O', phase);
 
     _state.timeMachines = {};
+    _state.timeouts = {};
 
     const componentNames = Object.keys(phase);
     let numComponentsDone = 0;
@@ -326,7 +339,8 @@ export default (
           _state.timeMachines[componentName],
           animation,
           onFrame,
-          onComponentDone
+          onComponentDone,
+          now,
         );
       } else if (isUsingSpring(animation)) {
         runSpringAnimation(
@@ -346,7 +360,10 @@ export default (
       if (!animation.delay) {
         runComponentPhase(componentName);
       } else {
-        setTimeout(() => runComponentPhase(componentName), animation.delay);
+        _state.timeout[componentName] = setTimeout(
+          () => runComponentPhase(componentName),
+          animation.delay
+        );
       }
     });
   }
@@ -437,6 +454,9 @@ export default (
 
     Object.keys(_state.timeMachines).forEach(componentName => {
       _state.timeMachines[componentName].stop();
+      if (_state.timeouts[componentName]) {
+        clearTimeout(_state.timeouts[componentName]);
+      }
     });
     _state.timeMachines = null;
     _state.phases = null;

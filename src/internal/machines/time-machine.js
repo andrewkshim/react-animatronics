@@ -53,7 +53,11 @@ export const InfiniteTimeMachine = (
   return machine;
 };
 
-export const FiniteTimeMachine = (machine: TimeMachine, duration: number): TimeMachine => {
+export const FiniteTimeMachine = (
+  machine: TimeMachine,
+  duration: number,
+  now: () => number,
+): TimeMachine => {
 
   let _startTime: number = 0;
   let _onComplete = () => {};
@@ -64,7 +68,7 @@ export const FiniteTimeMachine = (machine: TimeMachine, duration: number): TimeM
     ...rest,
     do: (job: Function) => {
       const _job = () => {
-        const elapsedTime: number = Date.now() - _startTime;
+        const elapsedTime: number = now() - _startTime;
         job(elapsedTime);
 
         if (elapsedTime >= duration) {
@@ -76,7 +80,7 @@ export const FiniteTimeMachine = (machine: TimeMachine, duration: number): TimeM
       return finiteMachine;
     },
     run: (onComplete) => {
-      _startTime = Date.now();
+      _startTime = now();
       _onComplete = onComplete || _onComplete;
       _run();
       return finiteMachine;
