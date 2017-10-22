@@ -7,7 +7,6 @@
 
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
-import lolex from 'lolex'
 
 import type {
   Animation,
@@ -23,8 +22,6 @@ import { IS_DEVELOPMENT, makeError } from '../utils'
 import { constructStyles } from '../fashionistas/timed-fashionista'
 import { InfiniteTimeMachine, FiniteTimeMachine } from './time-machine'
 import SpringMachine from './spring-machine'
-
-const clock = lolex.createClock();
 
 const debug = Debug('animatronics:animation');
 

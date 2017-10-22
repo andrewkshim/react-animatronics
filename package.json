@@ -6,6 +6,7 @@
   "author": "Andrew Shim",
   "license": "MIT",
   "scripts": {
+    "prepublish": "npm run lint && npm run test && npm run build",
     "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/**/*.spec.js,src/**/*.test.js",
     "examples": "./node_modules/.bin/webpack-dev-server --config examples/webpack.config.js",
     "example:basic": "./node_modules/.bin/webpack-dev-server --config examples/basic/webpack.config.js",
