@@ -7,7 +7,6 @@ class Example extends React.Component {
   constructor(props) {
     super(props);
     this._playAnimation = this._playAnimation.bind(this);
-    this._rewindAnimation = this._rewindAnimation.bind(this);
     this.state = {
       didAnimate: false,
     };
@@ -15,16 +14,12 @@ class Example extends React.Component {
 
   _playAnimation() {
     const { playAnimation } = this.props;
-    playAnimation(() => {
-      this.setState({ didAnimate: true });
-    });
-  }
-
-  _rewindAnimation() {
-    const { rewindAnimation } = this.props;
-    rewindAnimation(() => {
-      this.setState({ didAnimate: false });
-    });
+    const { didAnimate } = this.state;
+    if (!didAnimate) {
+      playAnimation(() => {
+        this.setState({ didAnimate: true });
+      });
+    }
   }
 
   render() {
@@ -44,7 +39,6 @@ class Example extends React.Component {
           { React.Children.map(children, c => React.cloneElement(c, {
             didAnimate,
             playAnimation: this._playAnimation,
-            rewindAnimation: this._rewindAnimation,
           })) }
         </div>
         <div style={{
@@ -53,13 +47,9 @@ class Example extends React.Component {
         }}>
           <Button
             onClick={ () => {
-              if (didAnimate) {
-                this._rewindAnimation();
-              } else {
-                this._playAnimation();
-              }
+              this._playAnimation();
             }}
-            text={ didAnimate ? 'Rewind animation' : 'Play animation' }
+            text={'Play animation' }
             style={{
               position: 'absolute',
               right: '0px',

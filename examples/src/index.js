@@ -171,9 +171,9 @@ class ExampleItem extends React.Component {
   }
 
   _onMouseOut() {
-    const { isSelected, rewindAnimation } = this.props;
+    const { isSelected, playAnimation } = this.props;
     if (!isSelected) {
-      rewindAnimation('hover');
+      playAnimation('unhover');
     }
   }
 
@@ -232,6 +232,19 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
         },
         end: {
           opacity: 0.2,
+        },
+      }
+    },
+  ],
+  unhover: [
+    {
+      [`${ example }Highlight`]: {
+        duration: HIGHLIGHT_DURATION,
+        start: {
+          opacity: 0.2,
+        },
+        end: {
+          opacity: 0,
         },
       }
     },

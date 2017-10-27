@@ -20,13 +20,13 @@ const Letters = withAnimatronics(() => [])(class extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { didAnimate: prevDidAnimate } = prevProps;
-    const { didAnimate: nextDidAnimate, playAnimation, rewindAnimation } = this.props;
+    const { didAnimate: nextDidAnimate, playAnimation } = this.props;
     if (!prevDidAnimate && nextDidAnimate) {
-      playAnimation(() => {
+      playAnimation('reveal', () => {
         this.setState({ didLettersAnimate: true });
       });
     } else if (prevDidAnimate && !nextDidAnimate) {
-      rewindAnimation(() => {
+      playAnimation('hide', () => {
         this.setState({ didLettersAnimate: false });
       });
     }
@@ -89,10 +89,10 @@ class Input extends React.Component {
   }
 
   _onChange(ev) {
-    const { didAnimate, rewindAnimation } = this.props;
+    const { didAnimate, playAnimation } = this.props;
     const text = ev.target.value;
     if (text === '' && didAnimate) {
-      rewindAnimation();
+      playAnimation('hide');
     }
     this.setState({ text });
   }
@@ -128,20 +128,36 @@ class Input extends React.Component {
           <Letters
             didAnimate={ didAnimate }
             text={ text }
-            createAnimationSequences={() => [
-              text.split('').reduce(
-                (result, letter, index) => {{
-                  result[`${ letter }-${ index }`] = {
-                    duration: 250,
-                    delay: index * 100,
-                    start: { transform: 'scale(0)' },
-                    end: { transform: 'scale(1)' }
-                  }
-                  return result;
-                }},
-                {}
-              )
-            ]}
+            createAnimationSequences={() => ({
+              reveal: [
+                text.split('').reduce(
+                  (result, letter, index) => {{
+                    result[`${ letter }-${ index }`] = {
+                      duration: 250,
+                      delay: index * 100,
+                      start: { transform: 'scale(0)' },
+                      end: { transform: 'scale(1)' }
+                    }
+                    return result;
+                  }},
+                  {}
+                )
+              ],
+              hide: [
+                text.split('').reduce(
+                  (result, letter, index) => {{
+                    result[`${ letter }-${ index }`] = {
+                      duration: 250,
+                      delay: index * 100,
+                      start: { transform: 'scale(1)' },
+                      end: { transform: 'scale(0)' }
+                    }
+                    return result;
+                  }},
+                  {}
+                )
+              ]
+            })}
           />
         </div>
       </div>
@@ -155,12 +171,9 @@ const ControlledInput = withControl('input')( Input );
 class InputExample extends React.Component {
 
   render() {
-    const { playAnimation, rewindAnimation } = this.props;
+    const { playAnimation } = this.props;
     return (
-      <Example
-        playAnimation={ playAnimation }
-        rewindAnimation={ rewindAnimation }
-      >
+      <Example playAnimation={ playAnimation }>
         <ControlledInput/>
       </Example>
     );

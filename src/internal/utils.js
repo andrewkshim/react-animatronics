@@ -35,3 +35,13 @@ export const makeError = (...messages: string[]): Error => {
 }
 
 export const IS_DEVELOPMENT = process.env.NODE_ENV !== 'development';
+
+export const omitKey = (obj, key) => (
+  Object.keys(obj)
+    .reduce(
+      (result, k) => (
+        key === k ? result : { ...result, [k]: obj[k] }
+      ),
+      {}
+    )
+);

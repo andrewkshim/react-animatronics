@@ -44,7 +44,7 @@ test('runs each animation phase', assert => {
   };
 
   const interval = 10;
-  const { Date, setTimeout, clearTimeout, tick } = lolex.createClock();
+  const { Date, setTimeout, clearTimeout, runAll } = lolex.createClock();
   const requestAnimationFrame = fn => { setTimeout(fn, interval) };
   const cancelAnimationFrame = clearTimeout;
   const startTime = Date.now();
@@ -68,5 +68,5 @@ test('runs each animation phase', assert => {
     },
   );
 
-  tick(550);
+  runAll();
 })

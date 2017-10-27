@@ -13,8 +13,8 @@ const CircleA = withControl('circleA')(Circle);
 const CircleB = withControl('circleB')(Circle);
 const CircleC = withControl('circleC')(Circle);
 
-const SpringsExample = ({ playAnimation, rewindAnimation }) => (
-  <Example playAnimation={ playAnimation } rewindAnimation={ rewindAnimation }>
+const SpringsExample = ({ playAnimation }) => (
+  <Example playAnimation={ playAnimation }>
     <CircleA
       dimension={ 100 }
       style={{

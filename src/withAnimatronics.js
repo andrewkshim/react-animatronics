@@ -7,8 +7,7 @@ import React from 'react'
 
 import type { VoidFn } from './internal/flow-types'
 
-import AnimationMachine from './internal/machines/animation-machine'
-import ComponentsMachine from './internal/machines/components-machine'
+import { makeMachinist } from './internal/machines/new/machinist'
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
 import Polyfills from './internal/polyfills'
@@ -45,15 +44,14 @@ const withAnimatronics = (
     }
   }
 
-  const components = ComponentsMachine();
-
-  const animation = AnimationMachine(
+  const machinist = makeMachinist();
+  const animatronics = machinist.makeAnimatronicsMachine(
     createAnimationSequences,
-    requestAnimationFrame,
-    cancelAnimationFrame,
-    setTimeout,
-    clearTimeout,
+    requestAnimationFrame.bind(window),
+    cancelAnimationFrame.bind(window),
     now,
+    setTimeout.bind(window),
+    clearTimeout.bind(window),
   );
 
   const playAnimation = (
@@ -78,22 +76,11 @@ const withAnimatronics = (
         );
       }
     }
-    animation.play(animationName, components, onComplete);
-  }
-
-  const rewindAnimation = (
-    animationName: string = Constants.DEFAULT_ANIMATION_NAME,
-    onComplete: VoidFn = noop
-  ) => {
-    if (typeof animationName === 'function') {
-      onComplete = animationName;
-      animationName = Constants.DEFAULT_ANIMATION_NAME;
-    }
-    animation.rewind(animationName, components, onComplete);
+    animatronics.play(animationName, onComplete);
   }
 
   const cancelAnimation = () => {
-    animation.stop();
+    animatronics.stop();
   }
 
   return (BaseComponent: Object): Object => {
@@ -106,8 +93,8 @@ const withAnimatronics = (
       getChildContext() {
         return {
           animatronics: {
-            registerComponent: components.registerComponent,
-            unregisterComponent: components.unregisterComponent,
+            registerComponent: animatronics.registerComponent,
+            unregisterComponent: animatronics.unregisterComponent,
           }
         };
       }
@@ -115,19 +102,18 @@ const withAnimatronics = (
       componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
         if (createAnimationSequences != null) {
-          animation.setCreateAnimationSequences(createAnimationSequences);
+          animatronics.setCreateAnimationSequences(createAnimationSequences);
         }
       }
 
       componentWillUnmount() {
-        animation.stop();
+        animatronics.stop();
       }
 
       render() {
         return (
           <BaseComponent
             playAnimation={ playAnimation }
-            rewindAnimation={ rewindAnimation }
             cancelAnimation={ cancelAnimation }
             { ...this.props }
           />
