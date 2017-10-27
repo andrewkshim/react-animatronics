@@ -1,9 +1,9 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import Constants from '../../constants'
-import { constructStyles } from '../../fashionistas/timed-fashionista'
-import { omitKey } from '../../utils'
+import Constants from '../constants'
+import { constructStyles } from '../fashionistas/timed-fashionista'
+import { omitKey } from '../utils'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 

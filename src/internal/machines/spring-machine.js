@@ -1,9 +1,9 @@
 import type { VoidFn, Styles, SpringMachine } from '../../flow-types'
 
-import Constants from '../../constants'
-import { noop } from '../../utils'
-import { parseStyle } from '../../fashionistas/common-fashionista'
-import { reconstructStyles, interpolateValue } from '../../fashionistas/spring-fashionista'
+import Constants from '../constants'
+import { noop } from '../utils'
+import { parseStyle } from '../fashionistas/common-fashionista'
+import { reconstructStyles, interpolateValue } from '../fashionistas/spring-fashionista'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally

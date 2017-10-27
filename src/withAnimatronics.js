@@ -7,7 +7,7 @@ import React from 'react'
 
 import type { VoidFn } from './internal/flow-types'
 
-import { makeMachinist } from './internal/machines/new/machinist'
+import { makeMachinist } from './internal/machines/machinist'
 import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
 import Polyfills from './internal/polyfills'
