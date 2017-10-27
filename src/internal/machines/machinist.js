@@ -1,8 +1,8 @@
-import { makeAnimatronicsMachine } from './animatronics-machine'
-import { makeCountdownJobMachine } from './countdown-job-machine'
-import { makeEndlessJobMachine } from './endless-job-machine'
-import { makeSpringMachine } from './spring-machine'
-import { makeTimedJobMachine } from './timed-job-machine'
+import { makeAnimatronicsMachine } from './animatronics'
+import { makeCountdownJobMachine } from './countdown-job'
+import { makeEndlessJobMachine } from './endless-job'
+import { makeSpringMachine } from './spring'
+import { makeTimedJobMachine } from './timed-job'
 
 export const makeMachinist = () => {
   const machinist = {};

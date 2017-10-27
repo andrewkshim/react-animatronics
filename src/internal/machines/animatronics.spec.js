@@ -6,9 +6,9 @@ import {
   play,
   makeSequence,
   makeReducers,
-} from './animatronics-machine'
+} from './animatronics'
 
-test('animatronics-machine/calculateEasingProgress', assert => {
+test('machines/animatronics/calculateEasingProgress', assert => {
   assert.equals(
     calculateEasingProgress(x => x, 500, 250), 0.5,
     'should return the result of the easing(elapsedTime / duration)'
@@ -22,7 +22,7 @@ test('animatronics-machine/calculateEasingProgress', assert => {
   assert.end();
 });
 
-test('animatronics-machine/makeSequence', assert => {
+test('machines/animatronics/makeSequence', assert => {
   const createAnimationSequences = () => ({
     hello: [
       {
@@ -55,7 +55,7 @@ test('animatronics-machine/makeSequence', assert => {
   assert.end();
 });
 
-test('animatronics-machine/makeReducers', assert => {
+test('machines/animatronics/makeReducers', assert => {
   const machinist = {
     makeCountdownJobMachine: () => {
       return { registerJob: () => {} };

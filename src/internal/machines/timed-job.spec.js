@@ -6,9 +6,9 @@ import {
   start,
   stop,
   makeReducers,
-} from './timed-job-machine'
+} from './timed-job'
 
-test('makeReducers', assert => {
+test('machines/timed-job/makeReducers', assert => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const state = {
@@ -52,7 +52,7 @@ test('makeReducers', assert => {
   assert.end();
 });
 
-test('start', assert => {
+test('machines/timed-job/start', assert => {
   const clock = lolex.createClock();
   const job = sinon.spy();
   const onCompletedJob = sinon.spy();
@@ -82,7 +82,7 @@ test('start', assert => {
   assert.end();
 });
 
-test('stop', assert => {
+test('machines/timed-job/stop', assert => {
   const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();
   const state = {

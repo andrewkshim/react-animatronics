@@ -7,7 +7,7 @@ import { omitKey } from '../utils'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
-const debug = Debug('animatronics:animatronics-machine');
+const debug = Debug('react-animatronics:machines:animatronics');
 
 const isUsingTime = (animation: Object): boolean =>
   animation.duration != null;

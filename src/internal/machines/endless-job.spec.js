@@ -6,9 +6,9 @@ import {
   makeReducers,
   start,
   stop,
-} from './endless-job-machine'
+} from './endless-job'
 
-test('endless-job-machine/makeReducers', assert => {
+test('machines/endless-job/makeReducers', assert => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const state = {
@@ -43,7 +43,7 @@ test('endless-job-machine/makeReducers', assert => {
   assert.end();
 });
 
-test('endless-job-machine/start', assert => {
+test('machines/endless-job/start', assert => {
   const clock = lolex.createClock();
   const dispatch = () => {};
   const state = {
@@ -74,7 +74,7 @@ test('endless-job-machine/start', assert => {
   assert.end();
 });
 
-test('endless-job-machine/stop', assert => {
+test('machines/endless-job/stop', assert => {
   const clock = lolex.createClock();
   const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();

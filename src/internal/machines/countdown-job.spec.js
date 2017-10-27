@@ -3,9 +3,9 @@ import sinon from 'sinon'
 
 import {
   makeReducers,
-} from './countdown-job-machine'
+} from './countdown-job'
 
-test('countdown-job-machine/makeReducers', assert => {
+test('machines/countdown-job/makeReducers', assert => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const job = sinon.spy();

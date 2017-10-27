@@ -1,6 +1,6 @@
 import Debug from 'debug'
 
-const debug = Debug('animatronics:timed-job-machine');
+const debug = Debug('react-animatronics:machines:timed-job');
 
 const registerJob = (state, dispatch) => job => {
   dispatch({
