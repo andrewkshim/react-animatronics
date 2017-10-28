@@ -742,9 +742,7 @@ const ControlledRect = withControl('myRect')(Rect);
 
 const App = ({ playAnimation }) => (
   <div>
-    <button onClick={() => {
-      playAnimation();
-    }}>
+    <button onClick={() => playAnimation()}>
       Play animation
     </button>
     <ControlledRect />
