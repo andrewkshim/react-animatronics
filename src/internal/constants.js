@@ -23,7 +23,7 @@ export const IS_RAF_AVAILABLE: boolean = (
 export const DEFAULT_REQUEST_ANIMATION_FRAME: Function = (
   IS_RAF_AVAILABLE
     ? requestAnimationFrame
-    : callback => setTimeout(callback, Constants.MS_PER_ANIMATION_FRAME)
+    : callback => setTimeout(callback, MS_PER_ANIMATION_FRAME)
 );
 
 export const DEFAULT_CANCEL_ANIMATION_FRAME: Function = (
