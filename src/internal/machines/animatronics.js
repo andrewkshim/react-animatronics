@@ -177,6 +177,7 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
   const runPhase = (phaseIndex) => {
     const sequence = makeSequence(state, dispatch)(animationName);
     const phase = sequence[phaseIndex];
+    debug('executing phase %O', phase);
     const componentNames = Object.keys(phase);
 
     dispatch({
@@ -320,6 +321,7 @@ export const makeReducers = machinist => ({
   },
   SET_CREATE_ANIMATION_SEQUENCES: (state, action) => {
     const { createAnimationSequences } = action;
+    debug('setting updated createAnimationSequences %s', createAnimationSequences);
     state.createAnimationSequences = createAnimationSequences;
   },
   START_TIMED_JOB: (state, action) => {
