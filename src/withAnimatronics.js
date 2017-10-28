@@ -103,7 +103,7 @@ const withAnimatronics = (
           + ` but you gave it: ${ BaseComponent }. Make sure that you're`
           + ` passing in either a component class or a function that returns`
           + ` an element. A common mistake is to pass in the React element`
-          + ` itself. For example, passing in <Component/> instead of Component,`
+          + ` itself. For example, passing in "<Component/>" instead of "Component",`
           + ` but you should be passing in the second form.`
         );
       }
