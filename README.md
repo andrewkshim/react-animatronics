@@ -45,7 +45,7 @@ examples, but when you're ready to dig into the details, take a look at the
 ### List of Examples
 
 - [Example 1: Basics](#example-1)
-- [Example 2: HoCs (Higher-Order Components)](#example-2)
+- [Example 2: Components](#example-2)
 - [Example 3: Multi-Phase Animations](#example-3)
 - [Example 4: Multi-Component Animations](#example-4)
 - [Example 5: Refs and DOM Nodes](#example-5)
@@ -56,34 +56,23 @@ examples, but when you're ready to dig into the details, take a look at the
 
 ### <a name='example-1'></a> Example 1: Basics
 
-CodeSandbox link: https://codesandbox.io/s/47pyw86jw
+CodeSandbox link: https://codesandbox.io/s/0o4349zlon
+
+I'm a fan of functional programming and composition via [higher-order
+components][hocs], so react-animatronics provides higher-order components as
+part of its API. You use the functions `withAnimatronics` and `withControl` to
+declare your animations.
 
 ```js
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { Animatronics, Control } from 'react-animatronics'
+import { withAnimatronics, withControl } from 'react-animatronics'
 
 
-// The 'Control' component will register itself when it mounts, meaning that it
-// can then be "controlled" and animated by the parent 'Animatronics'
-// component. Any component that you want to include in your animations must be
-// wrapped by a Control. The 'name' prop you pass into Control will be used later
-// inside the Animatronics component to reference your controlled component.
-// The Control component must have a single child, and that child will receive
-// an 'animatronicStyles' prop that is an object containing the interpolated
-// styles. See the Rect component directly below.
-
-const ControlledRect = () => (
-  <Control name='myRect'>
-    <Rect/>
-  </Control>
-);
-
-
-// This 'Rect' should not be used directly. Rather, we're going to use the
-// 'ControlledRect' above since it's wrapped by the 'Control'. Since the
-// Rect is a child of Control, it receives an 'animatronicStyles' prop that
+// The 'Rect' should not be used directly. Rather, we're going to use the
+// 'ControlledRect' below since it's wrapped by 'withControl'. Since the
+// Rect is a child of withControl, it receives an 'animatronicStyles' prop that
 // is an object containing the interpolated styles e.g. '{ left: "42.42px" }'.
 // It's up to you how to use the animatronicStyles, you can inject them into
 // the "style" prop or do something else. Just don't forget to use them!
@@ -100,14 +89,110 @@ const Rect = ({ animatronicStyles }) => (
 );
 
 
-// Similar to the 'Control' component, the 'Animatronics' component is a
-// wrapper that must have a single child. That child will receive as props a
-// function 'playAnimation' that you can call anytime to run your animations.
-// To declare an animation, you must pass in a 'createAnimationSequences'
-// function to the Animatronics component. In this example, we're returning
-// an array that describes the animation we want to run. There's a bit more to
-// this part of the API though, if you're curious, read through the Detailed
-// Walkthough's section on createAnimationSequences.
+// 'withControl' is a function that takes a string argument for its 'name'
+// which you will reference later. It returns a function that takes a base
+// component as its only argument. The final component is a "controlled" component
+// and it will register itself with react-animatronics so it can be animated by
+// the parent 'withAnimatronics' component. Any component that you want to include
+// in your animations must be wrapped by withControl.
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+// Just like the 'Rect', the 'App' component should not be used directly since
+// it's wrapped by 'withAnimatronics' in the 'AnimatedApp' component below.
+// Since the App is the child of withAnimatronics, it receives a 'playAnimation'
+// function as props. You can call playAnimation at any time to execute the
+// animation you declared in the withAnimatronics.
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+  </div>
+);
+
+
+// 'withAnimatronics' is a function that takes a function as its only argument,
+// and it returns a function that takes a base component. The function argument to
+// 'withAnimatronics' should return an array (or an object, but we'll cover that
+// in a later example) that describes your animations. We'll refer to this function
+// as 'createAnimationSequences' throughout these docs.
+
+const AnimatedApp = withAnimatronics(() => [
+  {
+    myRect: {
+      duration: 350, // milliseconds
+      start: { height: '100px' }, // your starting styles
+      end: { height: '200px' } // your ending styles
+    }
+  }
+])(App);
+
+
+// This example will render a button and a blue square. Clicking the button will
+// cause the square to animate for 350ms from a height of 100px to 200px.
+
+ReactDOM.render(
+  <AnimatedApp/>,
+  document.getElementById('root')
+);
+```
+
+These higher-order components work great with great with
+[recompose][recompose], but if you're not a fan of stateless components,
+react-animatronics also provides a component API, which we cover in the next
+section.
+
+
+### <a name='example-2'></a> Example 2: Components
+
+CodeSandbox link: https://codesandbox.io/s/47pyw86jw
+
+You can use react-animatronic's component-based API if higher-order components
+aren't your thing. The `<Animatronics/>` and `<Control/>` are used in much the
+same way as their higher-order counterparts.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { Animatronics, Control } from 'react-animatronics'
+
+
+// The 'Control' component takes a single 'name' prop that is the same as the
+// string argument you'd pass into withControl. You'll use this name to refer to
+// your components when you declare your animations. The Control component must
+// have a single child, and that child will receive an 'animatronicStyles' prop
+// that is the object containing the interpolated styles.
+
+const ControlledRect = () => (
+  <Control name='myRect'>
+    <Rect/>
+  </Control>
+);
+
+
+// The 'Rect' component below is the same as that in Example 1.
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      // set a default height of '100px' when the component is not animating
+      height: animatronicStyles.height || '100px',
+      width: '100px',
+      backgroundColor: 'blue'
+    }}
+  />
+);
+
+
+// The 'Animatronics' component takes a single 'createAnimationSequences' prop
+// that is a function which returns your animation declaractions. The Animatronics
+// component must have a single child, and that child will receive a 'playAnimation'
+// props that is a function you can call to execute your animations.
 
 const AnimatedApp = () => (
   <Animatronics createAnimationSequences={() => [
@@ -124,11 +209,7 @@ const AnimatedApp = () => (
 );
 
 
-// Just like the 'Rect', the 'App' component should not be used directly since
-// it's wrapped by 'Animatronics' in the 'AnimatedApp' component. Since the App
-// is the child of Animatronics, it receives a 'playAnimation' function as props.
-// You can call playAnimation at any time to execute the animation you declared
-// in the Animatronics 'createAnimationSequences' function.
+// The 'App' component below is the same as that in Example 1.
 
 const App = ({ playAnimation }) => (
   <div>
@@ -149,80 +230,9 @@ ReactDOM.render(
 );
 ```
 
-
-### <a name='example-2'></a> Example 2: HoCs (Higher-Order Components)
-
-CodeSandbox link: https://codesandbox.io/s/0o4349zlon
-
-I'm a fan of functional programming, so react-animatronics provides
-[higher-order component][hocs] versions of the `<Animatronics/>` and
-`<Control/>` components. You can use the functions `withAnimatronics` and
-`withControl` much the same way you'd use their component counterparts.  They
-also work great with [recompose][recompose].
-
-```js
-import React from 'react'
-import ReactDOM from 'react-dom'
-
-import { withAnimatronics, withControl } from 'react-animatronics'
-
-
-// Same 'Rect' from Example 1.
-
-const Rect = ({ animatronicStyles }) => (
-  <div
-    style={{
-      // set a default height of '100px' when the component is not animating
-      height: animatronicStyles.height || '100px',
-      width: '100px',
-      backgroundColor: 'blue'
-    }}
-  />
-);
-
-
-// 'withControl' is a function that takes a string argument that is the same as
-// the 'name' prop you'd pass into the <Control/> component. It then returns a
-// function that takes the base component as its only argument.
-
-const ControlledRect = withControl('myRect')(Rect);
-
-// Same 'App' from Example 1.
-const App = ({ playAnimation }) => (
-  <div>
-    <button onClick={() => playAnimation()}>
-      Play animation
-    </button>
-    <ControlledRect/>
-  </div>
-);
-
-
-// 'withAnimatronics' is a function that takes a function argument that is the
-// same as the 'createAnimationSequences' prop you'd pass into the <Animatronics/>
-// component. If then returns a function that takes the base component as its
-// only argument.
-
-const AnimatedApp = withAnimatronics(() => [
-  {
-    myRect: {
-      duration: 350, // milliseconds
-      start: { height: '100px' }, // your starting styles
-      end: { height: '200px' } // your ending styles
-    }
-  }
-])(App);
-
-
-// Just like Example 1, but now your components are powered by HoCs. This
-// example will render a button and a blue square. Clicking the button will
-// cause the square to animate for 350ms from a height of 100px to 200px.
-
-ReactDOM.render(
-  <AnimatedApp/>,
-  document.getElementById('root')
-);
-```
+The rest of the documentation uses the higher-order components, but you can use
+the `<Animatronics/>` and `<Control/>` components as drop-in replacements since
+the components use the higher-order components internally.
 
 
 ### <a name='example-3'></a> Example 3: Multi-Phase Animations
