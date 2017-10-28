@@ -13,6 +13,14 @@ export const noop = (): void => {};
 
 export const isStatelessComponent = (Component: Object): boolean => !Component.prototype.render;
 
+export const isReactComponent = (MaybeComponent: Object): boolean => (
+  MaybeComponent != null
+  && (
+    typeof MaybeComponent === 'function'
+    || !!(MaybeComponent.prototype && MaybeComponent.prototype.render)
+  )
+);
+
 export const makeError = (...messages: string[]): Error => {
   const err = new Error(messages.reduce((result, segment) => (
     result === '' ?

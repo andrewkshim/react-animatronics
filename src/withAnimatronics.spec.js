@@ -26,6 +26,12 @@ test('withAnimatronics', assert => {
     'correctly throws when provided incorrect arguments'
   );
 
+  assert.throws(
+    () => withAnimatronics(() => [])(undefined),
+    /must be used to wrap a React component/,
+    'correctly throws when provided an incorrect BaseComponent'
+  );
+
   assert.end();
 });
 

@@ -8,8 +8,8 @@ import React from 'react'
 import type { VoidFn } from './internal/flow-types'
 
 import ContextTypes from './internal/context-types'
-import { IS_DEVELOPMENT, makeError, noop } from './internal/utils'
 import { makeMachinist } from './internal/machines/machinist'
+
 import {
   DEFAULT_ANIMATION_NAME,
   DEFAULT_CANCEL_ANIMATION_FRAME,
@@ -18,6 +18,13 @@ import {
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_SET_TIMEOUT,
 } from './internal/constants'
+
+import {
+  IS_DEVELOPMENT,
+  isReactComponent,
+  makeError,
+  noop,
+} from './internal/utils'
 
 type Options = {
   requestAnimationFrame?: Function,
@@ -89,6 +96,18 @@ const withAnimatronics = (
   }
 
   return (BaseComponent: Object): Object => {
+    if (IS_DEVELOPMENT) {
+      if (!isReactComponent(BaseComponent)) {
+        throw makeError(
+          `withAnimatronics() must be used to wrap a React component`
+          + ` but you gave it: ${ BaseComponent }. Make sure that you're`
+          + ` passing in either a component class or a function that returns`
+          + ` an element. A common mistake is to pass in the React element`
+          + ` itself. For example, passing in <Component/> instead of Component,`
+          + ` but you should be passing in the second form.`
+        );
+      }
+    }
 
     class AnimatronicsComponent extends React.Component<Props> {
       constructor(props: Props) {
