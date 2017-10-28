@@ -2,12 +2,12 @@
 /**
  * TimedFashionista: manages Fashions for timed animations.
  *
- * @module internal/fashionistas/timed-fashionista
+ * @module internal/fashionistas/timed
  */
 
 import chroma from 'chroma-js'
 
-import { parseStyle, stringifyFashion } from './common-fashionista'
+import { parseStyle, stringifyFashion } from './common'
 
 import type { BasicFashion, TransformFashion, Fashion, Styles } from '../flow-types'
 

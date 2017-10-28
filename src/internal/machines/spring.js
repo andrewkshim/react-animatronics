@@ -1,8 +1,8 @@
 import type { VoidFn, Styles, SpringMachine } from '../../flow-types'
 
 import { noop } from '../utils'
-import { parseStyle } from '../fashionistas/common-fashionista'
-import { reconstructStyles, interpolateValue } from '../fashionistas/spring-fashionista'
+import { parseStyle } from '../fashionistas/common'
+import { reconstructStyles, interpolateValue } from '../fashionistas/spring'
 import {
   SECONDS_PER_ANIMATION_FRAME,
   MS_PER_ANIMATION_FRAME,

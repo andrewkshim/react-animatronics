@@ -2,13 +2,13 @@
 /**
  * SpringFashionista: manages Fashions for spring animations.
  *
- * @module internal/fashionistas/spring-fashionista
+ * @module internal/fashionistas/spring
  */
 
 import chroma from 'chroma-js'
 
 import type { Styles, BasicFashion } from '../flow-types'
-import { parseStyle, stringifyFashion } from './common-fashionista'
+import { parseStyle, stringifyFashion } from './common'
 
 export const interpolateValue = (
   currentValue: number,

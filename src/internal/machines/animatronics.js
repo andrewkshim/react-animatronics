@@ -3,7 +3,7 @@ import Debug from 'debug'
 
 import { DEFAULT_ANIMATION_NAME } from '../constants'
 import { IS_DEVELOPMENT, makeError } from '../utils'
-import { constructStyles } from '../fashionistas/timed-fashionista'
+import { constructStyles } from '../fashionistas/timed'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 

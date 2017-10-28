@@ -3,7 +3,7 @@
  * CommonFashionista: provides utilities to help manage Fashions
  * (which are * object-representations of CSS styles).
  *
- * @module internal/fashionistas/common-fashionista
+ * @module internal/fashionistas/common
  */
 
 import chroma from 'chroma-js'

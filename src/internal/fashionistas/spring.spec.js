@@ -1,8 +1,8 @@
 // @flow
 import test from 'tape'
 
-import { parseBasicStyle } from './common-fashionista'
-import { interpolateValue, interpolateFashion, reconstructStyles } from './spring-fashionista'
+import { parseBasicStyle } from './common'
+import { interpolateValue, interpolateFashion, reconstructStyles } from './spring'
 
 test('interpolateValue', assert => {
   const actual = interpolateValue(0, 100, 0.5);

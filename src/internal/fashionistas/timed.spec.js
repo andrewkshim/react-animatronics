@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import { calculateCurrentValue, constructStyles } from './timed-fashionista'
+import { calculateCurrentValue, constructStyles } from './timed'
 
 test('calculateCurrentValue', assert => {
   assert.equals(calculateCurrentValue(0, 100, 0.5), 50, 'returns the expected value');
