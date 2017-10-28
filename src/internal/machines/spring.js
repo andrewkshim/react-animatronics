@@ -148,8 +148,8 @@ const runNextFrame = (state, dispatch) => (
   if (isStopped(state)) {
     if (state.numStops === MIN_STOPS) {
       const updatedStyles = reconstructStyles(
-        state.startStyles,
-        state.endStyles,
+        state.fromStyles,
+        state.toStyles,
         state.styleNames,
         state.endValues
       );
@@ -180,8 +180,8 @@ const runNextFrame = (state, dispatch) => (
   moveToNextFrame(state, dispatch)(progress);
 
   const updatedStyles = reconstructStyles(
-    state.startStyles,
-    state.endStyles,
+    state.fromStyles,
+    state.toStyles,
     state.styleNames,
     state.values
   );
@@ -195,15 +195,15 @@ const runNextFrame = (state, dispatch) => (
 }
 
 export const makeSpringMachine = machinist => (
-  startStyles: Styles,
-  endStyles: Styles,
+  fromStyles: Styles,
+  toStyles: Styles,
   stiffness: number,
   damping: number,
 ) => {
-  const styleNames = Object.keys(startStyles);
+  const styleNames = Object.keys(fromStyles);
   const state = {
-    startStyles,
-    endStyles,
+    fromStyles,
+    toStyles,
     stiffness,
     damping,
     styleNames,

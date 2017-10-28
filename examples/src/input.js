@@ -135,8 +135,8 @@ class Input extends React.Component {
                     result[`${ letter }-${ index }`] = {
                       duration: 250,
                       delay: index * 100,
-                      start: { transform: 'scale(0)' },
-                      end: { transform: 'scale(1)' }
+                      from: { transform: 'scale(0)' },
+                      to: { transform: 'scale(1)' }
                     }
                     return result;
                   }},
@@ -149,8 +149,8 @@ class Input extends React.Component {
                     result[`${ letter }-${ index }`] = {
                       duration: 250,
                       delay: index * 100,
-                      start: { transform: 'scale(1)' },
-                      end: { transform: 'scale(0)' }
+                      from: { transform: 'scale(1)' },
+                      to: { transform: 'scale(0)' }
                     }
                     return result;
                   }},
@@ -189,8 +189,8 @@ export default withAnimatronics(
     {
       input: {
         duration: 0,
-        start: { transform: 'scale(1)' },
-        end: { transform: 'scale(1)' },
+        from: { transform: 'scale(1)' },
+        to: { transform: 'scale(1)' },
       }
     }
   ]

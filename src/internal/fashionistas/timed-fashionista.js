@@ -45,13 +45,13 @@ const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: 
     {
       ...startFashion,
       styles: endFashion.styles.map(
-        (end: BasicFashion, index: number): BasicFashion => {
+        (to: BasicFashion, index: number): BasicFashion => {
           // Flow isn't playing nicely with disjoint types here. I'd expect it to know
           // that startFashion isTransformType, but flow isn't recognizing it as such.
           // There might be an issue with detecting disjoint types via multiple conditions.
           // $FlowFixMe
-          const start: BasicFashion = startFashion.styles[index];
-          return calculateBasic(start, end, progress);
+          const from: BasicFashion = startFashion.styles[index];
+          return calculateBasic(from, to, progress);
         }),
     }
   :
@@ -59,14 +59,14 @@ const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: 
 );
 
 export const constructStyles = (
-  startStyles: Styles,
-  endStyles: Styles,
+  fromStyles: Styles,
+  toStyles: Styles,
   progress: number,
 ): Styles =>
-  Object.keys(startStyles).reduce(
+  Object.keys(fromStyles).reduce(
     (currentStyles: Styles, styleName: string) => {
-      const startFashion: Fashion = parseStyle(startStyles[styleName]);
-      const endFashion: Fashion = parseStyle(endStyles[styleName]);
+      const startFashion: Fashion = parseStyle(fromStyles[styleName]);
+      const endFashion: Fashion = parseStyle(toStyles[styleName]);
       currentStyles[styleName] = stringifyFashion(
         calculateFashion(startFashion, endFashion, progress)
       );

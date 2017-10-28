@@ -49,33 +49,33 @@ export default withAnimatronics(
       {
         circleA: {
           duration,
-          start: {
+          from: {
             top: `${ topA }px`,
             left: `${ leftA }px`,
           },
-          end: {
+          to: {
             top: `${ topB }px`,
             left: `${ leftB }px`,
           },
         },
         circleB: {
           duration,
-          start: {
+          from: {
             top: `${ topB }px`,
             left: `${ leftB }px`,
           },
-          end: {
+          to: {
             top: `${ topC }px`,
             left: `${ leftC }px`,
           },
         },
         circleC: {
           duration,
-          start: {
+          from: {
               top: `${ topC }px`,
               left: `${ leftC }px`,
           },
-          end: {
+          to: {
             top: `${ topA }px`,
             left: `${ leftA }px`,
           },

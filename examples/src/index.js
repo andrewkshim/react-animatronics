@@ -214,10 +214,10 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
     {
       [`${ example }Highlight`]: {
         duration: 0,
-        start: {
+        from: {
           opacity: HIGHLIGHT_SELECTED_OPACITY,
         },
-        end: {
+        to: {
           opacity: HIGHLIGHT_SELECTED_OPACITY,
         },
       }
@@ -227,10 +227,10 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
     {
       [`${ example }Highlight`]: {
         duration: HIGHLIGHT_DURATION,
-        start: {
+        from: {
           opacity: 0,
         },
-        end: {
+        to: {
           opacity: 0.2,
         },
       }
@@ -240,10 +240,10 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
     {
       [`${ example }Highlight`]: {
         duration: HIGHLIGHT_DURATION,
-        start: {
+        from: {
           opacity: 0.2,
         },
-        end: {
+        to: {
           opacity: 0,
         },
       }
@@ -253,10 +253,10 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
     {
       [`${ example }Highlight`]: {
         duration: HIGHLIGHT_DURATION,
-        start: {
+        from: {
           opacity: HIGHLIGHT_SELECTED_OPACITY,
         },
-        end: {
+        to: {
           opacity: 0,
         },
       }
@@ -266,21 +266,21 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
     {
       [`${ example }Highlight`]: {
         duration: CLICK_WAVE_DURATION,
-        start: {
+        from: {
           opacity: HIGHLIGHT_LIGHT_OPACITY,
         },
-        end: {
+        to: {
           opacity: HIGHLIGHT_SELECTED_OPACITY,
         },
       },
       clickWave: {
         duration: CLICK_WAVE_DURATION,
         easing: BezierEasing(0.4, 0.0, 1, 1),
-        start: {
+        from: {
           transform: 'scale(0)',
           opacity: 1,
         },
-        end: {
+        to: {
           opacity: 0,
           transform: 'scale(1)',
         },

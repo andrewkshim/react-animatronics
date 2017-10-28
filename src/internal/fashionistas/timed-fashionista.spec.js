@@ -8,11 +8,11 @@ test('calculateCurrentValue', assert => {
 });
 
 test('constructStyles', assert => {
-  const startStyles = { left: '0px' };
-  const endStyles = { left: '100px' };
+  const fromStyles = { left: '0px' };
+  const toStyles = { left: '100px' };
   const progress = 0.5;
 
-  const actualStyles = constructStyles(startStyles, endStyles, progress);
+  const actualStyles = constructStyles(fromStyles, toStyles, progress);
   const expectedStyles = { left: '50px' };
 
   assert.deepEquals(actualStyles, expectedStyles, 'correctly calculates the current styles');

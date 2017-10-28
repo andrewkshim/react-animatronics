@@ -46,8 +46,8 @@ const getNumPhases = state => animationName => {
 
 const runTimedAnimation = dispatch => (componentName, animation) => {
   const {
-    start: startStyles,
-    end: endStyles,
+    from: fromStyles,
+    to: toStyles,
     duration,
     easingFn = DEFAULT_EASING_FN,
   } = animation;
@@ -63,7 +63,7 @@ const runTimedAnimation = dispatch => (componentName, animation) => {
     componentName,
     job: elapsedTime => {
       const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
-      const updatedStyles = constructStyles(startStyles, endStyles, progress);
+      const updatedStyles = constructStyles(fromStyles, toStyles, progress);
       dispatch({
         type: 'UPDATE_COMPONENT_STYLES',
         componentName,
@@ -79,7 +79,7 @@ const runTimedAnimation = dispatch => (componentName, animation) => {
       dispatch({
         type: 'UPDATE_COMPONENT_STYLES',
         componentName,
-        styles: endStyles,
+        styles: toStyles,
       });
       dispatch({ type: 'COUNTDOWN_COMPONENTS' });
     }
@@ -93,8 +93,8 @@ const runTimedAnimation = dispatch => (componentName, animation) => {
 
 const runSpringAnimation = dispatch => (componentName, animation) => {
   const {
-    start: startStyles,
-    end: endStyles,
+    from: fromStyles,
+    to: toStyles,
     stiffness,
     damping,
   } = animation;
@@ -102,8 +102,8 @@ const runSpringAnimation = dispatch => (componentName, animation) => {
   dispatch({
     type: 'CREATE_SPRING_MACHINE',
     componentName,
-    startStyles,
-    endStyles,
+    fromStyles,
+    toStyles,
     stiffness,
     damping,
   });
@@ -248,10 +248,10 @@ const setCreateAnimationSequences = (state, dispatch) => createAnimationSequence
 
 export const makeReducers = machinist => ({
   CREATE_SPRING_MACHINE: (state, action) => {
-    const { componentName, startStyles, endStyles, stiffness, damping } = action;
+    const { componentName, fromStyles, toStyles, stiffness, damping } = action;
     const machine = machinist.makeSpringMachine(
-      startStyles,
-      endStyles,
+      fromStyles,
+      toStyles,
       stiffness,
       damping
     );

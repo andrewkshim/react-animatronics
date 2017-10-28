@@ -21,10 +21,10 @@ test('runs each animation phase', assert => {
       {
         base: {
           duration: 250,
-          start: {
+          from: {
             top: '0px',
           },
-          end: {
+          to: {
             top: '10px',
           },
         },
@@ -32,10 +32,10 @@ test('runs each animation phase', assert => {
       {
         base: {
           duration: 300,
-          start: {
+          from: {
             top: '10px',
           },
-          end: {
+          to: {
             top: '100px',
           },
         },

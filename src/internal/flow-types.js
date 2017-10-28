@@ -63,7 +63,7 @@ export type Animation = {
   delay?: number,
   stiffness?: number,
   damping?: number,
-  start: Object,
+  from: Object,
   end: Object,
 }
 

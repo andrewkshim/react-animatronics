@@ -20,43 +20,43 @@ export const interpolateValue = (
 }
 
 export const interpolateFashion = (
-  start: BasicFashion,
-  end: BasicFashion,
+  from: BasicFashion,
+  to: BasicFashion,
   springValue: number,
 ): BasicFashion => (
-  start.isColorType && end.isColorType ?
-    { ...start, value: chroma.mix(start.value, end.value, springValue) }
-  : start.isNumberType && end.isNumberType ?
-    { ...start, value: interpolateValue(start.value, end.value, springValue) }
-  : start.isUnitType && end.isUnitType ?
-    { ...start, value: interpolateValue(start.value, end.value, springValue) }
+  from.isColorType && to.isColorType ?
+    { ...from, value: chroma.mix(from.value, to.value, springValue) }
+  : from.isNumberType && to.isNumberType ?
+    { ...from, value: interpolateValue(from.value, to.value, springValue) }
+  : from.isUnitType && to.isUnitType ?
+    { ...from, value: interpolateValue(from.value, to.value, springValue) }
   :
-    end
+    to
 );
 
 export const reconstructStyles = (
-  startStyles: Styles,
-  endStyles: Styles,
+  fromStyles: Styles,
+  toStyles: Styles,
   styleNames: string[],
   springValues: number[],
 ): Styles =>
   styleNames.reduce(
     (reconstructed, name, index) => {
-      const start = parseStyle(startStyles[name]);
-      const end = parseStyle(endStyles[name]);
+      const from = parseStyle(fromStyles[name]);
+      const to = parseStyle(toStyles[name]);
       const value = springValues[index];
       reconstructed[name] = stringifyFashion(
-        start.isBasicType && end.isBasicType ?
-          interpolateFashion(start, end, value)
-        : start.isTransformType && end.isTransformType ?
+        from.isBasicType && to.isBasicType ?
+          interpolateFashion(from, to, value)
+        : from.isTransformType && to.isTransformType ?
           {
-            ...start,
-            styles: start.styles.map(
-              (s: BasicFashion, i: number) => interpolateFashion(s, end.styles[i], value)
+            ...from,
+            styles: from.styles.map(
+              (s: BasicFashion, i: number) => interpolateFashion(s, to.styles[i], value)
             ),
           }
         :
-          end
+          to
       );
       return reconstructed;
     },

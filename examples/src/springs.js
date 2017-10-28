@@ -52,30 +52,30 @@ export default withAnimatronics(
         circleA: {
           stiffness: 100,
           damping: 5,
-          start: {
+          from: {
             transform: START_SCALE,
           },
-          end: {
+          to: {
             transform: END_SCALE,
           },
         },
         circleB: {
           stiffness: 200,
           damping: 5,
-          start: {
+          from: {
             transform: START_SCALE,
           },
-          end: {
+          to: {
             transform: END_SCALE,
           },
         },
         circleC: {
           stiffness: 300,
           damping: 5,
-          start: {
+          from: {
             transform: START_SCALE,
           },
-          end: {
+          to: {
             transform: END_SCALE,
           },
         },

@@ -9,8 +9,8 @@ test('withAnimatronics', assert => {
     {
       base: {
         duration: 100,
-        start: { left: '100px' },
-        end: { left: '200px' },
+        from: { left: '100px' },
+        to: { left: '200px' },
       }
     }
   ];
@@ -35,8 +35,8 @@ test('withAnimatronics.playAnimation', assert => {
     {
       base: {
         duration: 100,
-        start: { left: '100px' },
-        end: { left: '200px' },
+        from: { left: '100px' },
+        to: { left: '200px' },
       }
     }
   ];

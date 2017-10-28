@@ -58,11 +58,11 @@ const AnimatedClickWave = withAnimatronics(() => ({
     {
       wave: {
         duration: CLICK_WAVE_DURATION,
-        start: {
+        from: {
           transform: 'scale(0)',
           opacity: 1,
         },
-        end: {
+        to: {
           opacity: 0,
           transform: 'scale(1)',
         },

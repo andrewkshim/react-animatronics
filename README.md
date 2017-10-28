@@ -1,4 +1,4 @@
-# react-animatronics
+z react-animatronics
 
 React Animatronics lets you write declarative, coordinated animations
 for your React components.
@@ -130,8 +130,8 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 350, // milliseconds
-      start: { height: '100px' }, // your starting styles
-      end: { height: '200px' } // your ending styles
+      from: { height: '100px' }, // your starting styles
+      to: { height: '200px' } // your ending styles
     }
   }
 ])(App);
@@ -204,8 +204,8 @@ const AnimatedApp = () => (
     {
       myRect: {
         duration: 350, // milliseconds
-        start: { height: '100px' }, // your starting styles
-        end: { height: '200px' } // your ending styles
+        from: { height: '100px' }, // your starting styles
+        to: { height: '200px' } // your ending styles
       }
     }
   ]}>
@@ -292,24 +292,24 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 350,
-      start: { top: '20px' },
-      end: { top: '200px' }
+      from: { top: '20px' },
+      to: { top: '200px' }
     }
   },
   // phase 2: move to the right
   {
     myRect: {
       duration: 350,
-      start: { left: '20px' },
-      end: { left: '200px' }
+      from: { left: '20px' },
+      to: { left: '200px' }
     }
   },
   // phase 3: move diagonally down to the right
   {
     myRect: {
       duration: 350,
-      start: { top: '200px', left: '200px' },
-      end: { top: '300px', left: '300px' }
+      from: { top: '200px', left: '200px' },
+      to: { top: '300px', left: '300px' }
     }
   }
 ])(App);
@@ -393,39 +393,39 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 350,
-      start: { top: '20px' },
-      end: { top: '200px' }
+      from: { top: '20px' },
+      to: { top: '200px' }
     },
     myCircle: {
       duration: 350,
-      start: { left: '20px' },
-      end: { left: '200px' }
+      from: { left: '20px' },
+      to: { left: '200px' }
     }
   },
   // phase 2
   {
     myRect: {
       duration: 350,
-      start: { left: '20px' },
-      end: { left: '200px' }
+      from: { left: '20px' },
+      to: { left: '200px' }
     },
     myCircle: {
       duration: 350,
-      start: { top: '20px' },
-      end: { top: '200px' }
+      from: { top: '20px' },
+      to: { top: '200px' }
     }
   },
   // phase 3
   {
     myRect: {
       duration: 350,
-      start: { top: '200px', left: '200px' },
-      end: { top: '300px', left: '300px' }
+      from: { top: '200px', left: '200px' },
+      to: { top: '300px', left: '300px' }
     },
     myCircle: {
       duration: 350,
-      start: { top: '200px', left: '200px' },
-      end: { top: '300px', left: '300px' }
+      from: { top: '200px', left: '200px' },
+      to: { top: '300px', left: '300px' }
     }
   }
 ])(App);
@@ -504,36 +504,36 @@ const AnimatedApp = withAnimatronics(({ circleA, circleB, circleC }) => {
     {
       circleA: {
         duration: 350,
-        start: { left: '20px' },
-        end: { left: '200px' }
+        from: { left: '20px' },
+        to: { left: '200px' }
       },
       circleB: {
         duration: 350,
-        start: { top: '20px', left: '20px' },
-        end: { top: '200px', left: '100px' }
+        from: { top: '20px', left: '20px' },
+        to: { top: '200px', left: '100px' }
       },
       circleC: {
         duration: 350,
-        start: { top: '20px', left: '20px' },
-        end: { top: '200px', left: '300px' }
+        from: { top: '20px', left: '20px' },
+        to: { top: '200px', left: '300px' }
       },
     },
     // phase 2
     {
       circleA: {
         duration: 350,
-        start: { top: `${topA}px`, left: '200px' },
-        end: { top: `${topB}px`, left: `${leftB}px` }
+        from: { top: `${topA}px`, left: '200px' },
+        to: { top: `${topB}px`, left: `${leftB}px` }
       },
       circleB: {
         duration: 350,
-        start: { top: '200px', left: '100px' },
-        end: { top: `${topC}px`, left: `${leftC}px` }
+        from: { top: '200px', left: '100px' },
+        to: { top: `${topC}px`, left: `${leftC}px` }
       },
       circleC: {
         duration: 350,
-        start: { top: '200px', left: '300px' },
-        end: { top: `${topA}px`, left: `${leftA}px` }
+        from: { top: '200px', left: '300px' },
+        to: { top: `${topA}px`, left: `${leftA}px` }
       },
     }
   ];
@@ -608,20 +608,20 @@ const AnimatedApp = withAnimatronics(() => {
     {
       circleA: {
         duration: 800,
-        start: { left: '20px' },
-        end: { left: '300px' }
+        from: { left: '20px' },
+        to: { left: '300px' }
       },
       circleB: {
         duration: 800,
         delay: 300,
-        start: { left: '20px' },
-        end: { left: '300px' }
+        from: { left: '20px' },
+        to: { left: '300px' }
       },
       circleC: {
         duration: 800,
         delay: 600,
-        start: { left: '20px' },
-        end: { left: '300px' }
+        from: { left: '20px' },
+        to: { left: '300px' }
 
       }
     }
@@ -689,8 +689,8 @@ const AnimatedApp = withAnimatronics(() => [
     myRect: {
       duration: 350,
       easingFn: BezierEasing(0.5, 0.5, 0.5, 0.5),
-      start: { left: '0px' },
-      end: { left: '400px' }
+      from: { left: '0px' },
+      to: { left: '400px' }
     }
   }
 ])(App);
@@ -756,13 +756,13 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 350,
-      start: {
+      from: {
         left: '0px', // you can animate strings,
         opacity: 0.2, // numbers,
         backgroundColor: 'blue', // colors,
         transform: 'scale(0.2)' // and even transformations!
       },
-      end: {
+      to: {
         left: '300px',
         opacity: 1,
         backgroundColor: 'red',
@@ -836,8 +836,8 @@ const AnimatedApp = withAnimatronics(() => {
       myCircle: {
         stiffness: 200,
         damping: 5,
-        start: { left: '20px' },
-        end: { left: '300px' }
+        from: { left: '20px' },
+        to: { left: '300px' }
       }
     }
   ];
@@ -938,8 +938,8 @@ const AnimatedApp = withAnimatronics(() => (
       {
         myRect: {
           duration: 350,
-          start: { left: '0px' },
-          end: { left: '300px' }
+          from: { left: '0px' },
+          to: { left: '300px' }
         }
       }
     ],
@@ -947,8 +947,8 @@ const AnimatedApp = withAnimatronics(() => (
       {
         myRect: {
           duration: 350,
-          start: { left: '300px' },
-          end: { left: '0px' }
+          from: { left: '300px' },
+          to: { left: '0px' }
         }
       }
     ]
@@ -1012,8 +1012,8 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 350,
-      start: { left: '0px' },
-      end: { left: '300px' }
+      from: { left: '0px' },
+      to: { left: '300px' }
     }
   }
 ])(App);
@@ -1071,7 +1071,7 @@ const App = ({ playAnimation, cancelAnimation }) => (
       Play animation
     </button>
     <div
-      // Use this div as a reference. It's width is the same as the "end"
+      // Use this div as a reference. It's width is the same as the "to"
       // position for myRect. If the animation didn't cancel, the rect would
       // reach the end of this div.
       style={{
@@ -1088,8 +1088,8 @@ const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
       duration: 2000,
-      start: { left: '0px' },
-      end: { left: '400px' }
+      from: { left: '0px' },
+      to: { left: '400px' }
     }
   }
 ])(App);
@@ -1214,8 +1214,8 @@ class App extends React.Component {
                     animations[`${letter}-${index}`] = {
                       duration: 250,
                       delay: index * 100,
-                      start: { transform: 'scale(0)' },
-                      end: { transform: 'scale(1)' }
+                      from: { transform: 'scale(0)' },
+                      to: { transform: 'scale(1)' }
                     }
                     return animations;
                   },
@@ -1351,13 +1351,13 @@ A pseudo-spec for all this looks like:
     string: {
       duration: number,
       easingFn: Function?,
-      start: { [string]: string|number },
-      end: { [string]: string|number },
+      from: { [string]: string|number },
+      to: { [string]: string|number },
     } | {
       stiffness: number,
       damping: number,
-      start: { [string]: string|number },
-      end: { [string]: string|number },
+      from: { [string]: string|number },
+      to: { [string]: string|number },
     }
   }
 ]
@@ -1375,13 +1375,13 @@ names to animation sequence arrays:
       string: {
         duration: number,
         easingFn: Function?,
-        start: { [string]: string|number },
-        end: { [string]: string|number },
+        from: { [string]: string|number },
+        to: { [string]: string|number },
       } | {
         stiffness: number,
         damping: number,
-        start: { [string]: string|number },
-        end: { [string]: string|number },
+        from: { [string]: string|number },
+        to: { [string]: string|number },
       }
     }
   ]
@@ -1397,7 +1397,7 @@ the `BezierEasing` import from react-animatronics. The `BezierEasing` is just a
 straight `export BezierEasing from 'bezier-easing`, so please refer to their documentation
 on how to use it.
 
-The `start` and `end` objects map strings to values (strings or numbers). They represent
+The `from` and `to` objects map strings to values (strings or numbers). They represent
 the animation's starting and ending styles, respectively. You can use arbitrary strings
 and numbers, but it's more idiomatic to use proper CSS style values since react-animatronics
 will nicely interpolate those values for you.
