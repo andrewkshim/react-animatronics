@@ -577,7 +577,7 @@ class Circle extends React.Component {
           height: '100px',
           width: '100px',
           borderRadius: '50px',
-          backgroundColor: 'lavender',
+          backgroundColor: 'darkturquoise',
           position: 'absolute',
         }}
       />
