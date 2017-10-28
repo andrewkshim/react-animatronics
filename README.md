@@ -1,4 +1,4 @@
-z react-animatronics
+# react-animatronics
 
 React Animatronics lets you write declarative, coordinated animations
 for your React components.
