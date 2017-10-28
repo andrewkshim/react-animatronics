@@ -99,6 +99,13 @@ const withAnimatronics = (
         };
       }
 
+      componentWillMount() {
+        const { createAnimationSequences } = this.props;
+        if (createAnimationSequences != null) {
+          animatronics.setCreateAnimationSequences(createAnimationSequences);
+        }
+      }
+
       componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
         if (createAnimationSequences != null) {
