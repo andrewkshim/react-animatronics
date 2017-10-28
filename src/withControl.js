@@ -13,6 +13,9 @@ import ContextTypes from './internal/context-types'
 
 import {
   IS_DEVELOPMENT,
+} from './internal/constants'
+
+import {
   isReactComponent,
   isStatelessComponent,
   makeError,

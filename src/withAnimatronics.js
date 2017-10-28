@@ -17,10 +17,10 @@ import {
   DEFAULT_NOW,
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_SET_TIMEOUT,
+  IS_DEVELOPMENT,
 } from './internal/constants'
 
 import {
-  IS_DEVELOPMENT,
   isReactComponent,
   makeError,
   noop,

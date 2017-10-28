@@ -41,5 +41,3 @@ export const makeError = (...messages: string[]): Error => {
   err.stack = poppedStack.join('\n');
   return err;
 }
-
-export const IS_DEVELOPMENT = process.env.NODE_ENV !== 'development';
