@@ -6,8 +6,8 @@ import { mount } from 'enzyme'
 import withControl from './withControl'
 
 test('withControl creates a valid React element', assert => {
-  const Rigged = withControl('base', { useStringRefs: true })(() => <div/>);
-  const element = React.createElement(Rigged);
+  const Controlled = withControl('base', { useStringRefs: true })(() => <div/>);
+  const element = React.createElement(Controlled);
   assert.true(React.isValidElement(element));
   assert.end();
 });
@@ -18,10 +18,10 @@ test('withControl throws a well-formed error when it does not have the correct c
       return <div/>;
     }
   }
-  const Rigged = withControl('base', { useStringRefs: true })(Base);
+  const Controlled = withControl('base', { useStringRefs: true })(Base);
   assert.throws(
     () => {
-      mount(<Rigged/>, { context: {} });
+      mount(<Controlled/>, { context: {} });
     },
     /forgot to use an animatronics component/,
   );
@@ -34,9 +34,9 @@ test('withControl registers the component when mounted', assert => {
       return <div/>;
     }
   }
-  const Rigged = withControl('base', { useStringRefs: true })(Base);
+  const Controlled = withControl('base', { useStringRefs: true })(Base);
   const registerComponent = sinon.spy()
-  const wrapper = mount(<Rigged/>, {
+  const wrapper = mount(<Controlled/>, {
     context: {
       animatronics: {
         registerComponent,
@@ -54,9 +54,9 @@ test('withControl unregisters the component when unmounted', assert => {
       return <div/>;
     }
   }
-  const Rigged = withControl('base', { useStringRefs: true })(Base);
+  const Controlled = withControl('base', { useStringRefs: true })(Base);
   const unregisterComponent = sinon.spy()
-  const wrapper = mount(<Rigged/>, {
+  const wrapper = mount(<Controlled/>, {
     context: {
       animatronics: {
         registerComponent: () => {},
@@ -76,10 +76,10 @@ test('withControl sets the ref to the DOM node', assert => {
     }
   }
 
-  const Rigged = withControl('base', { useStringRefs: true })(Base);
+  const Controlled = withControl('base', { useStringRefs: true })(Base);
   let actualDOMNode;
 
-  const wrapper = mount(<Rigged/>, {
+  const wrapper = mount(<Controlled/>, {
     context: {
       animatronics: {
         registerComponent: (componentName, domNode, styleUpdater) => {
