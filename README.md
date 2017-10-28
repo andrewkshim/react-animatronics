@@ -12,8 +12,24 @@ for your React components.
 
 - [Installation](#installation)
 - [Examples](#examples)
-- [Full API Documentation](#docs)
-- [Alternative Libraries](#alternative-libraries)
+  - [Example 1: Basics](#example-1)
+  - [Example 2: Components](#example-2)
+  - [Example 3: Multi-Phase Animations](#example-3)
+  - [Example 4: Multi-Component Animations](#example-4)
+  - [Example 5: Refs and DOM Nodes](#example-5)
+  - [Example 6: Delays](#example-6)
+  - [Example 7: Custom Easing](#example-7)
+  - [Example 8: Animatable Styles](#example-8)
+  - [Example 9: Springs](#example-9)
+  - [Example 10: Named Animations](#example-10)
+  - [Example 11: Finished Callback](#example-11)
+  - [Example 12: Canceling Animations](#example-12)
+  - [Example 13: Dynamic Components](#example-13)
+- [API Documentation](#docs)
+  - [withControl](#withControl)
+  - [withAnimatronics](#withAnimatronics)
+  - [Control](#Control)
+  - [Animatronics](#Animatronics)
 
 
 ## Installation
@@ -41,22 +57,6 @@ accompanying [CodeSandbox][sandbox] demo link.
 You can probably learn to use react-animatronics just by looking through the
 examples, but when you're ready to dig into the details, take a look at the
 [Full API Documentation](#docs).
-
-### List of Examples
-
-- [Example 1: Basics](#example-1)
-- [Example 2: Components](#example-2)
-- [Example 3: Multi-Phase Animations](#example-3)
-- [Example 4: Multi-Component Animations](#example-4)
-- [Example 5: Refs and DOM Nodes](#example-5)
-- [Example 6: Delays](#example-6)
-- [Example 7: Custom Easing](#example-7)
-- [Example 8: Animatable Styles](#example-8)
-- [Example 9: Springs](#example-9)
-- [Example 10: Named Animations](#example-10)
-- [Example 11: Finished Callback](#example-11)
-- [Example 12: Canceling Animations](#example-12)
-- [Example 13: Dynamic Components](#example-13)
 
 
 ### <a name='example-1'></a> Example 1: Basics
@@ -759,11 +759,13 @@ const AnimatedApp = withAnimatronics(() => [
       start: {
         left: '0px', // you can animate strings,
         opacity: 0.2, // numbers,
+        backgroundColor: 'blue', // colors,
         transform: 'scale(0.2)' // and even transformations!
       },
       end: {
         left: '300px',
         opacity: 1,
+        backgroundColor: 'red',
         transform: 'scale(1.2)'
       }
     }
@@ -1251,12 +1253,259 @@ please [create an issue][issue] and let me know.
 
 <!--
 ------------------------------------------------------------
-Full API Documentation
+API Documentation
 ------------------------------------------------------------
 -->
-## <a name='docs'></a> Full API Documentation
+## <a name='docs'></a> API Documentation
 
-Coming soon.
+This sections contains mostly words, versus the [Examples](#examples) section
+which contains mostly code. If you jumped to this section in hopes of a quick
+"getting started" guide, then you've jumped to the wrong section and I suggest
+you look at the examples instead.
+
+With that out of the way, here's the alphabetized list of everything you can
+import from react-animatronics:
+
+```js
+import {
+  Animatronics,
+  BezierEasing,
+  Control,
+  withAnimatronics,
+  withControl,
+} from 'react-animatronics'
+```
+
+We'll go over the API in a "semantic" order, that is, an order that makes
+sense for building up your understanding of how react-animatronics works.
+
+
+<!--
+------------------------------------------------------------
+withControl
+------------------------------------------------------------
+-->
+### <a name='withControl'></a> withControl
+
+```
+withControl(string): (ReactComponent) => (ReactComponent)
+```
+
+`withControl` is a function that returns another function. It takes a string as
+its only argument. The returned function takes a React component as its only
+argument and returns a final React component. That final component is a
+**controlled component**.
+
+The string is the name you use to reference the component in the animations
+you declare in [`withAnimatronics`](#withAnimatronics).
+
+The component that you wrap will receive the following props:
+
+```
+animatronicStyles: { [string]: string|number }
+```
+
+The `animatronicStyles` is an object that contains the interpolated style
+values. You'll most likely want to use these values in the `style` props
+of your components, but you can use these values however you like.
+
+Your components will not receive the `animatronicStyles` prop until you
+start your animation, so you may need to provide your components with
+default values.
+
+
+<!--
+------------------------------------------------------------
+withAnimatronics
+------------------------------------------------------------
+-->
+### <a name='withAnimatronics'></a> withAnimatronics
+
+```js
+withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)
+```
+
+`withAnimatronics` is a function that takes a single, function argument. It
+returns a function that is a higher-order component. The higher-order component
+returns a final component that is an **animatronics component**.
+
+The animatronics component knows how to run animations involving any of its
+descendant [controlled components](#withControl).
+
+You declare animations via the `createAnimationSequences` function that you
+pass into `withAnimatronics`. That function must return one or more
+**animation sequences**.
+
+An animation sequence is an array of objects, where each object represents
+a single **phase** of the animation. Each phase describes the styles for your
+controlled components and how to animate those styles. The objects that
+represent your phases should map your controlled component names to objects
+that describe the animation.
+
+A pseudo-spec for all this looks like:
+
+``` js
+// animation sequence spec
+[
+  {
+    string: {
+      duration: number,
+      easingFn: Function?,
+      start: { [string]: string|number },
+      end: { [string]: string|number },
+    } | {
+      stiffness: number,
+      damping: number,
+      start: { [string]: string|number },
+      end: { [string]: string|number },
+    }
+  }
+]
+```
+
+To return a single animation sequence, return an array that follows the spec
+above. To return multiple animation sequences, return an object that maps string
+names to animation sequence arrays:
+
+```js
+// multiple animation sequences
+{
+  string: [
+    {
+      string: {
+        duration: number,
+        easingFn: Function?,
+        start: { [string]: string|number },
+        end: { [string]: string|number },
+      } | {
+        stiffness: number,
+        damping: number,
+        start: { [string]: string|number },
+        end: { [string]: string|number },
+      }
+    }
+  ]
+}
+```
+
+The `duration` is the number in milliseconds for how long the animation should
+last.
+
+The `easingFn` is an optional function that should represent a [bezier-easing][bezier]
+function. You're welcome to bring your own bezier functions, but you can also use
+the `BezierEasing` import from react-animatronics. The `BezierEasing` is just a
+straight `export BezierEasing from 'bezier-easing`, so please refer to their documentation
+on how to use it.
+
+The `start` and `end` objects map strings to values (strings or numbers). They represent
+the animation's starting and ending styles, respectively. You can use arbitrary strings
+and numbers, but it's more idiomatic to use proper CSS style values since react-animatronics
+will nicely interpolate those values for you.
+
+An overview of what react-animatronics can interpolate for you:
+
+- numbers: `0` to `1`
+- unit strings: `'100px'` to `'200px'`
+- color strings: `red` to `blue`, `#FFFFFF` to `#000000`, `rgba(0, 0, 0, 0)` to `rgba(1, 1, 1, 1)`
+- transform strings: `'translateX(0em)'` to `'translateX(40em)'`
+
+That's all there is to know about the `createAnimationSequences` function,
+but now we should understand what wrapping your components `withAnimtronics`
+does to them.
+
+The component that you wrap `withAnimatronics` will receive the following props:
+
+```
+playAnimation: (string?, Function?) => void
+cancelAnimation: () => void
+```
+
+You call the `playAnimation` function to your animations. It's an overloaded
+function that takes two optional arguments and returns nothing (how
+un-functional). It has four forms:
+
+1. `playAnimation()` — takes no arguments.
+2. `playAnimation('name')` — takes a single string argument.
+3. `playAnimation(() => {})` — takes a single, callback function argument.
+4. `playAnimation('name', () => {})` — takes two arguments, a string and then a callback function.
+
+If you aren't using multiple, named animation sequences (i.e. you aren't
+returning an object from `createAnimationSequences), you don't need to pass a
+string argument — you can call `playAnimation` with no arguments or a single,
+callback function. The callback function takes no arguments and will execute
+when the animation completes.
+
+If you are using multiple, named animation sequences, you must pass in at
+least the string argument to specify which animation you want to run. You can
+optionally pass in a callback as the second argument.
+
+You can call the `cancelAnimation` function while an animation is running to stop
+the animation. This will stop the animation in its tracks — it will not reset the
+styles or do any form of cleanup, that part is up to you.
+
+
+<!--
+------------------------------------------------------------
+Control
+------------------------------------------------------------
+-->
+
+The `<Control/>` component is a wrapper over `withControl`, and it behaves very
+similarly. It expects the following props:
+
+```
+name: string
+children: ReactComponent
+```
+
+The `name` is the name you'll use to refer to the controlled component in your
+animation declarations (it's the same as the argument you pass into
+`withControl`).
+
+The `children` should be a single React component. That child component
+gets wrapped by `withControl` internally and will receive the following props
+
+```
+animatronicStyles: { [string]: string|number }
+```
+
+Refer to the [`withControl`](#withControl) docs for details.
+
+
+<!--
+------------------------------------------------------------
+Animatronics
+------------------------------------------------------------
+-->
+
+
+The `<Animtronics/>` component is a wrapper over `withAnimatronics`, and it behaves very
+similarly. It expects the following props:
+
+```
+createAnimationSequences: () => Array|Object
+children: ReactComponent
+```
+
+The `createAnimationSequences` function should return your animation
+declarations (it's the same as the argument you pass into `withAnimatronics`).
+
+The `children` should be a single React component. That child component gets
+wrapped by `withAnimatronics` internally and will receive the following props
+
+```
+playAnimation: (string?, Function?) => void
+cancelAnimation: () => void
+```
+
+Refer to the [`withAnimatronics`](#withAnimatronics) docs for details.
+
+
+<!--
+------------------------------------------------------------
+Alternative Libraries
+------------------------------------------------------------
+-->
 
 
 <!--
@@ -1264,12 +1513,6 @@ Coming soon.
 Contributing
 ------------------------------------------------------------
 -->
-
-
-### Alternative Libraries
-
-- [react-transition-group][transition]
-- [react-motion][motion]
 
 
 <!--
