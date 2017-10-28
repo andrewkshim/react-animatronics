@@ -1,6 +1,5 @@
 examples/
 node_modules/
 src/
-TODO.md
 yarn.lock
 yarn-error.log
