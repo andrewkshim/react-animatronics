@@ -28,6 +28,14 @@ test('withControl throws a well-formed error when it does not have the correct c
   assert.end();
 });
 
+test('withControl throws a well-formed error when it does not receive a React component', assert => {
+  assert.throws(
+    () => withControl('base', { useStringRefs: true })(undefined),
+    /must be used to wrap a React component/,
+  );
+  assert.end();
+});
+
 test('withControl registers the component when mounted', assert => {
   class Base extends React.Component {
     render() {

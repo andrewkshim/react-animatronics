@@ -10,7 +10,13 @@ import type { Ref, Element, ComponentType } from 'react'
 import type { Styles } from './internal/flow-types'
 
 import ContextTypes from './internal/context-types'
-import { IS_DEVELOPMENT, isStatelessComponent, makeError } from './internal/utils'
+
+import {
+  IS_DEVELOPMENT,
+  isReactComponent,
+  isStatelessComponent,
+  makeError,
+} from './internal/utils'
 
 type Options = {
   useStringRefs?: boolean,
@@ -28,6 +34,19 @@ const withControl = (
 ) => (BaseComponent: ComponentType<{}>): ComponentType<Props> => {
 
   type BaseRef = Element<typeof BaseComponent>;
+
+  if (IS_DEVELOPMENT) {
+    if (!isReactComponent(BaseComponent)) {
+      throw makeError(
+        `withControl() must be used to wrap a React component`
+        + ` but you gave it: ${ BaseComponent }. Make sure that you're`
+        + ` passing in either a component class or a function that returns`
+        + ` an element. A common mistake is to pass in the React element`
+        + ` itself. For example, passing in "<Component/>" instead of "Component",`
+        + ` but you should be passing in the second form.`
+      );
+    }
+  }
 
   class ControlledComponent extends React.Component<Props, State> {
     _ref: ?BaseRef
