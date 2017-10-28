@@ -8,7 +8,6 @@
 import chroma from 'chroma-js'
 
 import type { Styles, BasicFashion } from '../flow-types'
-import Constants from '../constants'
 import { parseStyle, stringifyFashion } from './common-fashionista'
 
 export const interpolateValue = (

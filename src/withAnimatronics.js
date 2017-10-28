@@ -7,11 +7,17 @@ import React from 'react'
 
 import type { VoidFn } from './internal/flow-types'
 
-import Constants from './internal/constants'
 import ContextTypes from './internal/context-types'
-import Polyfills from './internal/polyfills'
 import { IS_DEVELOPMENT, makeError, noop } from './internal/utils'
 import { makeMachinist } from './internal/machines/machinist'
+import {
+  DEFAULT_ANIMATION_NAME,
+  DEFAULT_CANCEL_ANIMATION_FRAME,
+  DEFAULT_CLEAR_TIMEOUT,
+  DEFAULT_NOW,
+  DEFAULT_REQUEST_ANIMATION_FRAME,
+  DEFAULT_SET_TIMEOUT,
+} from './internal/constants'
 
 type Options = {
   requestAnimationFrame?: Function,
@@ -28,11 +34,11 @@ type Props = {
 const withAnimatronics = (
   createAnimationSequences: Function,
   {
-    requestAnimationFrame = Polyfills.DEFAULT_REQUEST_ANIMATION_FRAME,
-    cancelAnimationFrame = Polyfills.DEFAULT_CANCEL_ANIMATION_FRAME,
-    setTimeout = window.setTimeout,
-    clearTimeout = window.clearTimeout,
-    now = Date.now,
+    requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
+    cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
+    setTimeout = DEFAULT_SET_TIMEOUT,
+    clearTimeout = DEFAULT_CLEAR_TIMEOUT,
+    now = DEFAULT_NOW,
   }: Options = {}
 ) => {
   if (IS_DEVELOPMENT) {
@@ -44,23 +50,22 @@ const withAnimatronics = (
     }
   }
 
-  const machinist = makeMachinist();
-  const animatronics = machinist.makeAnimatronicsMachine(
-    createAnimationSequences,
-    requestAnimationFrame.bind(window),
-    cancelAnimationFrame.bind(window),
+  const machinist = makeMachinist(
+    requestAnimationFrame,
+    cancelAnimationFrame,
+    setTimeout,
+    clearTimeout,
     now,
-    setTimeout.bind(window),
-    clearTimeout.bind(window),
   );
+  const animatronics = machinist.makeAnimatronicsMachine(createAnimationSequences);
 
   const playAnimation = (
-    animationName: string = Constants.DEFAULT_ANIMATION_NAME,
+    animationName: string = DEFAULT_ANIMATION_NAME,
     onComplete: VoidFn = noop
   ) => {
     if (typeof animationName === 'function') {
       onComplete = animationName;
-      animationName = Constants.DEFAULT_ANIMATION_NAME;
+      animationName = DEFAULT_ANIMATION_NAME;
     }
     if (IS_DEVELOPMENT) {
       if (typeof animationName !== 'string') {

@@ -1,9 +1,9 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import Constants from '../constants'
-import { constructStyles } from '../fashionistas/timed-fashionista'
+import { DEFAULT_ANIMATION_NAME } from '../constants'
 import { IS_DEVELOPMENT, makeError } from '../utils'
+import { constructStyles } from '../fashionistas/timed-fashionista'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
@@ -27,7 +27,7 @@ export const makeSequence = state => animationName => {
   const { createAnimationSequences, nodes } = state;
   const sequences = createAnimationSequences(nodes);
   const namedSequences = Array.isArray(sequences)
-    ? { [Constants.DEFAULT_ANIMATION_NAME]: sequences }
+    ? { [DEFAULT_ANIMATION_NAME]: sequences }
     : sequences;
   const sequence = namedSequences[animationName];
 
@@ -260,8 +260,8 @@ export const makeReducers = machinist => ({
   CREATE_ENDLESS_JOB_MACHINE: (state, action) => {
     const { componentName } = action;
     const machine = machinist.makeEndlessJobMachine(
-      state.requestAnimationFrame,
-      state.cancelAnimationFrame
+      machinist.requestAnimationFrame,
+      machinist.cancelAnimationFrame
     );
     state.endlessJobMachines[componentName] = machine;
   },
@@ -281,9 +281,9 @@ export const makeReducers = machinist => ({
     const { componentName, duration } = action;
     const machine = machinist.makeTimedJobMachine(
       duration,
-      state.requestAnimationFrame,
-      state.cancelAnimationFrame,
-      state.now,
+      machinist.requestAnimationFrame,
+      machinist.cancelAnimationFrame,
+      machinist.now,
     );
     state.timedJobMachines[componentName] = machine;
   },
@@ -317,7 +317,7 @@ export const makeReducers = machinist => ({
   },
   RUN_DELAYED_ANIMATION: (state, action) => {
     const { componentName, delay, job } = action;
-    state.timeouts[componentName] = state.setTimeout(job, delay);
+    state.timeouts[componentName] = machinist.setTimeout(job, delay);
   },
   SET_CREATE_ANIMATION_SEQUENCES: (state, action) => {
     const { createAnimationSequences } = action;
@@ -336,7 +336,7 @@ export const makeReducers = machinist => ({
   STOP_MACHINE: (state, action) => {
     const { job } = action;
     Object.values(state.timedJobMachines).forEach(machine => machine.stop());
-    Object.values(state.timeouts).forEach(timeout => state.clearTimeout(timeout));
+    Object.values(state.timeouts).forEach(timeout => machinist.clearTimeout(timeout));
     state.timedJobMachines = {};
     state.timeouts = {};
   },
@@ -358,14 +358,7 @@ export const makeReducers = machinist => ({
   }
 });
 
-export const makeAnimatronicsMachine = machinist => (
-  createAnimationSequences,
-  requestAnimationFrame,
-  cancelAnimationFrame,
-  now,
-  setTimeout,
-  clearTimeout,
-) => {
+export const makeAnimatronicsMachine = machinist => createAnimationSequences => {
   const state = {
     nodes: {},
     styleUpdaters: {},
@@ -376,11 +369,6 @@ export const makeAnimatronicsMachine = machinist => (
     componentCountdownMachine: null,
     phasesCountdownMachine: null,
     createAnimationSequences,
-    requestAnimationFrame,
-    cancelAnimationFrame,
-    now,
-    setTimeout,
-    clearTimeout,
   };
 
   const reducers = makeReducers(machinist);

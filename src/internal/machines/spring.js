@@ -1,9 +1,12 @@
 import type { VoidFn, Styles, SpringMachine } from '../../flow-types'
 
-import Constants from '../constants'
 import { noop } from '../utils'
 import { parseStyle } from '../fashionistas/common-fashionista'
 import { reconstructStyles, interpolateValue } from '../fashionistas/spring-fashionista'
+import {
+  SECONDS_PER_ANIMATION_FRAME,
+  MS_PER_ANIMATION_FRAME,
+} from '../constants'
 
 // Springs can sometimes take a few iterations to get started. Need to set a minimum
 // number of iterations before we mark a spring as "stopped" so we don't accidentally
@@ -29,11 +32,11 @@ const calculateVelocity = (
   const spring: number = -stiffness * (currentPosition - endPosition);
   const damper: number = -damping * currentVelocity;
   const acceleration: number = spring + damper;
-  return currentVelocity + (acceleration * Constants.SECONDS_PER_ANIMATION_FRAME);
+  return currentVelocity + (acceleration * SECONDS_PER_ANIMATION_FRAME);
 };
 
 const calculateValue = (currentValue: number, velocity: number): number =>
-  currentValue + (velocity * Constants.SECONDS_PER_ANIMATION_FRAME);
+  currentValue + (velocity * SECONDS_PER_ANIMATION_FRAME);
 
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
@@ -169,9 +172,9 @@ const runNextFrame = (state, dispatch) => (
     accumulatedTime: state.accumulatedTime + timeSinceLastFrame,
   });
 
-  const numFramesBehind = Math.floor(state.accumulatedTime / Constants.MS_PER_ANIMATION_FRAME);
-  const remainingTime = numFramesBehind * Constants.MS_PER_ANIMATION_FRAME;
-  const progress = (state.accumulatedTime - remainingTime) / Constants.MS_PER_ANIMATION_FRAME;
+  const numFramesBehind = Math.floor(state.accumulatedTime / MS_PER_ANIMATION_FRAME);
+  const remainingTime = numFramesBehind * MS_PER_ANIMATION_FRAME;
+  const progress = (state.accumulatedTime - remainingTime) / MS_PER_ANIMATION_FRAME;
 
   syncToLatestFrame(state, dispatch)(numFramesBehind);
   moveToNextFrame(state, dispatch)(progress);
@@ -186,7 +189,7 @@ const runNextFrame = (state, dispatch) => (
 
   dispatch({
     type: 'UPDATE_ACCUMULATED_TIME',
-    accumulatedTime: state.accumulatedTime - (numFramesBehind * Constants.MS_PER_ANIMATION_FRAME)
+    accumulatedTime: state.accumulatedTime - (numFramesBehind * MS_PER_ANIMATION_FRAME)
   });
   dispatch({ type: 'INCREMENT_NUM_ITERATIONS' });
 }

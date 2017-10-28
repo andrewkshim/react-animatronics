@@ -4,8 +4,20 @@ import { makeEndlessJobMachine } from './endless-job'
 import { makeSpringMachine } from './spring'
 import { makeTimedJobMachine } from './timed-job'
 
-export const makeMachinist = () => {
-  const machinist = {};
+export const makeMachinist = (
+  requestAnimationFrame,
+  cancelAnimationFrame,
+  setTimeout,
+  clearTimeout,
+  now,
+) => {
+  const machinist = {
+    requestAnimationFrame: (...args) => requestAnimationFrame(...args),
+    cancelAnimationFrame: (...args) => cancelAnimationFrame(...args),
+    setTimeout: (...args) => setTimeout(...args),
+    clearTimeout: (...args) => clearTimeout(...args),
+    now: (...args) => now(...args),
+  };
 
   machinist.makeAnimatronicsMachine = makeAnimatronicsMachine(machinist);
   machinist.makeCountdownJobMachine = makeCountdownJobMachine(machinist);
