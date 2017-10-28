@@ -40,7 +40,7 @@ involving multiple components scattered throughout your component hierarchy.
 
 This section is just a bunch of example code plus some comments. You can get
 started just by following the examples, but when you're ready to dig into the
-details, take a look at the [Detailed Walkthrough](#detailed-walkthrough).
+details, take a look at the [Full API Documentation](#docs).
 
 Each example has an accompanying [CodeSandbox][sandbox] demo link at the end.
 
