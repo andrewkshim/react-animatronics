@@ -11,9 +11,8 @@ for your React components.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Quick Guide](#quick-guide)
-- [Full API Documentation](#docs)
 - [Examples](#examples)
+- [Full API Documentation](#docs)
 - [Alternative Libraries](#alternative-libraries)
 
 
@@ -30,22 +29,34 @@ yarn add react-animatronics
 
 <!--
 ============================================================
-Quick Guide
+Examples
 ============================================================
 -->
-## Quick Guide
+## Examples
 
-React Animatronics provides components that let you describe animations
-involving multiple components scattered throughout your component hierarchy.
+Lots of folks learn best by looking at and playing with actual code, so section
+is a bunch of example code plus some comments.  Each example has an
+accompanying [CodeSandbox][sandbox] demo link at the end.
 
-This section is just a bunch of example code plus some comments. You can get
-started just by following the examples, but when you're ready to dig into the
-details, take a look at the [Full API Documentation](#docs).
+You can probably learn to use react-animatronics just by looking through the
+examples, but when you're ready to dig into the details, take a look at the
+[Full API Documentation](#docs).
 
-Each example has an accompanying [CodeSandbox][sandbox] demo link at the end.
+### List of Examples
+
+- [Example 1: Basics](#example-1)
+- [Example 2: HoCs (Higher-Order Components)](#example-2)
+- [Example 3: Multi-Phase Animations](#example-3)
+- [Example 4: Multi-Component Animations](#example-4)
+- [Example 5: Refs and DOM Nodes](#example-5)
+- [Example 6: Delays](#example-6)
+- [Example 7: Springs](#example-7)
+- [Example 8: Dynamic Components](#example-8)
 
 
-### Example 1: Basics
+### <a name='example-1'></a> Example 1: Basics
+
+CodeSandbox link: https://codesandbox.io/s/47pyw86jw
 
 ```js
 import React from 'react'
@@ -128,15 +139,16 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/47pyw86jw
 
+### <a name='example-2'></a> Example 2: HoCs (Higher-Order Components)
 
-### Example 2: HoCs (Higher-Order Components)
+CodeSandbox link: https://codesandbox.io/s/0o4349zlon
 
-I'm a fan of being functional, so react-animatronics provides [higher-order component][hocs]
-versions of the `<Animatronics/>` and `<Control/>` components. You can use the functions
-`withAnimatronics` and `withControl` much the same way you'd use their component counterparts.
-They also work great with [recompose][recompose].
+I'm a fan of functional programming, so react-animatronics provides
+[higher-order component][hocs] versions of the `<Animatronics/>` and
+`<Control/>` components. You can use the functions `withAnimatronics` and
+`withControl` much the same way you'd use their component counterparts.  They
+also work great with [recompose][recompose].
 
 ```js
 import React from 'react'
@@ -194,10 +206,10 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/0o4349zlon
 
+### <a name='example-3'></a> Example 3: Multi-Phase Animations
 
-### Example 3: Multi-Phase Animations
+CodeSandbox link: https://codesandbox.io/s/r78352vxom
 
 "Multi-phase animations" sound fancy, but they're simple. Rather than having
 your animations do a single thing (having just one phase) like in the previous
@@ -272,10 +284,10 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/r78352vxom
 
+### <a name='example-4'></a> Example 4: Multi-Component Animations
 
-### Example 4: Multi-Component Animations
+CodeSandbox link: https://codesandbox.io/s/xl4v12nyj4
 
 Another fancy-sounding title but simple concept. Rather than animating a single
 component like in the previous examples, you can animate multiple components
@@ -379,10 +391,10 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/xl4v12nyj4
 
+### <a name='example-5'></a> Example 5: Refs and DOM Nodes
 
-### Example 5: Refs and DOM Nodes
+CodeSandbox link: https://codesandbox.io/s/7wpkolroz0
 
 Wrapping a component with `<Control/>` or `withControl` has a secret effect, it'll
 grab the `ref` of your component so you can use it in `createAnimationSequences`.
@@ -483,10 +495,10 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/7wpkolroz0
 
+### <a name='example-6'></a> Example 6: Delays
 
-### Example 6: Delays
+CodeSandbox link: https://codesandbox.io/s/mj5mnyxr9x
 
 You can provide your animations with a `delay` if you want to have the animation
 run a little bit later. You can use this to create staggered animations within
@@ -565,13 +577,13 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/mj5mnyxr9x
 
+### <a name='example-7'></a> Example 7: Springs
 
-### Example 7: Springs
+CodeSandbox link: https://codesandbox.io/s/3r61zv3lx6
 
-Up until now, we've used time `durations` in our animations, but we can also
-use springs by providing a `stiffness` and `damping`.
+Up until now, we've used time `durations` in our animations, but we can use
+springs instead by providing a `stiffness` and `damping`.
 
 ```js
 import React from 'react'
@@ -632,8 +644,6 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/3r61zv3lx6
-
 You'll be familiar with springs if you've used [react-motion][motion]. If this
 is the first time you've encountered them, I highly recommend you look into
 react-motion because it's all about springs and their docs provide a much
@@ -654,7 +664,9 @@ understand spring animations is to go in and tweak the `stiffness` and `damping`
 parameters to see how they affect the animation.
 
 
-### Example 8: Dynamic Components
+### <a name='example-8'></a> Example 8: Dynamic Components
+
+CodeSandbox link: https://codesandbox.io/s/v0ko8zjm05
 
 Sometimes you'll want to declare animations for dyanmic components — components
 that aren't known beforehand. All the previous examples demonstrated animations
@@ -779,8 +791,6 @@ ReactDOM.render(
 );
 ```
 
-CodeSandbox link: https://codesandbox.io/s/v0ko8zjm05
-
 This is the most dense example. The main idea is that you're passing in an
 updated `createAnimationSequences` prop to the `<AniamtedLetters/>` component
 every time the `text` updates. Then, when the `<Letters/>` component renders,
@@ -804,30 +814,10 @@ Coming soon.
 
 <!--
 ------------------------------------------------------------
-Examples
+Contributing
 ------------------------------------------------------------
 -->
-## Examples
 
-You can find running examples under [`examples/src/`](./examples/src).
-
-To run the examples:
-
-```bash
-# clone the repo
-git@github.com:andrewkshim/react-animatronics.git
-
-# go into the repo
-cd react-animatronics
-
-# install the dependencies
-yarn install
-
-# run the examples
-yarn run examples
-
-# open localhost:8080 in your browser
-```
 
 ### Alternative Libraries
 
