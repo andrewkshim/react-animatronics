@@ -11,19 +11,8 @@ for your React components.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage](#usage)
-- [API Documentation](#docs)
-  - [withControl](#withControl)
-  - [withAnimatronics](#withAnimatronics)
-    - [createAnimationSequences](#createanimationsequences)
-    - [Executing your Animations](#executing-your-animations)
-      - [playAnimation](#playAnimation)
-      - [rewindAnimation](#rewindAnimation)
-    - [What can be Animated?](#what-can-be-animated)
-    - [More Animation Options](#more-animation-options)
-      - [Custom Easing Functions](#custom-easing-functions)
-      - [Spring Animations](#spring-animations)
-      - [Animation Options Summary](#animation-options-summary)
+- [Quick Guide](#quick-guide)
+- [Full API Documentation](#docs)
 - [Examples](#examples)
 - [Alternative Libraries](#alternative-libraries)
 
@@ -41,573 +30,776 @@ yarn add react-animatronics
 
 <!--
 ============================================================
-Usage
+Quick Guide
 ============================================================
 -->
-## Usage
+## Quick Guide
 
-React Animatronics provides [higher-order components][hocs] that let you describe
-animations involving multiple components scattered throughout your component
-hierarchy.
+React Animatronics provides components that let you describe animations
+involving multiple components scattered throughout your component hierarchy.
 
-A quick, basic example:
+This section is just a bunch of example code plus some comments. You can get
+started just by following the examples, but when you're ready to dig into the
+details, take a look at the [Detailed Walkthrough](#detailed-walkthrough).
+
+Each example has an accompanying [CodeSandbox][sandbox] demo link at the end.
+
+
+### Example 1: Basics
 
 ```js
 import React from 'react'
-import { withAnimatronics, withControl } from 'react-animatronics'
+import ReactDOM from 'react-dom'
 
-const Square = withControl('square')(
-  ({ animatronicStyles }) => (
-    <div
-      style={{
-        height: animatronicStyles.height || '100px',
-        width: '100px',
-        backgroundColor: 'blue'
-      }}
-    />
-  )
+import { Animatronics, Control } from 'react-animatronics'
+
+// The 'Control' component will register itself when it mounts, meaning that it
+// can then be "controlled" and animated by the parent 'Animatronics'
+// component. Any component that you want to include in your animations must be
+// wrapped by a Control. The 'name' prop you pass into Control will be used later
+// inside the Animatronics component to reference your controlled component.
+// The Control component must have a single child, and that child will receive
+// an 'animatronicStyles' prop that is an object containing the interpolated
+// styles. See the Rect component directly below.
+const ControlledRect = () => (
+  <Control name='myRect'>
+    <Rect/>
+  </Control>
 );
 
-const App = withAnimatronics(
-  () => [
+// This 'Rect' should not be used directly. Rather, we're going to use the
+// 'ControlledRect' above since it's wrapped by the 'Control'. Since the
+// Rect is a child of Control, it receives an 'animatronicStyles' prop that
+// is an object containing the interpolated styles e.g. '{ left: "42.42px" }'.
+// It's up to you how to use the animatronicStyles, you can inject them into
+// the "style" prop or do something else. Just don't forget to use them!
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      // set a default height of '100px' when the component is not animating
+      height: animatronicStyles.height || '100px',
+      width: '100px',
+      backgroundColor: 'blue'
+    }}
+  />
+);
+
+// Similar to the 'Control' component, the 'Animatronics' component is a
+// wrapper that must have a single child. That child will receive as props a
+// function 'playAnimation' that you can call anytime to run your animations.
+// To declare an animation, you must pass in a 'createAnimationSequences'
+// function to the Animatronics component. In this example, we're returning
+// an array that describes the animation we want to run. There's a bit more to
+// this part of the API though, if you're curious, read through the Detailed
+// Walkthough's section on createAnimationSequences.
+const AnimatedApp = () => (
+  <Animatronics createAnimationSequences={() => [
     {
-      square: {
-        duration: 500,
-        start: { height: '100px' },
-        end: { height: '200px' }
+      myRect: {
+        duration: 350, // milliseconds
+        start: { height: '100px' }, // your starting styles
+        end: { height: '200px' } // your ending styles
       }
     }
-  ]
-)(
-  ({ playAnimation }) => (
-    <div>
-      <button onClick={() => playAnimation()}>Play animation</button>
-      <Square/>
-    </div>
-  )
+  ]}>
+    <App/>
+  </Animatronics>
+);
+
+// Just like the 'Rect', the 'App' component should not be used directly since
+// it's wrapped by 'Animatronics' in the 'AnimatedApp' component. Since the App
+// is the child of Animatronics, it receives a 'playAnimation' function as props.
+// You can call playAnimation at any time to execute the animation you declared
+// in the Animatronics 'createAnimationSequences' function.
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+  </div>
+);
+
+// This example will render a button and a blue square. Clicking the button will
+// cause the square to animate for 350ms from a height of 100px to 200px.
+ReactDOM.render(
+  <AnimatedApp/>,
+  document.getElementById('root')
 );
 ```
 
-This example will render a button and a blue square. Clicking the
-button will cause the square to animate for 500ms to a height of
-200px.
+CodeSandbox link: https://codesandbox.io/s/47pyw86jw
 
 
-<!--
-============================================================
-API Documentation
-============================================================
--->
-## <a name='docs'></a> API Documentation
+### Example 2: HoCs (Higher-Order Components)
+
+I'm a fan of being functional, so react-animatronics provides [higher-order component][hocs]
+versions of the `<Animatronics/>` and `<Control/>` components. You can use the functions
+`withAnimatronics` and `withControl` much the same way you'd use their component counterparts.
+They also work great with [recompose][recompose].
 
 ```js
-import { withControl, withAnimatronics } from 'react-animatronics'
-```
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-<!--
-------------------------------------------------------------
-withControl
-------------------------------------------------------------
--->
-### <a name='withControl'></a> withControl
+import { withAnimatronics, withControl } from 'react-animatronics'
 
-```
-withControl(string): (ReactComponent) => (ReactComponent)
-```
-
-`withControl` is a function that returns another function. It takes a string as
-its only argument. The returned function takes a React component as its only
-argument and returns a final React component (i.e. it's a higher-order
-component). That final component is a **controlled component**.
-
-The string is the name you use to reference the component in
-[`withAnimatronics`](#withAnimatronics):
-
-```js
-const higherOrderComponent = withControl('helloWorld');
-const ControlledComponent = higherOrderComponent(
-  ({ animatronicStyles }) => <div style={ animatronicStyles }/>
+// Same 'Rect' from Example 1.
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      // set a default height of '100px' when the component is not animating
+      height: animatronicStyles.height || '100px',
+      width: '100px',
+      backgroundColor: 'blue'
+    }}
+  />
 );
 
-// The helloWorld property in the object below corresponds to the 'helloWorld'
-// string passed into withControl and the associated animation will be applied
-// to the ControlledComponent.
-const App = withAnimatronics(() => [
+// 'withControl' is a function that takes a string argument that is the same as
+// the 'name' prop you'd pass into the <Control/> component. It then returns a
+// function that takes the base component as its only argument.
+const ControlledRect = withControl('myRect')(Rect);
+
+// Same 'App' from Example 1.
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+  </div>
+);
+
+// 'withAnimatronics' is a function that takes a function argument that is the
+// same as the 'createAnimationSequences' prop you'd pass into the <Animatronics/>
+// component. If then returns a function that takes the base component as its
+// only argument.
+const AnimatedApp = withAnimatronics(() => [
   {
-    helloWorld: {
-      duration: 500,
-      start: { left: '100px' },
+    myRect: {
+      duration: 350, // milliseconds
+      start: { height: '100px' }, // your starting styles
+      end: { height: '200px' } // your ending styles
+    }
+  }
+])(App);
+
+// Just like Example 1, but now your components are powered by HoCs. This
+// example will render a button and a blue square. Clicking the button will
+// cause the square to animate for 350ms from a height of 100px to 200px.
+ReactDOM.render(
+  <AnimatedApp/>,
+  document.getElementById('root')
+);
+```
+
+CodeSandbox link: https://codesandbox.io/s/0o4349zlon
+
+
+### Example 3: Multi-Phase Animations
+
+"Multi-phase animations" sound fancy, but they're simple. Rather than having
+your animations do a single thing (having just one phase) like in the previous
+examples, you can declare your animations in `createAnimationSequences` to execute
+multiple phases that run in sequence, one after the other.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      top: animatronicStyles.top || '20px',
+      left: animatronicStyles.left || '20px',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      position: 'absolute',
+    }}
+  />
+);
+
+const ControlledRect = withControl('myRect')(Rect);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+  </div>
+);
+
+// This is where things get interesting. Rather than returning just a single-element
+// array, we can return an array with as many elements as we want. The animations will
+// fire in sequence, one after the other.
+const AnimatedApp = withAnimatronics(() => [
+  // phase 1: move down
+  {
+    myRect: {
+      duration: 350,
+      start: { top: '20px' },
+      end: { top: '200px' }
+    }
+  },
+  // phase 2: move to the right
+  {
+    myRect: {
+      duration: 350,
+      start: { left: '20px' },
       end: { left: '200px' }
     }
-  }
-])(() => <ControlledComponent/>);
-```
-
-We'll go into more detail on `withAnimatronics` later. For now, it's only
-important to know that the string you put into `withControl` will be used in
-`withAnimatronics`.
-
-The component you pass into the higher-order component will receive an
-additional prop called `animatronicStyles`. This is an object that contains the
-interpolated style values for the current animation frame. The styles that get
-included are determined by what you declare in the `start` and `end` of your
-animation — this is another `withAnimatronics` detail we'll go into later.
-
-Here are some ways you can use the `animatronicStyles` in your components:
-
-```js
-// If you just want to use the animatronicStyles.
-const YourComponent = withControl('square')(
-  ({ animatronicStyles }) => (
-    <div
-      style={ animatronicStyles }
-    />
-  )
-);
-
-// If you have styles you want to keep static, you can use specific
-// values from animatronicStyles while keeping other styles unchanged.
-const YourComponent = withControl('square')(
-  ({ animatronicStyles }) => (
-    <div
-      style={{
-        top: animatronicStyles.top,
-        backgroundColor: 'blue'
-      }}
-    />
-  )
-);
-
-// If you always want the animatronicStyles to take precedence, you
-// can use object spread.
-const YourComponent = withControl('square')(
-  ({ animatronicStyles }) => (
-    <div
-      style={{
-        top: '100px',
-        backgroundColor: 'blue',
-        ...animatronicStyles
-      }}
-    />
-  )
-);
-```
-
-
-<!--
-------------------------------------------------------------
-withAnimatronics
-------------------------------------------------------------
--->
-### <a name='withAnimatronics'></a> withAnimatronics
-
-```js
-withAnimatronics(() => Array|Object): (ReactComponent) => (ReactComponent)
-```
-
-`withAnimatronics` is a function that takes a single, function argument. It
-returns a function that is a higher-order component. The higher-order component
-returns a final component that is an **animatronics component**.
-
-```js
-const higherOrderComponent = withAnimatronics(() => {});
-const AnimatronicsComponent = higherOrderComponent(YourComponent);
-
-// Or, on one line.
-const AnimatronicsComponent  = withAnimatronics(() => {})(YourComponent);
-```
-
-The animatronics component knows how to run animations involving any of its
-descendant [controlled components](#withControl).
-
-The function you pass into `withAnimatronics` is internally named `createAnimationSequences`,
-and it's described in the next section.
-
-
-<!--
-------------------------------------------------------------
-createAnimationSequences
-------------------------------------------------------------
--->
-#### createAnimationSequences
-
-The function you pass into `withAnimatronics` is internally named `createAnimationSequences`
-because it must return one or more **animation sequences**. We'll go into animation sequences
-shortly, but there's an important detail about `createAnimationSequences` I don't want to miss
-since it can help you build interesting animations.
-
-When `createAnimationSequences` executes, it'll be called with an object that maps the
-names of your [controlled components](#withControl) to their DOM nodes:
-
-```js
-const Square = withControl('mySquare')(
-  () => <div/>
-);
-
-const Circle = withControl('myCircle')(
-  () => <div/>
-);
-
-const createAnimationSequences = (nodes) => {
-  const { mySquare, myCircle } = nodes;
-  const { left: squareLeft, top: squareTop } = mySquare.getBoundingClientRect();
-  const { left: circleLeft, top: circleTop } = myCircle.getBoundingClientRect();
-
-  // use the DOM properties to create your animation sequences
-  const animationSequences = /* ... */;
-  return animationSequences;
-};
-
-const higherOrderComponent = withAnimatronics(createAnimationSequences);
-```
-
-This makes it so you can find the exact positions of your elements and create
-animation sequences that are adjusted to where your elements are at the moment
-you execute the animation. Keep this in mind as we talk about animation
-sequences next.
-
-An animation sequence is an array of objects, where each object represents
-a single **phase** of the animation. Each phase describes the styles for your
-controlled components and how to animate those styles:
-
-```js
-// Phase 1 describes two components (mySquare and myCircle) simultaneously animating
-// their top positions from 0px to 100px for a 500ms duration.
-const phase1 = {
-  mySquare: {
-    duration: 500,
-    start: { top: '0px' },
-    end: { top: '100px' },
   },
-  myCircle: {
-    duration: 500,
-    start: { top: '0px' },
-    end: { top: '100px' },
+  // phase 3: move diagonally down to the right
+  {
+    myRect: {
+      duration: 350,
+      start: { top: '200px', left: '200px' },
+      end: { top: '300px', left: '300px' }
+    }
   }
-};
+])(App);
 
-// Phase 2 describes the same two components both animating their top positions
-// further from 100px to 200px for a 500ms duration.
-const phase2 = {
-  mySquare: {
-    duration: 500,
-    start: { top: '100px' },
-    end: { top: '200px' },
-  },
-  myCircle: {
-    duration: 500,
-    start: { top: '100px' },
-    end: { top: '200px' },
-}
-
-// The order of the phases gets determined by their position in the sequence.
-const animationSequence = [ phase1, phase2 ];
-
-// This animationSequence is what you need to return in createAnimationSequences.
-const createAnimationSequences = () => {
-  return animationSequence;
-};
-
-const higherOrderComponent = withAnimatronics(createAnimationSequences);
+// In this example, you'll see a blue square that animates its position
+// in a sequence of moves.
+ReactDOM.render(
+  <AnimatedApp/>,
+  document.getElementById('root')
+);
 ```
 
-In the above example, we're constructing static phases, but we could also construct
-phases based on the DOM nodes of our controlled components:
+CodeSandbox link: https://codesandbox.io/s/r78352vxom
+
+
+### Example 4: Multi-Component Animations
+
+Another fancy-sounding title but simple concept. Rather than animating a single
+component like in the previous examples, you can animate multiple components
+(remember to wrap your components with `<Control/>` or `withControl()`).
 
 ```js
-const Square = withControl('mySquare')(
-  () => <div/>
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      top: animatronicStyles.top || '20px',
+      left: animatronicStyles.left || '20px',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      position: 'absolute',
+    }}
+  />
 );
 
-const Circle = withControl('myCircle')(
-  () => <div/>
+const ControlledRect = withControl('myRect')(Rect);
+
+const Circle = ({ animatronicStyles }) => (
+  <div
+    style={{
+      top: animatronicStyles.top || '20px',
+      left: animatronicStyles.left || '20px',
+      height: '100px',
+      width: '100px',
+      borderRadius: '50px',
+      backgroundColor: 'red',
+      position: 'absolute',
+    }}
+  />
+)
+
+const ControlledCircle = withControl('myCircle')(Circle);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+    <ControlledCircle/>
+  </div>
 );
 
-// The following animation sequence will cause myCircle and mySquare to
-// switch positions.
-const createAnimationSequences = (nodes) => {
-  const { mySquare, myCircle } = nodes;
-  const { left: squareLeft, top: squareTop } = mySquare.getBoundingClientRect();
-  const { left: circleLeft, top: circleTop } = myCircle.getBoundingClientRect();
-  return [
-    mySquare: {
-      duration: 500,
-      start: { left: `${ squareLeft }px`, top: `${ squareTop }px` },
-      end: { left: `${ circleLeft }px`, top: `${ circleTop }px` }
+// Within each phase, you can declare animations for more than one component.
+const AnimatedApp = withAnimatronics(() => [
+  // phase 1
+  {
+    myRect: {
+      duration: 350,
+      start: { top: '20px' },
+      end: { top: '200px' }
     },
     myCircle: {
-      duration: 500,
-      start: { left: `${ circleLeft }px`, top: `${ circleTop }px` }
-      end: { left: `${ squareLeft }px`, top: `${ squareTop }px` },
+      duration: 350,
+      start: { left: '20px' },
+      end: { left: '200px' }
+    }
+  },
+  // phase 2
+  {
+    myRect: {
+      duration: 350,
+      start: { left: '20px' },
+      end: { left: '200px' }
+    },
+    myCircle: {
+      duration: 350,
+      start: { top: '20px' },
+      end: { top: '200px' }
+    }
+  },
+  // phase 3
+  {
+    myRect: {
+      duration: 350,
+      start: { top: '200px', left: '200px' },
+      end: { top: '300px', left: '300px' }
+    },
+    myCircle: {
+      duration: 350,
+      start: { top: '200px', left: '200px' },
+      end: { top: '300px', left: '300px' }
+    }
+  }
+])(App);
+
+// In this example, you'll see a blue square and red circle that animate their
+// positions in a sequence of moves.
+ReactDOM.render(
+  <AnimatedApp/>,
+  document.getElementById('root')
+);
+```
+
+CodeSandbox link: https://codesandbox.io/s/xl4v12nyj4
+
+
+### Example 5: Refs and DOM Nodes
+
+Wrapping a component with `<Control/>` or `withControl` has a secret effect, it'll
+grab the `ref` of your component so you can use it in `createAnimationSequences`.
+At the moment, I can think of only one use case for this, but it's a pretty cool one.
+When you're declaring your animations, you can reference your components' DOM nodes
+and make animations based on their current positions. Enough words, code!
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+class Circle extends React.Component {
+  render() {
+    const { animatronicStyles } = this.props
+    return (
+      <div
+        style={{
+          top: animatronicStyles.top || '20px',
+          left: animatronicStyles.left || '20px',
+          height: '100px',
+          width: '100px',
+          borderRadius: '50px',
+          backgroundColor: 'tomato',
+          position: 'absolute',
+        }}
+      />
+    );
+  }
+}
+
+const ControlledCircleA = withControl('circleA')(Circle);
+const ControlledCircleB = withControl('circleB')(Circle);
+const ControlledCircleC = withControl('circleC')(Circle);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledCircleA/>
+    <ControlledCircleB/>
+    <ControlledCircleC/>
+  </div>
+);
+
+const AnimatedApp = withAnimatronics(({ circleA, circleB, circleC }) => {
+  const { left: leftA, top: topA } = circleA.getBoundingClientRect();
+  const { left: leftB, top: topB } = circleB.getBoundingClientRect();
+  const { left: leftC, top: topC } = circleC.getBoundingClientRect();
+  return [
+    // phase 1
+    {
+      circleA: {
+        duration: 350,
+        start: { left: '20px' },
+        end: { left: '200px' }
+      },
+      circleB: {
+        duration: 350,
+        start: { top: '20px', left: '20px' },
+        end: { top: '200px', left: '100px' }
+      },
+      circleC: {
+        duration: 350,
+        start: { top: '20px', left: '20px' },
+        end: { top: '200px', left: '300px' }
+      },
+    },
+    // phase 2
+    {
+      circleA: {
+        duration: 350,
+        start: { top: `${topA}px`, left: '200px' },
+        end: { top: `${topB}px`, left: `${leftB}px` }
+      },
+      circleB: {
+        duration: 350,
+        start: { top: '200px', left: '100px' },
+        end: { top: `${topC}px`, left: `${leftC}px` }
+      },
+      circleC: {
+        duration: 350,
+        start: { top: '200px', left: '300px' },
+        end: { top: `${topA}px`, left: `${leftA}px` }
+      },
     }
   ];
-};
+}
+)(App);
 
-const higherOrderComponent = withAnimatronics(createAnimationSequences);
+// In this example, you'll see three circles animate into a triangle formation
+// and then rotate counter clockwise.
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
 ```
 
-In all the previous examples, we've had `createAnimationSequences` return
-a single animation sequence which means we can only ever run that one sequence
-when we [execute our animation](#executing-your-animations). However, you'll
-sometimes want to define multiple, named sequences and decide at runtime
-which one you want to execute.
+CodeSandbox link: https://codesandbox.io/s/7wpkolroz0
 
-To do this, you can have `createAnimationSequences` return an object where the
-keys are arbitrary names and the values are animation sequence arrays.
 
-```
-const createAnimationSequences = () => {
-  return {
-    animationSequence1: [ /* ... */ ],
-    animationSequence2: [ /* ... */ ],
+### Example 6: Delays
+
+You can provide your animations with a `delay` if you want to have the animation
+run a little bit later. You can use this to create staggered animations within
+your phases.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+class Circle extends React.Component {
+  render() {
+    const { animatronicStyles } = this.props
+    return (
+      <div
+        style={{
+          top: animatronicStyles.top || '20px',
+          left: animatronicStyles.left || '20px',
+          height: '100px',
+          width: '100px',
+          borderRadius: '50px',
+          backgroundColor: 'lavender',
+          position: 'absolute',
+        }}
+      />
+    );
   }
 }
+
+const ControlledCircleA = withControl('circleA')(Circle);
+const ControlledCircleB = withControl('circleB')(Circle);
+const ControlledCircleC = withControl('circleC')(Circle);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledCircleA/>
+    <ControlledCircleB/>
+    <ControlledCircleC/>
+  </div>
+);
+
+const AnimatedApp = withAnimatronics(() => {
+  return [
+    {
+      circleA: {
+        duration: 800,
+        start: { left: '20px' },
+        end: { left: '300px' }
+      },
+      circleB: {
+        duration: 800,
+        delay: 300,
+        start: { left: '20px' },
+        end: { left: '300px' }
+      },
+      circleC: {
+        duration: 800,
+        delay: 600,
+        start: { left: '20px' },
+        end: { left: '300px' }
+
+      }
+    }
+  ];
+}
+)(App);
+
+// In this example, you'll see three circles animate left in a staggered sequence.
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
 ```
 
-You can then choose to execute either `"animationSequence1"` or
-`"animationSequence2"` (or whatever you decide to name them) when it comes time
-to run your animations, which brings us to the next section.
+CodeSandbox link: https://codesandbox.io/s/mj5mnyxr9x
 
 
-<!--
-------------------------------------------------------------
-Executing your Animations
-------------------------------------------------------------
--->
-#### Executing your Animations
+### Example 7: Springs
 
-Once you've setup [`withControl`](#withControl) and [`withAnimatronics`](#withAnimatronics),
-you can execute your animations.
-
-The component you pass into the `withAnimatronics` higher-order component can execute
-animations via two props:
+Up until now, we've used time `durations` in our animations, but we can also
+use springs by providing a `stiffness` and `damping`.
 
 ```js
-const createAnimationSequences = () => [];
-const higherOrderComponent = withAnimatronics(createAnimationSequences);
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-// YourComponent receives playAnimation and rewindAnimation as props from
-// the higherOrderComponent.
-const YourComponent = ({ playAnimation, rewindAnimation }) => <div/>;
+import { withAnimatronics, withControl } from 'react-animatronics'
 
-const AnimatronicsComponent = higherOrderComponent(YourComponent);
-```
-
-To execute your animations normally, you can call `playAnimation`. In less
-common cases, you may want to rewind the last animation with `rewindAnimation`.
-
-
-<!--
-------------------------------------------------------------
-playAnimation
-------------------------------------------------------------
--->
-##### <a name='playAnimation'></a> playAnimation
-
-```js
-playAnimation(string?, Function?): void
-```
-
-`playAnimation` starts your animations. It's an overloaded function that takes
-two optional arguments and returns nothing (how un-functional). It has four
-forms:
-
-1. `playAnimation()` — takes no arguments.
-2. `playAnimation('name')` — takes a single string argument.
-3. `playAnimation(() => {})` — takes a single, callback function argument.
-4. `playAnimation('name', () => {})` — takes two arguments, a string and then a callback function.
-
-If you aren't using multiple, named animation sequences, you don't need to pass
-a string argument — you can call `playAnimation` with no arguments or a single,
-callback function. The callback function will execute when the animation
-completes. It takes no arguments and returns nothing:
-
-```js
-playAnimation(() => {
-  console.log('Animation done');
-});
-```
-
-If you _are_ using multiple, named animation sequences, you must pass in at
-least the string argument — you can call `playAnimation` with the single string
-argument or two arguments, the string and the callback function:
-
-```
-playAnimation('name', () => {
-  console.log('Animation done');
-});
-```
-
-The string `'name'` refers to the name of the animation sequence you want to run.
-
-
-<!--
-------------------------------------------------------------
-rewindAnimation
-------------------------------------------------------------
--->
-##### <a name='rewindAnimation'></a> rewindAnimation
-
-```js
-rewindAnimation(Function?): void
-```
-
-`rewindAnimation` reverses the last played animation. It will run the animation
-sequence backwards starting from the last phase, and in each phase, it will
-switch the `start` and `end` styles. A call to `rewindAnimation` must always be
-preceeded with a call to `playAnimation`, otherwise it will throw.  It, too, is
-an overloaded function, but it only has two forms:
-
-1. `rewindAnimation()` — takes no arguments.
-3. `rewindAnimation(() => {})` — takes a single, callback function argument.
-
-The callback function executes when the animation completes. It takes no arguments
-and returns nothing:
-
-```js
-// You must always call playAnimation at least once before calling rewindAnimation.
-playAnimation();
-
-rewindAnimation(() => {
-  console.log('Animation done rewinding');
-});
-```
-
-
-<!--
-------------------------------------------------------------
-What can be Animated?
-------------------------------------------------------------
--->
-#### <a name='what-can-be-animated'></a> What can be Animated?
-
-React Animatronics can handle a bunch of different style values. Here are some
-examples:
-
-```js
-{
-  duration: 500,
-  start: {
-    height: '100px',
-    left: '200em', // any unit will work
-    opacity: 0, // numbers will work too
-    transform: 'scale(0.5)' // transforms will animate too!
-  },
-  end: {
-    height: '200px',
-    left: '100em',
-    opacity: 1,
-    transform: 'scale(1.2)'
+class Circle extends React.Component {
+  render() {
+    const { animatronicStyles } = this.props
+    return (
+      <div
+        style={{
+          top: '20px',
+          left: animatronicStyles.left || '20px',
+          height: '100px',
+          width: '100px',
+          borderRadius: '50px',
+          backgroundColor: 'lightskyblue',
+          position: 'absolute',
+        }}
+      />
+    );
   }
 }
+
+const ControlledCircle = withControl('myCircle')(Circle);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledCircle />
+  </div>
+);
+
+const AnimatedApp = withAnimatronics(() => {
+  return [
+    {
+      myCircle: {
+        stiffness: 200,
+        damping: 5,
+        start: { left: '20px' },
+        end: { left: '300px' }
+      }
+    }
+  ];
+}
+)(App);
+
+// This example shows a blue circle that will animate its left position in a
+// "springy" way. The circle will bounce left and right before settling into
+// its final position.
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
 ```
 
-There may be some styles that this library won't handle correctly. If you run
-into any, please [file an issue][issue] and let me know.
+CodeSandbox link: https://codesandbox.io/s/3r61zv3lx6
+
+You'll be familiar with springs if you've used [react-motion][motion]. If this
+is the first time you've encountered them, I highly recommend you look into
+react-motion because it's all about springs and their docs provide a much
+better overview on springs.
+
+If you don't have time for that, I'll attempt a quick explanation (fair
+warning, I'm not a physicist and my explanation won't use precise language).
+"Springs" model physical springs and aren't subject to the notion of time
+(which is why we don't specify a `duration`). It's as if you're applying a
+force to whatever thing you're animating, and then friction/damping eventually
+reduce that force to zero.
+
+The `stiffness` refers to how "springy" the spring is — if the stiffness is
+higher, the spring will bounce back with more force. The `damping` refers to
+how much the spring "slows down" — if the damping is higher, the force applied
+to the spring will go down to zero faster. In my experience, the best way to
+understand spring animations is to go in and tweak the `stiffness` and `damping`
+parameters to see how they affect the animation.
+
+
+### Example 8: Dynamic Components
+
+Sometimes you'll want to declare animations for dyanmic components — components
+that aren't known beforehand. All the previous examples demonstrated animations
+that choreographed components which we already knew were available to us, but
+there's a way to declare animations for components that are rendered later.
+
+To do that, you can pass in a new `createAnimationSequences` prop to the component
+you wrapped with `<Animatronics/>` or `withAnimatronics`.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+class Letters extends React.Component {
+
+  componentDidMount() {
+    const { playAnimation } = this.props;
+    playAnimation();
+  }
+
+  componentDidUpdate() {
+    const { playAnimation } = this.props;
+    playAnimation();
+  }
+
+  render() {
+    const { text } = this.props;
+    return (
+      <div>{
+        text.split('').map((letter, index) => {
+          const ControlledLetter = withControl(`${letter}-${index}`)(
+            ({ animatronicStyles }) => (
+              <div
+                style={{
+                  backgroundColor: 'lightgreen',
+                  display: 'inline-block',
+                  height: '30px',
+                  lineHeight: '30px',
+                  margin: '3px',
+                  textAlign: 'center',
+                  width: '30px',
+                  transform: animatronicStyles.transform || 'scale(0)',
+                }}
+              >
+                {letter}
+              </div>
+            )
+          );
+          return <ControlledLetter key={index} />;
+        })
+      }</div>
+    );
+  }
+}
+
+// Intentionally returning an empty array in `createAnimationSequences` because we're
+// going to be providing it later as a prop (see the <App/> render method below).
+const AnimatedLetters = withAnimatronics(() => [])(Letters);
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+      shouldRenderLetters: false,
+    };
+  }
+
+  render() {
+    const { text, shouldRenderLetters } = this.state;
+    return (
+      <div>
+        <input
+          placeholder='Type something then click play'
+          value={text}
+          onChange={
+            ev => this.setState({ text: ev.target.value })
+          }
+          style={{
+            width: '200px',
+            display: 'inline-block'
+          }}
+        />
+        <button onClick={
+          () => this.setState(
+            state => ({ shouldRenderLetters: !state.shouldRenderLetters })
+          )
+        }>
+          Play animation
+        </button>
+        {(!text || !shouldRenderLetters) ? null : (
+          <AnimatedLetters
+            text={text}
+            createAnimationSequences={() =>
+              [
+                text.split('').reduce(
+                  (animations, letter, index) => {
+                    animations[`${letter}-${index}`] = {
+                      duration: 250,
+                      delay: index * 100,
+                      start: { transform: 'scale(0)' },
+                      end: { transform: 'scale(1)' }
+                    }
+                    return animations;
+                  },
+                  {}
+                )
+              ]
+            }
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
+```
+
+CodeSandbox link: https://codesandbox.io/s/v0ko8zjm05
+
+This is the most dense example. The main idea is that you're passing in an
+updated `createAnimationSequences` prop to the `<AniamtedLetters/>` component
+every time the `text` updates. Then, when the `<Letters/>` component renders,
+it will create new controlled components based on the `text`, and it will
+animate those controlled components appropriately.
+
+Admittedly, the developer experience around this use case can be improved. If you
+use react-animatronics for animating dynamic components and have suggestions,
+please [create an issue][issue] and let me know.
 
 
 <!--
 ------------------------------------------------------------
-More Animation Options
+Full API Documentation
 ------------------------------------------------------------
 -->
-#### More Animation Options
+## <a name='docs'></a> Full API Documentation
 
-All previous examples have shown timed animations with specified
-`durations`:
-
-```js
-{
-  duration: 500,
-  start: { height: '100px' },
-  end: { height: '200px' }
-}
-```
-
-But you have more options available to you.
-
-
-<!--
-------------------------------------------------------------
-Custom Easing Functions
-------------------------------------------------------------
--->
-##### Custom Easing Functions
-
-In each animation frame, the styles will progress from their `start` to `end` values
-using a default easing function, but you can provide a custom easing function:
-
-```js
-import { BezierEasing } from 'react-animatronics'
-
-{
-  duration: 500,
-  easingFn: BezierEasing(0.25, 0.75, 0.75, 0.25),
-  start: { height: '100px' },
-  end: { height: '200px' }
-}
-```
-
-The `BezierEasing` function in this library is exported directly from the
-[bezier-easing][bezier] library and it included for convenience. The default easing
-is `BezierEasing(0.4, 0.0, 0.2, 1)` which is the [standard ease-in-out][material] from
-Material Design.
-
-
-<!--
-------------------------------------------------------------
-Spring Animations
-------------------------------------------------------------
--->
-##### Spring Animations
-
-If you're a fan of springs, you can do:
-
-```js
-{
-  stiffness: 170,
-  damping: 26,
-  start: { height: '100px' },
-  end: { height: '200px' }
-}
-```
-
-This will animate your components just like [react-motion][motion] does.
-
-If you specify a `stiffness` you must also include a `damping`, and
-you cannot include a `duration` or `easingFn`.
-
-In other words, your animations can use either time _or_ springs, not both.
-
-
-<!--
-------------------------------------------------------------
-Animation Options Summary
-------------------------------------------------------------
--->
-##### Animation Options Summary
-
-Timed animations attributes:
-
-```js
-{
-  duration: number,
-  easingFn: Function?,
-  start: Object,
-  end: Object
-}
-```
-
-Spring animations attributes:
-
-```js
-{
-  stiffness: number,
-  damping: number,
-  start: Object,
-  end: Object
-}
-```
+Coming soon.
 
 
 <!--
@@ -615,7 +807,7 @@ Spring animations attributes:
 Examples
 ------------------------------------------------------------
 -->
-### Examples
+## Examples
 
 You can find running examples under [`examples/src/`](./examples/src).
 
@@ -654,4 +846,5 @@ Links
 [material]:https://material.io/guidelines/motion/duration-easing.html
 [motion]:https://github.com/chenglou/react-motion
 [recompose]:https://github.com/acdlite/recompose
+[sandbox]:https://codesandbox.io/
 [transition]:https://github.com/reactjs/react-transition-group
