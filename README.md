@@ -1449,6 +1449,7 @@ styles or do any form of cleanup, that part is up to you.
 Control
 ------------------------------------------------------------
 -->
+### <a name='Control'></a> Control
 
 The `<Control/>` component is a wrapper over `withControl`, and it behaves very
 similarly. It expects the following props:
@@ -1477,7 +1478,7 @@ Refer to the [`withControl`](#withControl) docs for details.
 Animatronics
 ------------------------------------------------------------
 -->
-
+### <a name='Animatronics'></a> Animatronics
 
 The `<Animtronics/>` component is a wrapper over `withAnimatronics`, and it behaves very
 similarly. It expects the following props:
