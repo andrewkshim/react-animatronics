@@ -50,8 +50,13 @@ examples, but when you're ready to dig into the details, take a look at the
 - [Example 4: Multi-Component Animations](#example-4)
 - [Example 5: Refs and DOM Nodes](#example-5)
 - [Example 6: Delays](#example-6)
-- [Example 7: Springs](#example-7)
-- [Example 8: Dynamic Components](#example-8)
+- [Example 7: Custom Easing](#example-7)
+- [Example 8: Animatable Styles](#example-8)
+- [Example 9: Springs](#example-9)
+- [Example 10: Named Animations](#example-10)
+- [Example 11: Finished Callback](#example-11)
+- [Example 12: Canceling Animations](#example-12)
+- [Example 13: Dynamic Components](#example-13)
 
 
 ### <a name='example-1'></a> Example 1: Basics
@@ -118,7 +123,7 @@ const App = ({ playAnimation }) => (
 // 'withAnimatronics' is a function that takes a function as its only argument,
 // and it returns a function that takes a base component. The function argument to
 // 'withAnimatronics' should return an array (or an object, but we'll cover that
-// in a later example) that describes your animations. We'll refer to this function
+// later in Example 10) that describes your animations. We'll refer to this function
 // as 'createAnimationSequences' throughout these docs.
 
 const AnimatedApp = withAnimatronics(() => [
@@ -634,7 +639,149 @@ ReactDOM.render(
 ```
 
 
-### <a name='example-7'></a> Example 7: Springs
+### <a name='example-7'></a> Example 7: Custom Easing
+
+CodeSandbox link: https://codesandbox.io/s/qkypk60l89
+
+react-animatronics uses the [bezier-easing][bezier] library internally,
+but it also exports the `BezierEasing` function and allows you to provide
+custom easing functions. The default is `BezierEasing(0.4, 0.0, 0.2, 1)`,
+which is the ["Standard Curve" from Material Design][material].
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl, BezierEasing } from 'react-animatronics'
+
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      position: 'absolute',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '30px',
+      left: animatronicStyles.left,
+    }}
+  />
+);
+
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect />
+  </div>
+);
+
+
+const AnimatedApp = withAnimatronics(() => [
+  {
+    // You can declare an 'easingFn' attribute in your animations to customize
+    // the easing.
+    myRect: {
+      duration: 350,
+      easingFn: BezierEasing(0.5, 0.5, 0.5, 0.5),
+      start: { left: '0px' },
+      end: { left: '400px' }
+    }
+  }
+])(App);
+
+
+// In this example, you'll see a blue rectangle animate left.
+
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
+```
+
+
+### <a name='example-8'></a> Example 8: Animatable Styles
+
+CodeSandbox link: https://codesandbox.io/s/7wkkvnx4xj
+
+react-animatronics parses the styles you give it and knows how to animate
+things like going from '100px' to '200px'. As with most parsing, the
+implementation is rather messy, but it handles enough use cases to be helpful.
+The following example demonstrates the range of styles you can animate.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      position: 'absolute',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '30px',
+      opacity: 0.2,
+      transform: 'scale(0.2)',
+      ...animatronicStyles,
+    }}
+  />
+);
+
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => {
+      playAnimation();
+    }}>
+      Play animation
+    </button>
+    <ControlledRect />
+  </div>
+);
+
+
+const AnimatedApp = withAnimatronics(() => [
+  {
+    myRect: {
+      duration: 350,
+      start: {
+        left: '0px', // you can animate strings,
+        opacity: 0.2, // numbers,
+        transform: 'scale(0.2)' // and even transformations!
+      },
+      end: {
+        left: '300px',
+        opacity: 1,
+        transform: 'scale(1.2)'
+      }
+    }
+  }
+])(App);
+
+
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
+```
+
+If you find styles that react-animatronics doesn't know how to deal with,
+please [create an issue][issue] to let me know.
+
+
+### <a name='example-9'></a> Example 9: Springs
 
 CodeSandbox link: https://codesandbox.io/s/3r61zv3lx6
 
@@ -726,7 +873,237 @@ understand spring animations is to go in and tweak the `stiffness` and `damping`
 parameters to see how they affect the animation.
 
 
-### <a name='example-8'></a> Example 8: Dynamic Components
+### <a name='example-10'></a> Example 10: Named Animations
+
+CodeSandbox link: https://codesandbox.io/s/3ynwox9w6p
+
+You'll sometimes want to declare multiple, different animations and then
+decide at runtime which one to play. You can do this by returning an
+object from `createAnimationSequences`. The object should map names
+to animation sequences (i.e. strings to arrays).
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      position: 'absolute',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '30px',
+      ...animatronicStyles,
+    }}
+  />
+);
+
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+// If you've declared multiple, named animations in withAnimatronics (below),
+// then you must pass in a string to playAnimation. That string should match
+// whatever name you've given to your animation.
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation('moveLeft')}>
+      Move left
+    </button>
+    <button onClick={() => playAnimation('moveRight')}>
+      Move right
+    </button>
+    <ControlledRect />
+  </div>
+);
+
+
+// To delcare multiple, named animations, return an object in the
+// createAnimationSequences function you pass into withAnimatronics. That object
+// should map strings to arrays.  The string keys are the names that you'll pass
+// into playAnimation when you want to execute that specific animation. The array
+// values are the animation sequence declarations you've been returning from
+// createAnimationSequences up until now.
+
+const AnimatedApp = withAnimatronics(() => (
+  {
+    moveLeft: [
+      {
+        myRect: {
+          duration: 350,
+          start: { left: '0px' },
+          end: { left: '300px' }
+        }
+      }
+    ],
+    moveRight: [
+      {
+        myRect: {
+          duration: 350,
+          start: { left: '300px' },
+          end: { left: '0px' }
+        }
+      }
+    ]
+  }
+))(App);
+
+
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
+```
+
+
+### <a name='example-11'></a> Example 11: Finished Callback
+
+CodeSandbox link: https://codesandbox.io/s/2m16xmy8j
+
+If you need to do something once your animations finish, you can pass in a callback
+function as the last argument to `playAnimation`.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      position: 'absolute',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '30px',
+      ...animatronicStyles,
+    }}
+  />
+);
+
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => {
+      playAnimation(() => {
+        alert('Done');
+      });
+    }}>
+      Play animation
+    </button>
+    <ControlledRect />
+  </div>
+);
+
+
+const AnimatedApp = withAnimatronics(() => [
+  {
+    myRect: {
+      duration: 350,
+      start: { left: '0px' },
+      end: { left: '300px' }
+    }
+  }
+])(App);
+
+
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
+```
+
+
+### <a name='example-12'></a> Example 12: Canceling Animations
+
+CodeSandbox link: https://codesandbox.io/s/5zkkrz0xlk
+
+In addition to `playAnimation`, any components wrapped by `withAnimatronics`
+will get `cancelAnimation` as a prop. Call the `cancelAnimation` function
+during an animation to cancel it. Note, this will not reset your styles, it
+will pause everything and leave your components where they are.
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      position: 'absolute',
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '30px',
+      left: animatronicStyles.left,
+    }}
+  />
+);
+
+
+const ControlledRect = withControl('myRect')(Rect);
+
+
+const App = ({ playAnimation, cancelAnimation }) => (
+  <div>
+    <button onClick={() => {
+      playAnimation();
+      setTimeout(() => {
+        // Cancel the animation before it finishes.
+        cancelAnimation();
+      }, 500);
+    }}>
+      Play animation
+    </button>
+    <div
+      // Use this div as a reference. It's width is the same as the "end"
+      // position for myRect. If the animation didn't cancel, the rect would
+      // reach the end of this div.
+      style={{
+        border: '2px solid black',
+        width: '400px',
+      }}
+    />
+    <ControlledRect />
+  </div>
+);
+
+
+const AnimatedApp = withAnimatronics(() => [
+  {
+    myRect: {
+      duration: 2000,
+      start: { left: '0px' },
+      end: { left: '400px' }
+    }
+  }
+])(App);
+
+
+// In this example, you'll see a blue rectangle start to animate its left
+// position and then stop before it reaches the end.
+
+ReactDOM.render(
+  <AnimatedApp />,
+  document.getElementById('root')
+);
+```
+
+
+### <a name='example-13'></a> Example 13: Dynamic Components
 
 CodeSandbox link: https://codesandbox.io/s/v0ko8zjm05
 
