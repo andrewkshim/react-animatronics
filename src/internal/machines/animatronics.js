@@ -3,6 +3,7 @@ import Debug from 'debug'
 
 import Constants from '../constants'
 import { constructStyles } from '../fashionistas/timed-fashionista'
+import { IS_DEVELOPMENT, makeError } from '../utils'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
@@ -153,6 +154,19 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
   // things are the way they are so the user does not need to write each
   // phase as a function - having this inefficiency makes the API nicer.
   const numPhases = getNumPhases(state, dispatch)(animationName);
+
+  if (IS_DEVELOPMENT) {
+    if (numPhases === 0) {
+      throw makeError(
+        `Attemped to run an empty animation sequence. Check <Animatronics/>`
+        + ` or withAnimatronics and make sure youre're returning either an Array or`
+        + ` an Object from the "createAnimationSequences" function. Here's what your`
+        + ` function looks like right now:`
+        + `\n`
+        + `${ state.createAnimationSequences.toString() }`
+      );
+    }
+  }
 
   dispatch({
     type: 'CREATE_PHASES_COUNTDOWN_MACHINE',
