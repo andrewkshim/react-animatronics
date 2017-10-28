@@ -34,8 +34,8 @@ Examples
 -->
 ## Examples
 
-Lots of folks learn best by looking at and playing with actual code, so section
-is a bunch of example code plus some comments.  Each example has an
+Lots of folks learn best by looking at and playing with actual code, so this
+section is a bunch of example code plus some comments.  Each example has an
 accompanying [CodeSandbox][sandbox] demo link at the end.
 
 You can probably learn to use react-animatronics just by looking through the
