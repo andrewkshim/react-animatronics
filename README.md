@@ -35,8 +35,8 @@ Examples
 ## Examples
 
 Lots of folks learn best by looking at and playing with actual code, so this
-section is a bunch of example code plus some comments.  Each example has an
-accompanying [CodeSandbox][sandbox] demo link at the end.
+section is a bunch of example code plus some comments. Each example has an
+accompanying [CodeSandbox][sandbox] demo link.
 
 You can probably learn to use react-animatronics just by looking through the
 examples, but when you're ready to dig into the details, take a look at the
@@ -64,6 +64,7 @@ import ReactDOM from 'react-dom'
 
 import { Animatronics, Control } from 'react-animatronics'
 
+
 // The 'Control' component will register itself when it mounts, meaning that it
 // can then be "controlled" and animated by the parent 'Animatronics'
 // component. Any component that you want to include in your animations must be
@@ -72,11 +73,13 @@ import { Animatronics, Control } from 'react-animatronics'
 // The Control component must have a single child, and that child will receive
 // an 'animatronicStyles' prop that is an object containing the interpolated
 // styles. See the Rect component directly below.
+
 const ControlledRect = () => (
   <Control name='myRect'>
     <Rect/>
   </Control>
 );
+
 
 // This 'Rect' should not be used directly. Rather, we're going to use the
 // 'ControlledRect' above since it's wrapped by the 'Control'. Since the
@@ -84,6 +87,7 @@ const ControlledRect = () => (
 // is an object containing the interpolated styles e.g. '{ left: "42.42px" }'.
 // It's up to you how to use the animatronicStyles, you can inject them into
 // the "style" prop or do something else. Just don't forget to use them!
+
 const Rect = ({ animatronicStyles }) => (
   <div
     style={{
@@ -95,6 +99,7 @@ const Rect = ({ animatronicStyles }) => (
   />
 );
 
+
 // Similar to the 'Control' component, the 'Animatronics' component is a
 // wrapper that must have a single child. That child will receive as props a
 // function 'playAnimation' that you can call anytime to run your animations.
@@ -103,6 +108,7 @@ const Rect = ({ animatronicStyles }) => (
 // an array that describes the animation we want to run. There's a bit more to
 // this part of the API though, if you're curious, read through the Detailed
 // Walkthough's section on createAnimationSequences.
+
 const AnimatedApp = () => (
   <Animatronics createAnimationSequences={() => [
     {
@@ -117,11 +123,13 @@ const AnimatedApp = () => (
   </Animatronics>
 );
 
+
 // Just like the 'Rect', the 'App' component should not be used directly since
 // it's wrapped by 'Animatronics' in the 'AnimatedApp' component. Since the App
 // is the child of Animatronics, it receives a 'playAnimation' function as props.
 // You can call playAnimation at any time to execute the animation you declared
 // in the Animatronics 'createAnimationSequences' function.
+
 const App = ({ playAnimation }) => (
   <div>
     <button onClick={() => playAnimation()}>
@@ -131,8 +139,10 @@ const App = ({ playAnimation }) => (
   </div>
 );
 
+
 // This example will render a button and a blue square. Clicking the button will
 // cause the square to animate for 350ms from a height of 100px to 200px.
+
 ReactDOM.render(
   <AnimatedApp/>,
   document.getElementById('root')
@@ -156,7 +166,9 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 // Same 'Rect' from Example 1.
+
 const Rect = ({ animatronicStyles }) => (
   <div
     style={{
@@ -168,9 +180,11 @@ const Rect = ({ animatronicStyles }) => (
   />
 );
 
+
 // 'withControl' is a function that takes a string argument that is the same as
 // the 'name' prop you'd pass into the <Control/> component. It then returns a
 // function that takes the base component as its only argument.
+
 const ControlledRect = withControl('myRect')(Rect);
 
 // Same 'App' from Example 1.
@@ -183,10 +197,12 @@ const App = ({ playAnimation }) => (
   </div>
 );
 
+
 // 'withAnimatronics' is a function that takes a function argument that is the
 // same as the 'createAnimationSequences' prop you'd pass into the <Animatronics/>
 // component. If then returns a function that takes the base component as its
 // only argument.
+
 const AnimatedApp = withAnimatronics(() => [
   {
     myRect: {
@@ -197,9 +213,11 @@ const AnimatedApp = withAnimatronics(() => [
   }
 ])(App);
 
+
 // Just like Example 1, but now your components are powered by HoCs. This
 // example will render a button and a blue square. Clicking the button will
 // cause the square to animate for 350ms from a height of 100px to 200px.
+
 ReactDOM.render(
   <AnimatedApp/>,
   document.getElementById('root')
@@ -222,6 +240,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 const Rect = ({ animatronicStyles }) => (
   <div
     style={{
@@ -235,7 +254,9 @@ const Rect = ({ animatronicStyles }) => (
   />
 );
 
+
 const ControlledRect = withControl('myRect')(Rect);
+
 
 const App = ({ playAnimation }) => (
   <div>
@@ -246,9 +267,11 @@ const App = ({ playAnimation }) => (
   </div>
 );
 
+
 // This is where things get interesting. Rather than returning just a single-element
 // array, we can return an array with as many elements as we want. The animations will
 // fire in sequence, one after the other.
+
 const AnimatedApp = withAnimatronics(() => [
   // phase 1: move down
   {
@@ -276,8 +299,10 @@ const AnimatedApp = withAnimatronics(() => [
   }
 ])(App);
 
+
 // In this example, you'll see a blue square that animates its position
 // in a sequence of moves.
+
 ReactDOM.render(
   <AnimatedApp/>,
   document.getElementById('root')
@@ -299,6 +324,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 const Rect = ({ animatronicStyles }) => (
   <div
     style={{
@@ -312,7 +338,9 @@ const Rect = ({ animatronicStyles }) => (
   />
 );
 
+
 const ControlledRect = withControl('myRect')(Rect);
+
 
 const Circle = ({ animatronicStyles }) => (
   <div
@@ -328,7 +356,9 @@ const Circle = ({ animatronicStyles }) => (
   />
 )
 
+
 const ControlledCircle = withControl('myCircle')(Circle);
+
 
 const App = ({ playAnimation }) => (
   <div>
@@ -340,7 +370,9 @@ const App = ({ playAnimation }) => (
   </div>
 );
 
+
 // Within each phase, you can declare animations for more than one component.
+
 const AnimatedApp = withAnimatronics(() => [
   // phase 1
   {
@@ -383,8 +415,10 @@ const AnimatedApp = withAnimatronics(() => [
   }
 ])(App);
 
+
 // In this example, you'll see a blue square and red circle that animate their
 // positions in a sequence of moves.
+
 ReactDOM.render(
   <AnimatedApp/>,
   document.getElementById('root')
@@ -408,6 +442,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 class Circle extends React.Component {
   render() {
     const { animatronicStyles } = this.props
@@ -427,9 +462,11 @@ class Circle extends React.Component {
   }
 }
 
+
 const ControlledCircleA = withControl('circleA')(Circle);
 const ControlledCircleB = withControl('circleB')(Circle);
 const ControlledCircleC = withControl('circleC')(Circle);
+
 
 const App = ({ playAnimation }) => (
   <div>
@@ -441,6 +478,7 @@ const App = ({ playAnimation }) => (
     <ControlledCircleC/>
   </div>
 );
+
 
 const AnimatedApp = withAnimatronics(({ circleA, circleB, circleC }) => {
   const { left: leftA, top: topA } = circleA.getBoundingClientRect();
@@ -487,8 +525,10 @@ const AnimatedApp = withAnimatronics(({ circleA, circleB, circleC }) => {
 }
 )(App);
 
+
 // In this example, you'll see three circles animate into a triangle formation
 // and then rotate counter clockwise.
+
 ReactDOM.render(
   <AnimatedApp />,
   document.getElementById('root')
@@ -510,6 +550,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 class Circle extends React.Component {
   render() {
     const { animatronicStyles } = this.props
@@ -529,9 +570,11 @@ class Circle extends React.Component {
   }
 }
 
+
 const ControlledCircleA = withControl('circleA')(Circle);
 const ControlledCircleB = withControl('circleB')(Circle);
 const ControlledCircleC = withControl('circleC')(Circle);
+
 
 const App = ({ playAnimation }) => (
   <div>
@@ -543,6 +586,7 @@ const App = ({ playAnimation }) => (
     <ControlledCircleC/>
   </div>
 );
+
 
 const AnimatedApp = withAnimatronics(() => {
   return [
@@ -570,7 +614,9 @@ const AnimatedApp = withAnimatronics(() => {
 }
 )(App);
 
+
 // In this example, you'll see three circles animate left in a staggered sequence.
+
 ReactDOM.render(
   <AnimatedApp />,
   document.getElementById('root')
@@ -591,6 +637,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 class Circle extends React.Component {
   render() {
     const { animatronicStyles } = this.props
@@ -610,7 +657,9 @@ class Circle extends React.Component {
   }
 }
 
+
 const ControlledCircle = withControl('myCircle')(Circle);
+
 
 const App = ({ playAnimation }) => (
   <div>
@@ -620,6 +669,7 @@ const App = ({ playAnimation }) => (
     <ControlledCircle />
   </div>
 );
+
 
 const AnimatedApp = withAnimatronics(() => {
   return [
@@ -635,9 +685,11 @@ const AnimatedApp = withAnimatronics(() => {
 }
 )(App);
 
+
 // This example shows a blue circle that will animate its left position in a
 // "springy" way. The circle will bounce left and right before settling into
 // its final position.
+
 ReactDOM.render(
   <AnimatedApp />,
   document.getElementById('root')
@@ -682,6 +734,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 class Letters extends React.Component {
 
   componentDidMount() {
@@ -724,9 +777,12 @@ class Letters extends React.Component {
   }
 }
 
+
 // Intentionally returning an empty array in `createAnimationSequences` because we're
 // going to be providing it later as a prop (see the <App/> render method below).
+
 const AnimatedLetters = withAnimatronics(() => [])(Letters);
+
 
 class App extends React.Component {
   constructor(props) {
@@ -784,6 +840,10 @@ class App extends React.Component {
     );
   }
 }
+
+
+// This example renders a text input and animated letters that correspond to the
+// input text.
 
 ReactDOM.render(
   <App />,
