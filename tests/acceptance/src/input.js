@@ -3,7 +3,7 @@ import React from 'react'
 import Example from './internal/components/Example'
 import Circle from './internal/components/Circle'
 import { SERIF_FONT, COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
-import { withAnimatronics, withControl } from '../../src'
+import { withAnimatronics, withControl } from '../../../src'
 
 const COLORS = [
   COLOR_A,

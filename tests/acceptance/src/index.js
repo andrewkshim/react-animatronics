@@ -18,7 +18,7 @@ import {
   SML_FONT_SIZE,
 } from './internal/styles'
 
-import { withControl, withAnimatronics, BezierEasing } from '../../src'
+import { withControl, withAnimatronics, BezierEasing } from '../../../src'
 
 const BASIC = 'basic';
 const SPRINGS = 'springs';

@@ -8,10 +8,7 @@
   "scripts": {
     "prepublish": "npm run lint && npm run test && npm run build",
     "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/**/*.spec.js,src/**/*.test.js",
-    "examples": "./node_modules/.bin/webpack-dev-server --config examples/webpack.config.js",
-    "example:basic": "./node_modules/.bin/webpack-dev-server --config examples/basic/webpack.config.js",
-    "example:welcome": "./node_modules/.bin/webpack-dev-server --config examples/welcome/webpack.config.js",
-    "example:springs": "./node_modules/.bin/webpack-dev-server --config examples/springs/webpack.config.js",
+    "acceptance": "./node_modules/.bin/webpack-dev-server --config tests/acceptance/webpack.config.js",
     "test": "./node_modules/.bin/tape -r babel-register -r ./tests/setup './src/**/*.spec.js' './tests/**/*.test.js'",
     "lint": "./node_modules/.bin/flow status"
   },
