@@ -146,8 +146,8 @@ ReactDOM.render(
 );
 ```
 
-These higher-order components work great with great with
-[recompose][recompose], but if you're not a fan of stateless components,
+These higher-order components work great with [recompose][recompose],
+but if you're not a fan of stateless components,
 react-animatronics also provides a component API, which we cover in the next
 section.
 
