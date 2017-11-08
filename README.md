@@ -1306,16 +1306,6 @@ ReactDOM.render(
 );
 ```
 
-This is the most dense example. The main idea is that you're passing in an
-updated `createAnimationSequences` prop to the `<AniamtedLetters/>` component
-every time the `text` updates. Then, when the `<Letters/>` component renders,
-it will create new controlled components based on the `text`, and it will
-animate those controlled components appropriately.
-
-Admittedly, the developer experience around this use case can be improved. If you
-use react-animatronics for animating dynamic components and have suggestions,
-please [create an issue][issue] and let me know.
-
 
 ## <a name='docs'></a> API Documentation
 
