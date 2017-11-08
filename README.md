@@ -44,11 +44,6 @@ yarn add react-animatronics
 ```
 
 
-<!--
-============================================================
-Examples
-============================================================
--->
 ## Examples
 
 Lots of folks learn best by looking at and playing with actual code, so this
@@ -1321,11 +1316,6 @@ use react-animatronics for animating dynamic components and have suggestions,
 please [create an issue][issue] and let me know.
 
 
-<!--
-------------------------------------------------------------
-API Documentation
-------------------------------------------------------------
--->
 ## <a name='docs'></a> API Documentation
 
 This sections contains mostly words, versus the [Examples](#examples) section
@@ -1350,11 +1340,6 @@ We'll go over the API in a "semantic" order, that is, an order that makes
 sense for building up your understanding of how react-animatronics works.
 
 
-<!--
-------------------------------------------------------------
-withControl
-------------------------------------------------------------
--->
 ### <a name='withControl'></a> withControl
 
 ```
@@ -1384,11 +1369,6 @@ start your animation, so you may need to provide your components with
 default values.
 
 
-<!--
-------------------------------------------------------------
-withAnimatronics
-------------------------------------------------------------
--->
 ### <a name='withAnimatronics'></a> withAnimatronics
 
 ```js
@@ -1514,11 +1494,6 @@ the animation. This will stop the animation in its tracks — it will not reset 
 styles or do any form of cleanup, that part is up to you.
 
 
-<!--
-------------------------------------------------------------
-Control
-------------------------------------------------------------
--->
 ### <a name='Control'></a> Control
 
 The `<Control/>` component is a wrapper over `withControl`, and it behaves very
@@ -1543,11 +1518,6 @@ animatronicStyles: { [string]: string|number }
 Refer to the [`withControl`](#withControl) docs for details.
 
 
-<!--
-------------------------------------------------------------
-Animatronics
-------------------------------------------------------------
--->
 ### <a name='Animatronics'></a> Animatronics
 
 The `<Animtronics/>` component is a wrapper over `withAnimatronics`, and it behaves very
@@ -1572,25 +1542,6 @@ cancelAnimation: () => void
 Refer to the [`withAnimatronics`](#withAnimatronics) docs for details.
 
 
-<!--
-------------------------------------------------------------
-Alternative Libraries
-------------------------------------------------------------
--->
-
-
-<!--
-------------------------------------------------------------
-Contributing
-------------------------------------------------------------
--->
-
-
-<!--
-------------------------------------------------------------
-Links
-------------------------------------------------------------
--->
 [bezier]:https://github.com/gre/bezier-easing
 [hocs]:https://reactjs.org/docs/higher-order-components.html
 [issue]:https://github.com/andrewkshim/react-animatronics/issues/new
