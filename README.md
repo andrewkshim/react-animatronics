@@ -1261,6 +1261,7 @@ const Rect = ({ animatronicStyles }) => (
       height: '100px',
       width: '100px',
       backgroundColor: 'blue',
+      position: 'absolute',
       top: '20px',
       left: '20px',
       ...animatronicStyles
