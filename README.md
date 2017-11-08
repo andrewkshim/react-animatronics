@@ -1283,6 +1283,7 @@ const App = ({ playAnimation }) => (
 // You can declare simultaneous animations on a single component by providing
 // an array instead of an object. The array should contain objects that describe
 // the animations that will run in parallel.
+
 const AnimatedApp = withAnimatronics(() => [
   {
     myRect: [
