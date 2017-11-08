@@ -7,6 +7,7 @@ import chroma from 'chroma-js'
 import BasicExample from './basic'
 import SpringsExample from './springs'
 import InputExample from './input'
+import CurveExample from './curve'
 
 import {
   PRIMARY_COLOR,
@@ -23,6 +24,7 @@ import { withControl, withAnimatronics, BezierEasing } from '../../../src'
 const BASIC = 'basic';
 const SPRINGS = 'springs';
 const INPUT = 'input';
+const CURVE = 'curve';
 
 const debug = Debug('animatronics:examples');
 
@@ -30,6 +32,7 @@ const EXAMPLES = {
   [ BASIC ]: BasicExample,
   [ SPRINGS ]: SpringsExample,
   [ INPUT ]: InputExample,
+  [ CURVE ]: CurveExample,
 };
 
 // component styles
