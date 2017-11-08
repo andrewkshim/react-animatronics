@@ -1,4 +1,4 @@
-# react-animatronics
+z react-animatronics
 
 React Animatronics lets you write declarative, coordinated animations
 for your React components.
@@ -25,6 +25,7 @@ for your React components.
   - [Example 11: Finished Callback](#example-11)
   - [Example 12: Canceling Animations](#example-12)
   - [Example 13: Dynamic Components](#example-13)
+  - [Example 14: Simultaneous Attribute Animations](#example-14)
 - [API Documentation](#docs)
   - [withControl](#withControl)
   - [withAnimatronics](#withAnimatronics)
@@ -1234,6 +1235,77 @@ class App extends React.Component {
 
 ReactDOM.render(
   <App />,
+  document.getElementById('root')
+);
+```
+
+This is the most dense example. The main idea is that you're passing in an
+updated `createAnimationSequences` prop to the `<AniamtedLetters/>` component
+every time the `text` updates. Then, when the `<Letters/>` component renders,
+it will create new controlled components based on the `text`, and it will
+animate those controlled components appropriately.
+
+Admittedly, the developer experience around this use case can be improved. If you
+use react-animatronics for animating dynamic components and have suggestions,
+please [create an issue][issue] and let me know.
+
+
+### <a name='example-14'></a> Example 14: Simultaneous Attribute Animations
+
+CodeSandbox link: https://codesandbox.io/s/7k97joz1l6
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { withAnimatronics, withControl } from 'react-animatronics'
+
+const Rect = ({ animatronicStyles }) => (
+  <div
+    style={{
+      height: '100px',
+      width: '100px',
+      backgroundColor: 'blue',
+      top: '20px',
+      left: '20px',
+      ...animatronicStyles
+    }}
+  />
+);
+
+const ControlledRect = withControl('myRect')(Rect);
+
+const App = ({ playAnimation }) => (
+  <div>
+    <button onClick={() => playAnimation()}>
+      Play animation
+    </button>
+    <ControlledRect/>
+  </div>
+);
+
+// You can declare simultaneous animations on a single component by providing
+// an array instead of an object. The array should contain objects that describe
+// the animations that will run in parallel.
+const AnimatedApp = withAnimatronics(() => [
+  {
+    myRect: [
+      {
+        duration: 500,
+        from: { top: '20px' },
+        to: { top: '100px' }
+      },
+      {
+        duration: 750,
+        from: { left: '20px' },
+        to: { left: '200px' }
+      }
+    ]
+  }
+])(App);
+
+ReactDOM.render(
+  <AnimatedApp/>,
   document.getElementById('root')
 );
 ```
