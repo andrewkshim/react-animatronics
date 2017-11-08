@@ -1255,6 +1255,7 @@ import ReactDOM from 'react-dom'
 
 import { withAnimatronics, withControl } from 'react-animatronics'
 
+
 const Rect = ({ animatronicStyles }) => (
   <div
     style={{
@@ -1269,6 +1270,7 @@ const Rect = ({ animatronicStyles }) => (
   />
 );
 
+
 const ControlledRect = withControl('myRect')(Rect);
 
 const App = ({ playAnimation }) => (
@@ -1279,6 +1281,7 @@ const App = ({ playAnimation }) => (
     <ControlledRect/>
   </div>
 );
+
 
 // You can declare simultaneous animations on a single component by providing
 // an array instead of an object. The array should contain objects that describe
@@ -1300,6 +1303,7 @@ const AnimatedApp = withAnimatronics(() => [
     ]
   }
 ])(App);
+
 
 ReactDOM.render(
   <AnimatedApp/>,
