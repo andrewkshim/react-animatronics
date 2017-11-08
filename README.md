@@ -1263,7 +1263,7 @@ const Rect = ({ animatronicStyles }) => (
       backgroundColor: 'blue',
       position: 'absolute',
       top: '20px',
-      left: '20px',
+      left: '0px',
       ...animatronicStyles
     }}
   />
@@ -1293,7 +1293,7 @@ const AnimatedApp = withAnimatronics(() => [
       },
       {
         duration: 750,
-        from: { left: '20px' },
+        from: { left: '0px' },
         to: { left: '200px' }
       }
     ]
