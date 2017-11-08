@@ -41,3 +41,6 @@ export const makeError = (...messages: string[]): Error => {
   err.stack = poppedStack.join('\n');
   return err;
 }
+
+export const flatten = <T>(arrays: Array<Array<T>>): Array<T> =>
+  arrays.reduce((flat, arr) => flat.concat(arr), []);

@@ -217,19 +217,19 @@ test('machines/animatronics/makeReducers', assert => {
   const reducers = makeReducers(machinist);
 
   const state = {
-    componentCountdownMachine: null,
+    animationCountdownMachine: null,
     phasesCountdownMachine: null,
     timedJobMachines: {},
   };
 
-  reducers.CREATE_COMPONENTS_COUNTDOWN_MACHINE(
+  reducers.CREATE_ANIMATION_COUNTDOWN_MACHINE(
     state,
-    { numComponents: 4, job: () => {} }
+    { numAnimations: 4, job: () => {} }
   );
 
   assert.ok(
-    state.componentCountdownMachine,
-    'CREATE_COMPONENTS_COUNTDOWN_MACHINE should create a countdown machine'
+    state.animationCountdownMachine,
+    'CREATE_ANIMATION_COUNTDOWN_MACHINE should create a countdown machine'
   );
 
   reducers.CREATE_PHASES_COUNTDOWN_MACHINE(
