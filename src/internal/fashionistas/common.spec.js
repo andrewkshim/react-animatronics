@@ -83,6 +83,12 @@ test('parseStyle', assert => {
     'correctly creates a unit fashion'
   );
 
+  assert.deepEquals(
+    parseStyle('rgba(0, 0, 0, 0)'),
+    createColorFashion('rgba(0, 0, 0, 0)'),
+    'correctly creates an rgba color fashion'
+  );
+
   assert.end();
 });
 

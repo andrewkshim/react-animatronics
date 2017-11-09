@@ -1,7 +1,7 @@
 // @flow
 import test from 'tape'
 
-import { parseBasicStyle } from './common'
+import { parseStyle } from './common'
 import { interpolateValue, interpolateFashion, reconstructStyles } from './spring'
 
 test('interpolateValue', assert => {
@@ -12,21 +12,21 @@ test('interpolateValue', assert => {
 });
 
 test('interpolateFashion', assert => {
-  const startColor = parseBasicStyle('black');
-  const endColor = parseBasicStyle('white');
+  const startColor = parseStyle('black');
+  const endColor = parseStyle('white');
   const interpolatedColor = interpolateFashion(startColor, endColor, 0.5);
   assert.equals(
     interpolatedColor.isColorType && interpolatedColor.value.name(), 'gray',
     'correctly interpolates colors'
   );
 
-  const startNumber = parseBasicStyle(0);
-  const endNumber = parseBasicStyle(100);
+  const startNumber = parseStyle(0);
+  const endNumber = parseStyle(100);
   const interpolatedNumber = interpolateFashion(startNumber, endNumber, 0.6)
   assert.equals(interpolatedNumber.value, 60, 'correctly interpolates numbers');
 
-  const startUnit = parseBasicStyle('0px');
-  const endUnit = parseBasicStyle('100px');
+  const startUnit = parseStyle('0px');
+  const endUnit = parseStyle('100px');
   const interpolatedUnit = interpolateFashion(startUnit, endUnit, 0.42);
   assert.equals(interpolatedUnit.value, 42, 'correctly interpolates units');
 

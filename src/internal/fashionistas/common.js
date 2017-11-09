@@ -62,7 +62,7 @@ const parseTransformName = (transform: string): string =>
   transform.slice(0, transform.indexOf('('));
 
 const parseTransformStyle = (transform: string): BasicFashion =>
-  parseBasicStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
+  parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
 export const createTransformFashion = (raw: string): TransformFashion => ({
   isTransformType: true,
@@ -70,22 +70,17 @@ export const createTransformFashion = (raw: string): TransformFashion => ({
   styles: raw.split(' ').map(parseTransformStyle),
 });
 
-export const parseBasicStyle = (raw: string | number): BasicFashion => (
+export const parseStyle = (raw: string | number): Fashion => (
   typeof raw === 'number' ?
     createNumberFashion(raw)
   : isNumberStr(raw) ?
     createNumberFashion(raw)
   : isColorString(raw) ?
     createColorFashion(raw)
-  :
-    createUnitFashion(raw)
-);
-
-export const parseStyle = (raw: string | number): Fashion => (
-  typeof raw === 'string' && raw.indexOf('(') > -1 ?
+  : typeof raw === 'string' && raw.indexOf('(') > -1 ?
     createTransformFashion(raw)
   :
-    parseBasicStyle(raw)
+    createUnitFashion(raw)
 );
 
 export const stringifyColor = (color: ColorFashion) => `${ chroma(color.value).hex() }`;
