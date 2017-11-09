@@ -47,7 +47,7 @@ export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
 export type TransformFashion = {|
   isTransformType: true,
   names: string[],
-  styles: BasicFashion[],
+  styles: Fashion[],
 |}
 
 export type Fashion = BasicFashion | TransformFashion;

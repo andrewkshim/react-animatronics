@@ -23,11 +23,13 @@ test('interpolateFashion', assert => {
   const startNumber = parseStyle(0);
   const endNumber = parseStyle(100);
   const interpolatedNumber = interpolateFashion(startNumber, endNumber, 0.6)
+  // $FlowFixMe: fighting with flow on how to manage the Fashion type, clean up later
   assert.equals(interpolatedNumber.value, 60, 'correctly interpolates numbers');
 
   const startUnit = parseStyle('0px');
   const endUnit = parseStyle('100px');
   const interpolatedUnit = interpolateFashion(startUnit, endUnit, 0.42);
+  // $FlowFixMe: fighting with flow on how to manage the Fashion type, clean up later
   assert.equals(interpolatedUnit.value, 42, 'correctly interpolates units');
 
   assert.end();

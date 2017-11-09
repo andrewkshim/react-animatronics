@@ -12,7 +12,6 @@ import type {
   ColorFashion,
   NumberFashion,
   UnitFashion,
-  BasicFashion,
   TransformFashion,
   Fashion,
 } from '../flow-types'
@@ -61,7 +60,7 @@ export const createUnitFashion = (raw: string): UnitFashion => ({
 const parseTransformName = (transform: string): string =>
   transform.slice(0, transform.indexOf('('));
 
-const parseTransformStyle = (transform: string): BasicFashion =>
+const parseTransformStyle = (transform: string): Fashion =>
   parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
 export const createTransformFashion = (raw: string): TransformFashion => ({
@@ -91,12 +90,12 @@ export const stringifyUnit = (style: UnitFashion) => `${ style.value }${ style.u
 
 export const stringifyTransform = (transform: TransformFashion) => transform.names
   .reduce((arr: string[], name: string, index: number) => {
-    const style: BasicFashion = transform.styles[index];
+    const style: Fashion = transform.styles[index];
     return arr.concat(`${ name }(${ stringifyFashion(style) })`);
   }, [])
   .join(' ');
 
-const stringifyBasic = (style: BasicFashion): string => (
+const stringifyBasic = (style: Fashion): string => (
   style.isColorType ?
     stringifyColor(style)
   : style.isNumberType ?
