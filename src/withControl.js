@@ -54,6 +54,7 @@ const withControl = (
     _ref: ?BaseRef
     _onRef: Function
     _setComponentStyle: Function
+    _resetComponentStyle: Function
 
     constructor(props: Props) {
       super(props);
@@ -61,6 +62,7 @@ const withControl = (
       this._ref = null;
       this._onRef = this._onRef.bind(this);
       this._setComponentStyle = this._setComponentStyle.bind(this);
+      this._resetComponentStyle = this._resetComponentStyle.bind(this);
     }
 
     componentDidMount() {
@@ -88,6 +90,7 @@ const withControl = (
         name,
         domNode,
         this._setComponentStyle,
+        this._resetComponentStyle,
       );
     }
 
@@ -103,6 +106,10 @@ const withControl = (
           ...updatedStyles,
         },
       }));
+    }
+
+    _resetComponentStyle() {
+      this.setState({ style: {} })
     }
 
     _onRef(ref: ?BaseRef) {

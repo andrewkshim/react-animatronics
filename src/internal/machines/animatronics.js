@@ -410,12 +410,13 @@ const reset = (state, dispatch) => () => {
   dispatch({ type: 'RESET_MACHINE' });
 };
 
-const registerComponent = (state, dispatch) => (componentName, node, styleUpdater) => {
+const registerComponent = (state, dispatch) => (componentName, node, styleUpdater, styleResetter) => {
   dispatch({
     type: 'REGISTER_COMPONENT',
     componentName,
     node,
     styleUpdater,
+    styleResetter,
   });
 }
 
@@ -497,10 +498,11 @@ export const makeReducers = machinist => ({
     state.phasesCountdownMachine.countdown();
   },
   REGISTER_COMPONENT: (state, action) => {
-    const { componentName, node, styleUpdater } = action;
+    const { componentName, node, styleUpdater, styleResetter } = action;
     debug('registering component %s %o', componentName, node);
     state.nodes[componentName] = node;
     state.styleUpdaters[componentName] = styleUpdater;
+    state.styleResetters[componentName] = styleResetter;
   },
   REGISTER_ENDLESS_JOB: (state, action) => {
     const { index, componentName, job } = action;
@@ -515,8 +517,8 @@ export const makeReducers = machinist => ({
     state.timedJobMachines[componentName][index].registerOnCompleteJob(job);
   },
   RESET_MACHINE: (state, action) => {
-    Object.keys(state.styleUpdaters).map(componentName => {
-      state.styleUpdaters[componentName]({});
+    Object.keys(state.styleResetters).map(componentName => {
+      state.styleResetters[componentName]();
     });
   },
   RUN_NEXT_SPRING_FRAME: (state, action) => {
@@ -576,6 +578,7 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
   const state = {
     nodes: {},
     styleUpdaters: {},
+    styleResetters: {},
     timedJobMachines: {},
     springMachines: {},
     endlessJobMachines: {},
