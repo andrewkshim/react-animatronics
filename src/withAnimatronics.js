@@ -95,6 +95,10 @@ const withAnimatronics = (
     animatronics.stop();
   }
 
+  const resetAnimation = () => {
+    animatronics.reset();
+  }
+
   return (BaseComponent: Object): Object => {
     if (IS_DEVELOPMENT) {
       if (!isReactComponent(BaseComponent)) {
@@ -145,6 +149,7 @@ const withAnimatronics = (
           <BaseComponent
             playAnimation={ playAnimation }
             cancelAnimation={ cancelAnimation }
+            resetAnimation={ resetAnimation }
             { ...this.props }
           />
         );

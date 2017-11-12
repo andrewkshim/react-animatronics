@@ -405,6 +405,11 @@ const stop = (state, dispatch) => () => {
   dispatch({ type: 'STOP_MACHINE' });
 };
 
+const reset = (state, dispatch) => () => {
+  dispatch({ type: 'STOP_MACHINE' });
+  dispatch({ type: 'RESET_MACHINE' });
+};
+
 const registerComponent = (state, dispatch) => (componentName, node, styleUpdater) => {
   dispatch({
     type: 'REGISTER_COMPONENT',
@@ -509,6 +514,11 @@ export const makeReducers = machinist => ({
     const { index, componentName, job } = action;
     state.timedJobMachines[componentName][index].registerOnCompleteJob(job);
   },
+  RESET_MACHINE: (state, action) => {
+    Object.keys(state.styleUpdaters).map(componentName => {
+      state.styleUpdaters[componentName]({});
+    });
+  },
   RUN_NEXT_SPRING_FRAME: (state, action) => {
     const {
       index,
@@ -586,6 +596,7 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
   const animatronicsMachine = {
     play: play(state, dispatch),
     stop: stop(state, dispatch),
+    reset: reset(state, dispatch),
     registerComponent: registerComponent(state, dispatch),
     unregisterComponent: unregisterComponent(state, dispatch),
     setCreateAnimationSequences: setCreateAnimationSequences(state, dispatch),
