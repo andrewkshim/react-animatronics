@@ -547,7 +547,6 @@ export const makeReducers = machinist => ({
     state.endlessJobMachines[componentName][index].start();
   },
   STOP_MACHINE: (state, action) => {
-    const { job } = action;
     flatten(Object.values(state.timedJobMachines))
       .forEach(machine => machine.stop());
     Object.values(state.timeouts)
