@@ -68,9 +68,7 @@ const withControl = (
     componentDidMount() {
       const { animatronics } = this.context;
 
-      const ref: ?BaseRef = useStringRefs
-        ? this.refs[name]
-        : this._ref;
+      const ref: ?BaseRef = useStringRefs ? this.refs[name] : this._ref;
 
       // $FlowFixMe: flow thinks the ref is an object type for some reason
       const domNode = ReactDOM.findDOMNode(ref);
@@ -85,6 +83,22 @@ const withControl = (
           );
         }
       }
+
+      animatronics.registerComponent(
+        name,
+        domNode,
+        this._setComponentStyle,
+        this._resetComponentStyle,
+      );
+    }
+
+    componentDidUpdate() {
+      const { animatronics } = this.context;
+
+      const ref: ?BaseRef = useStringRefs ? this.refs[name] : this._ref;
+
+      // $FlowFixMe: flow thinks the ref is an object type for some reason
+      const domNode = ReactDOM.findDOMNode(ref);
 
       animatronics.registerComponent(
         name,
