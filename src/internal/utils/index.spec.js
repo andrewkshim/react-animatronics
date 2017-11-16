@@ -1,7 +1,7 @@
 // @flow
 import test from 'tape'
 
-import { makeError } from './utils'
+import { makeError } from './index'
 
 test('utils.makeError', assert => {
   const spaceErr = makeError('hello', 'world');
