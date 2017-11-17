@@ -102,3 +102,35 @@ test('withControl sets the ref to the DOM node', assert => {
   assert.equal(actualDOMNode, expectedDOMNode);
   assert.end();
 });
+
+test('withControl sees the latest DOM node', assert => {
+  class Base extends React.Component {
+    render() {
+      const { shouldRender } = this.props;
+      return !shouldRender ? null : <div/>;
+    }
+  }
+
+  const Controlled = withControl('base')(Base);
+  let actualDOMNode;
+
+  const wrapper = mount(
+    <Controlled shouldRender={false} />,
+    {
+      context: {
+        animatronics: {
+          registerComponent: (componentName, domNode, styleUpdater) => {
+            actualDOMNode = domNode;
+          },
+          unregisterComponent: () => {},
+        },
+      },
+    }
+  );
+
+  wrapper.setProps({ shouldRender: true });
+  wrapper.update();
+  const expectedDOMNode = wrapper.find('div').getDOMNode();
+  assert.equal(actualDOMNode, expectedDOMNode);
+  assert.end();
+});
