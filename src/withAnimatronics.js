@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import hoistNonReactStatics from 'hoist-non-react-statics'
 
 import type { VoidFn } from './internal/flow-types'
 
@@ -158,7 +159,7 @@ const withAnimatronics = (
 
     AnimatronicsComponent.childContextTypes = ContextTypes;
 
-    return AnimatronicsComponent;
+    return hoistNonReactStatics(AnimatronicsComponent, BaseComponent);
   };
 
 };

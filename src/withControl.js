@@ -5,6 +5,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import hoistNonReactStatics from 'hoist-non-react-statics'
 
 import type { Ref, Element, ComponentType } from 'react'
 import type { Styles } from './internal/flow-types'
@@ -148,7 +149,7 @@ const withControl = (
 
   ControlledComponent.contextTypes = ContextTypes;
 
-  return ControlledComponent;
+  return hoistNonReactStatics(ControlledComponent, BaseComponent);
 };
 
 export default withControl;
