@@ -144,21 +144,21 @@ const withControl = (
     }
 
     render() {
-      const { ...props } = this.props;
+      const baseProps = this.props;
       const { style } = this.state;
 
-      const baseProps = mergeProps ? (
-        mergeProps(props, style)
+      const props = mergeProps ? (
+        mergeProps(baseProps, style)
       ) : ({
+        ...baseProps,
         animatronicStyles: style,
-        ...props,
       });
 
       if (!isStatelessComponent(BaseComponent)) {
-        baseProps.ref = useStringRefs ? name : this._onRef;
+        props.ref = useStringRefs ? name : this._onRef;
       }
 
-      return <BaseComponent { ...baseProps }/>;
+      return <BaseComponent { ...props }/>;
     }
   }
 
