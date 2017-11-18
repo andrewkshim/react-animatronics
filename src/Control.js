@@ -12,9 +12,10 @@ import ContextTypes from './internal/context-types'
 import withControl from './withControl'
 
 type Props = {
+  children: Element<any>,
+  mergeProps?: Function,
   name: string,
   useStringRefs?: boolean,
-  children: Element<any>,
 };
 
 class Control extends React.Component<Props> {
@@ -26,8 +27,8 @@ class Control extends React.Component<Props> {
   }
 
   render() {
-    const { name, children, useStringRefs } = this.props;
-    const enhance = withControl(name, { useStringRefs });
+    const { name, mergeProps, children, useStringRefs } = this.props;
+    const enhance = withControl(name, { mergeProps, useStringRefs });
     class BaseComponent extends React.Component<{}> {
       render() {
         return React.cloneElement(children, this.props);

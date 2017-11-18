@@ -24,6 +24,7 @@ import {
 
 type Options = {
   useStringRefs?: boolean,
+  mergeProps?: Function,
 };
 
 type Props = {};
@@ -34,7 +35,10 @@ type State = {
 
 const withControl = (
   name: string,
-  { useStringRefs = false }: Options = {}
+  {
+    mergeProps,
+    useStringRefs = false,
+  }: Options = {}
 ) => (BaseComponent: ComponentType<{}>): ComponentType<Props> => {
 
   type BaseRef = Element<typeof BaseComponent>;
@@ -47,6 +51,14 @@ const withControl = (
          + ` function that returns an element. A common mistake is to pass in`
          + ` the React element itself. For example, passing in "<Component/>"`
          + ` instead of "Component", but you should be passing in the second form.`
+      );
+    }
+    if (mergeProps && typeof mergeProps !== 'function') {
+      throw makeError(
+        `The second argument to withControl must be a function with two arguments:`
+        + ` the first is the props of the controlled component, and the second is`
+        + ` the animatronicStyles object. The function must return an object that`
+        + ` will be spread into the wrapped component as props.`
       );
     }
   }
@@ -135,10 +147,13 @@ const withControl = (
       const { ...props } = this.props;
       const { style } = this.state;
 
-      const baseProps = {
+      const baseProps = mergeProps ? (
+        mergeProps(props, style)
+      ) : ({
         animatronicStyles: style,
         ...props,
-      };
+      });
+
       if (!isStatelessComponent(BaseComponent)) {
         baseProps.ref = useStringRefs ? name : this._onRef;
       }
