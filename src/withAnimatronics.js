@@ -33,6 +33,7 @@ type Options = {
   setTimeout?: Function,
   clearTimeout?: Function,
   now?: Function,
+  mergeProps?: Function,
 };
 
 type Props = {
@@ -42,6 +43,7 @@ type Props = {
 const withAnimatronics = (
   createAnimationSequences: Function,
   {
+    mergeProps,
     requestAnimationFrame = DEFAULT_REQUEST_ANIMATION_FRAME,
     cancelAnimationFrame = DEFAULT_CANCEL_ANIMATION_FRAME,
     setTimeout = DEFAULT_SET_TIMEOUT,
@@ -111,6 +113,15 @@ const withAnimatronics = (
           + ` instead of "Component", but you should be passing in the second form.`
         );
       }
+      if (mergeProps && typeof mergeProps !== 'function') {
+        throw makeError(
+          `The "mergeProps" option to withAnimatronics must be a function with two arguments:`
+          + ` the first is the props of the controlled component, and the second is`
+          + ` an object with functions { playAnimation, cancelAnimation, resetAnimation }.`
+          + ` The function must return an object that will be spread into the wrapped`
+          + ` component as props.`
+        );
+      }
     }
 
     class AnimatronicsComponent extends React.Component<Props> {
@@ -146,14 +157,20 @@ const withAnimatronics = (
       }
 
       render() {
-        return (
-          <BaseComponent
-            playAnimation={ playAnimation }
-            cancelAnimation={ cancelAnimation }
-            resetAnimation={ resetAnimation }
-            { ...this.props }
-          />
-        );
+        const baseProps = this.props;
+        const props = mergeProps ? (
+          mergeProps(baseProps, {
+            playAnimation,
+            cancelAnimation,
+            resetAnimation,
+          })
+        ) : ({
+          ...this.props,
+          playAnimation,
+          cancelAnimation,
+          resetAnimation,
+        });
+        return <BaseComponent { ...props } />;
       }
     };
 

@@ -13,12 +13,13 @@ import withAnimatronics from './withAnimatronics'
 type Props = {
   createAnimationSequences: Function,
   children: Element<any>,
+  mergeProps?: Function,
 };
 
 class Animatronics extends React.Component<Props> {
   render() {
-    const { createAnimationSequences, children } = this.props;
-    const enhance = withAnimatronics(createAnimationSequences);
+    const { createAnimationSequences, children, mergeProps } = this.props;
+    const enhance = withAnimatronics(createAnimationSequences, { mergeProps });
     class BaseComponent extends React.Component<{}> {
       render() {
         return React.cloneElement(children, this.props);
