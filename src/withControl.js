@@ -55,7 +55,7 @@ const withControl = (
     }
     if (mergeProps && typeof mergeProps !== 'function') {
       throw makeError(
-        `The second argument to withControl must be a function with two arguments:`
+        `The "mergeProps" option to withControl must be a function with two arguments:`
         + ` the first is the props of the controlled component, and the second is`
         + ` the animatronicStyles object. The function must return an object that`
         + ` will be spread into the wrapped component as props.`
