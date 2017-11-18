@@ -57,8 +57,9 @@ const withControl = (
       throw makeError(
         `The "mergeProps" option to withControl must be a function with two arguments:`
         + ` the first is the props of the controlled component, and the second is`
-        + ` the animatronicStyles object. The function must return an object that`
-        + ` will be spread into the wrapped component as props.`
+        + ` an object { animatronicStyles } that contains the interpolated styles.`
+        + ` The function must return an object that will be spread into the wrapped`
+        + ` component as props.`
       );
     }
   }
@@ -148,7 +149,7 @@ const withControl = (
       const { style } = this.state;
 
       const props = mergeProps ? (
-        mergeProps(baseProps, style)
+        mergeProps(baseProps, { animatronicStyles: style })
       ) : ({
         ...baseProps,
         animatronicStyles: style,
