@@ -62,5 +62,13 @@ test('withAnimatronics.playAnimation', assert => {
     'correctly throws when provided incorrect arguments',
   );
 
+  const wrapperTwo = mount(<Animated/>);
+  const playAnimationTwo = wrapperTwo.find(Base).prop('playAnimation');
+
+  assert.notEqual(
+    playAnimation, playAnimationTwo,
+    'creates separate animatronics for each component'
+  );
+
   assert.end();
 });
