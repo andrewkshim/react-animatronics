@@ -133,6 +133,19 @@ test('machines/animatronics/throwIfAnimationNotValid', assert => {
 
   assert.throws(
     () => throwIfAnimationNotValid({
+      from: {
+        scaleA: 0,
+      },
+      to: {
+        scaleA: 1,
+      }
+    }),
+    /specify one or the other/,
+    'should throw when neither a duration or stiffness are specified'
+  );
+
+  assert.throws(
+    () => throwIfAnimationNotValid({
       duration: 100,
       delay: 'foobar',
       from: {},

@@ -90,6 +90,14 @@ export const throwIfAnimationNotValid = (animation: Animation) => {
       `Spring animations must specify both a stiffness and damping,`,
       `so add a 'stiffness' value to your animation for springy goodness.`
     );
+  } else if (animation.duration == null && animation.stiffness == null) {
+    throw makeError(
+      `You declared an animation with neither a 'duration' or 'stiffness':`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`,
+      `You must specify one or the other.`
+    );
   } else if (animation.duration != null && typeof animation.duration !== 'number') {
     throw makeError(
       `You declared an animation with an invalid 'duration':`,
