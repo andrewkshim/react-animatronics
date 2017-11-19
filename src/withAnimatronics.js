@@ -51,6 +51,7 @@ const withAnimatronics = (
     now = DEFAULT_NOW,
   }: Options = {}
 ) => {
+
   if (IS_DEVELOPMENT) {
     if (typeof createAnimationSequences !== 'function') {
       throw makeError(
@@ -58,48 +59,6 @@ const withAnimatronics = (
         `but it received: ${ createAnimationSequences }.`,
       );
     }
-  }
-
-  const machinist = makeMachinist(
-    requestAnimationFrame,
-    cancelAnimationFrame,
-    setTimeout,
-    clearTimeout,
-    now,
-  );
-  const animatronics = machinist.makeAnimatronicsMachine(createAnimationSequences);
-
-  const playAnimation = (
-    animationName: string = DEFAULT_ANIMATION_NAME,
-    onComplete: VoidFn = noop
-  ) => {
-    if (typeof animationName === 'function') {
-      onComplete = animationName;
-      animationName = DEFAULT_ANIMATION_NAME;
-    }
-    if (IS_DEVELOPMENT) {
-      if (typeof animationName !== 'string') {
-        throw makeError(
-          `playAnimation() expects its first argument to be the string name of`,
-          `your animation, but it received: ${ animationName }. You might be`,
-          `passing playAnimation directly into an event handler e.g.\n`,
-          `    onClick={playAnimation}`,
-          `\nbut that will pass in the event as the first argument, so you should`,
-          `instead be calling playAnimation directly e.g.\n`,
-          `    onClick={() => playAnimation()}`,
-          `\n`,
-        );
-      }
-    }
-    animatronics.play(animationName, onComplete);
-  }
-
-  const cancelAnimation = () => {
-    animatronics.stop();
-  }
-
-  const resetAnimation = () => {
-    animatronics.reset();
   }
 
   return (BaseComponent: Object): Object => {
@@ -127,13 +86,60 @@ const withAnimatronics = (
     class AnimatronicsComponent extends React.Component<Props> {
       constructor(props: Props) {
         super(props);
+
+        const machinist = makeMachinist(
+          requestAnimationFrame,
+          cancelAnimationFrame,
+          setTimeout,
+          clearTimeout,
+          now,
+        );
+
+        const animatronics = machinist.makeAnimatronicsMachine(createAnimationSequences);
+
+        this._playAnimation = (
+          animationName: string = DEFAULT_ANIMATION_NAME,
+          onComplete: VoidFn = noop
+        ) => {
+          if (typeof animationName === 'function') {
+            onComplete = animationName;
+            animationName = DEFAULT_ANIMATION_NAME;
+          }
+          if (IS_DEVELOPMENT) {
+            if (typeof animationName !== 'string') {
+              throw makeError(
+                `playAnimation() expects its first argument to be the string name of`,
+                `your animation, but it received: ${ animationName }. You might be`,
+                `passing playAnimation directly into an event handler e.g.\n`,
+                `    onClick={playAnimation}`,
+                `\nbut that will pass in the event as the first argument, so you should`,
+                `instead be calling playAnimation directly e.g.\n`,
+                `    onClick={() => playAnimation()}`,
+                `\n`,
+              );
+            }
+          }
+          animatronics.play(animationName, onComplete);
+        }
+
+        this._cancelAnimation = () => {
+          animatronics.stop();
+        }
+
+        this._resetAnimation = () => {
+          animatronics.reset();
+        }
+
+        this._registerComponent = animatronics.registerComponent;
+        this._unregisterComponent = animatronics.unregisterComponent;
+        this._setCreateAnimationSequences = animatronics.setCreateAnimationSequences;
       }
 
       getChildContext() {
         return {
           animatronics: {
-            registerComponent: animatronics.registerComponent,
-            unregisterComponent: animatronics.unregisterComponent,
+            registerComponent: this._registerComponent,
+            unregisterComponent: this._unregisterComponent,
           }
         };
       }
@@ -141,34 +147,33 @@ const withAnimatronics = (
       componentWillMount() {
         const { createAnimationSequences } = this.props;
         if (createAnimationSequences != null) {
-          animatronics.setCreateAnimationSequences(createAnimationSequences);
+          this._setCreateAnimationSequences(createAnimationSequences);
         }
       }
 
       componentWillReceiveProps(nextProps: Props) {
         const { createAnimationSequences } = nextProps;
         if (createAnimationSequences != null) {
-          animatronics.setCreateAnimationSequences(createAnimationSequences);
+          this._setCreateAnimationSequences(createAnimationSequences);
         }
       }
 
       componentWillUnmount() {
-        animatronics.stop();
+        this._cancelAnimation();
       }
 
       render() {
         const baseProps = this.props;
+        const animatronicProps = {
+          playAnimation: this._playAnimation,
+          cancelAnimation: this._cancelAnimation,
+          resetAnimation: this._resetAnimation,
+        };
         const props = mergeProps ? (
-          mergeProps(baseProps, {
-            playAnimation,
-            cancelAnimation,
-            resetAnimation,
-          })
+          mergeProps(baseProps, animatronicProps)
         ) : ({
-          ...this.props,
-          playAnimation,
-          cancelAnimation,
-          resetAnimation,
+          ...baseProps,
+          ...animatronicProps
         });
         return <BaseComponent { ...props } />;
       }
