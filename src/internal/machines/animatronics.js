@@ -205,7 +205,12 @@ const getNumPhases = state => animationName => {
   return sequence.length;
 };
 
-const runTimedAnimation = dispatch => (componentName, animation, index) => {
+const runTimedAnimation = dispatch => (
+  animationName,
+  componentName,
+  animation,
+  index,
+) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -245,7 +250,10 @@ const runTimedAnimation = dispatch => (componentName, animation, index) => {
         componentName,
         styles: toStyles,
       });
-      dispatch({ type: 'COUNTDOWN_ANIMATIONS' });
+      dispatch({
+        type: 'COUNTDOWN_ANIMATIONS',
+        animationName,
+      });
     }
   });
 
@@ -256,7 +264,12 @@ const runTimedAnimation = dispatch => (componentName, animation, index) => {
   });
 };
 
-const runSpringAnimation = dispatch => (componentName, animation, index) => {
+const runSpringAnimation = dispatch => (
+  animationName,
+  componentName,
+  animation,
+  index,
+) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -307,7 +320,10 @@ const runSpringAnimation = dispatch => (componentName, animation, index) => {
             index,
             componentName,
           });
-          dispatch({ type: 'COUNTDOWN_ANIMATIONS' });
+          dispatch({
+            type: 'COUNTDOWN_ANIMATIONS',
+            animationName,
+          });
         }
       });
     }
@@ -341,8 +357,9 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
 
   dispatch({
     type: 'CREATE_PHASES_COUNTDOWN_MACHINE',
-    numPhases,
+    animationName,
     job: onComplete,
+    numPhases,
   });
 
   const runPhase = (phaseIndex) => {
@@ -362,8 +379,12 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
     dispatch({
       type: 'CREATE_ANIMATION_COUNTDOWN_MACHINE',
       numAnimations,
+      animationName,
       job: () => {
-        dispatch({ type: 'COUNTDOWN_PHASES' });
+        dispatch({
+          type: 'COUNTDOWN_PHASES',
+          animationName,
+        });
         if (phaseIndex < (numPhases - 1)) {
           runPhase(phaseIndex + 1);
         }
@@ -376,9 +397,19 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
       animations.forEach((animation, index) => {
         if (!animation.delay) {
           if (isUsingTime(animation)) {
-            runTimedAnimation(dispatch)(componentName, animation, index);
+            runTimedAnimation(dispatch)(
+              animationName,
+              componentName,
+              animation,
+              index
+            );
           } else if (isUsingSpring(animation)) {
-            runSpringAnimation(dispatch)(componentName, animation, index);
+            runSpringAnimation(dispatch)(
+              animationName,
+              componentName,
+              animation,
+              index
+            );
           }
         } else {
           dispatch({
@@ -387,9 +418,19 @@ export const play = (state, dispatch) => (animationName, onComplete) => {
             delay: animation.delay,
             job: () => {
               if (isUsingTime(animation)) {
-                runTimedAnimation(dispatch)(componentName, animation, index);
+                runTimedAnimation(dispatch)(
+                  animationName,
+                  componentName,
+                  animation,
+                  index
+                );
               } else if (isUsingSpring(animation)) {
-                runSpringAnimation(dispatch)(componentName, animation, index);
+                runSpringAnimation(dispatch)(
+                  animationName,
+                  componentName,
+                  animation,
+                  index
+                );
               }
             }
           });
@@ -467,16 +508,16 @@ export const makeReducers = machinist => ({
     state.endlessJobMachines[componentName][index] = machine;
   },
   CREATE_ANIMATION_COUNTDOWN_MACHINE: (state, action) => {
-    const { numAnimations, job } = action;
+    const { numAnimations, job, animationName } = action;
     const machine = machinist.makeCountdownJobMachine(numAnimations);
     machine.registerJob(job);
-    state.animationCountdownMachine = machine;
+    state.animationCountdownMachines[animationName] = machine;
   },
   CREATE_PHASES_COUNTDOWN_MACHINE: (state, action) => {
-    const { numPhases, job } = action;
+    const { numPhases, job, animationName } = action;
     const machine = machinist.makeCountdownJobMachine(numPhases);
     machine.registerJob(job);
-    state.phasesCountdownMachine = machine;
+    state.phasesCountdownMachines[animationName] = machine;
   },
   CREATE_TIMED_JOB_MACHINE: (state, action) => {
     const { index, componentName, duration } = action;
@@ -492,10 +533,12 @@ export const makeReducers = machinist => ({
     state.timedJobMachines[componentName][index] = machine;
   },
   COUNTDOWN_ANIMATIONS: (state, action) => {
-    state.animationCountdownMachine.countdown();
+    const { animationName } = action;
+    state.animationCountdownMachines[animationName].countdown();
   },
   COUNTDOWN_PHASES: (state, action) => {
-    state.phasesCountdownMachine.countdown();
+    const { animationName } = action;
+    state.phasesCountdownMachines[animationName].countdown();
   },
   REGISTER_COMPONENT: (state, action) => {
     const { componentName, node, styleUpdater, styleResetter } = action;
@@ -583,8 +626,8 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
     springMachines: {},
     endlessJobMachines: {},
     timeouts: {},
-    animationCountdownMachine: null,
-    phasesCountdownMachine: null,
+    animationCountdownMachines: {},
+    phasesCountdownMachines: {},
     createAnimationSequences,
   };
 

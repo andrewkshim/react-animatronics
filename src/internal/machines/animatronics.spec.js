@@ -216,29 +216,30 @@ test('machines/animatronics/makeReducers', assert => {
 
   const reducers = makeReducers(machinist);
 
+  const animationName = 'foobar';
   const state = {
-    animationCountdownMachine: null,
-    phasesCountdownMachine: null,
+    animationCountdownMachines: {},
+    phasesCountdownMachines: {},
     timedJobMachines: {},
   };
 
   reducers.CREATE_ANIMATION_COUNTDOWN_MACHINE(
     state,
-    { numAnimations: 4, job: () => {} }
+    { numAnimations: 4, job: () => {}, animationName }
   );
 
   assert.ok(
-    state.animationCountdownMachine,
+    state.animationCountdownMachines.foobar,
     'CREATE_ANIMATION_COUNTDOWN_MACHINE should create a countdown machine'
   );
 
   reducers.CREATE_PHASES_COUNTDOWN_MACHINE(
     state,
-    { numPhases: 3, job: () => {} }
+    { numPhases: 3, job: () => {}, animationName }
   );
 
   assert.ok(
-    state.phasesCountdownMachine,
+    state.phasesCountdownMachines.foobar,
     'CREATE_PHASES_COUNTDOWN_MACHINE should create a countdown machine'
   );
 
