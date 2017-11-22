@@ -195,11 +195,18 @@ export const throwIfPhaseNotValid = (phase: AnimationPhase, nodes: { [string]: D
 
 export const makeSequence = state => animationName => {
   const { createAnimationSequences, nodes } = state;
-  const sequences = createAnimationSequences(nodes);
+  const areSequencesStatic = typeof createAnimationSequences === 'function';
+
+  const sequences = areSequencesStatic
+    ? createAnimationSequences(nodes)
+    : createAnimationSequences;
+
   const namedSequences = Array.isArray(sequences)
     ? { [DEFAULT_ANIMATION_NAME]: sequences }
     : sequences;
-  const sequence = namedSequences[animationName];
+  const sequence = areSequencesStatic
+    ? namedSequences[animationName]
+    : namedSequences[animationName](nodes);
 
   if (IS_DEVELOPMENT) {
     sequence.forEach(phase => throwIfPhaseNotValid(phase, nodes));
