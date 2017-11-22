@@ -10,6 +10,10 @@ import {
   makeReducers,
 } from './animatronics'
 
+import {
+  DEFAULT_ANIMATION_NAME
+} from '../constants'
+
 test('machines/animatronics/calculateEasingProgress', assert => {
   assert.equals(
     calculateEasingProgress(x => x, 500, 250), 0.5,
@@ -185,25 +189,23 @@ test('machines/animatronics/throwIfPhaseNotValid', assert => {
 });
 
 test('machines/animatronics/makeSequence', assert => {
-  const createAnimationSequences = () => ({
-    hello: [
-      {
-        circle: {
-          duration: 500,
-          from: { left: '100px' },
-          to: { left: '200px' },
-        }
-      }
-    ]
-  });
-
-  const state = {
-    createAnimationSequences,
-    nodes: { circle: {} },
-  };
-
   assert.deepEquals(
-    makeSequence(state)('hello'),
+    makeSequence(
+      {
+        createAnimationSequences: () => ({
+          hello: [
+            {
+              circle: {
+                duration: 500,
+                from: { left: '100px' },
+                to: { left: '200px' },
+              }
+            }
+          ]
+        }),
+        nodes: { circle: {} },
+      }
+    )('hello'),
     [
       {
         circle: {
@@ -212,8 +214,38 @@ test('machines/animatronics/makeSequence', assert => {
           to: { left: '200px' },
         }
       }
-    ]
+    ],
+    'should make a basic sequence'
   );
+
+  makeSequence(
+    {
+      createAnimationSequences: ({ circle }) => {
+        assert.deepEquals(
+          circle, { message: 'foobar' },
+          'should pass nodes into static sequences'
+        );
+        return [];
+      },
+      nodes: { circle: { message: 'foobar' } },
+    }
+  )(DEFAULT_ANIMATION_NAME),
+
+  makeSequence(
+    {
+      createAnimationSequences: {
+        hey: ({ circle }) => {
+          assert.deepEquals(
+            circle, { message: 'hey hey' },
+            'should pass nodes into dynamic sequences'
+          );
+          return [];
+        }
+      },
+      nodes: { circle: { message: 'hey hey' } },
+    }
+  )('hey'),
+
   assert.end();
 });
 
