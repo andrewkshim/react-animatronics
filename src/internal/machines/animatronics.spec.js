@@ -246,6 +246,20 @@ test('machines/animatronics/makeSequence', assert => {
     }
   )('hey'),
 
+  assert.throws(() => {
+    makeSequence(
+      {
+        createAnimationSequences: () => ({
+          foo: [],
+          bar: [],
+        }),
+        nodes: {},
+      }
+    )('woo'),
+    /there is no such named animation/,
+    'should throw when you try to run a named animation that does not exist'
+  });
+
   assert.end();
 });
 
