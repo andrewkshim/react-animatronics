@@ -204,6 +204,17 @@ export const makeSequence = state => animationName => {
   const namedSequences = Array.isArray(sequences)
     ? { [DEFAULT_ANIMATION_NAME]: sequences }
     : sequences;
+
+  if (IS_DEVELOPMENT) {
+    if (namedSequences[animationName] == null) {
+      throw makeError(
+        `Attempted to run an animation named "${ animationName }", but there is no such`
+        + ` named animation. The animations you have defined are:`
+        + ` [${ Object.keys(namedSequences).filter(name => name !== DEFAULT_ANIMATION_NAME) }]`
+      );
+    }
+  }
+
   const sequence = areSequencesStatic
     ? namedSequences[animationName]
     : namedSequences[animationName](nodes);
