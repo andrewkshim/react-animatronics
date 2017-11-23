@@ -41,35 +41,35 @@ const calculateValue = (currentValue: number, velocity: number): number =>
 // Credit for most of this logic goes to:
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
 
-export const makeSideEffects = machinist => ({
-  INCREMENT_NUM_STOPS: (state, action) => {
+export const makeMutators = (machinist, state) => ({
+  incrementNumStops: action => {
     state.numStops++;
   },
-  UPDATE_VELOCITIES: (state, action) => {
+  updateVelocities: action => {
     const { velocities } = action;
     state.velocities = velocities;
   },
-  UPDATE_VALUES: (state, action) => {
+  updateValues: action => {
     const { values } = action;
     state.values = values;
   },
-  UPDATE_INTERMEDIATE_VELOCITIES: (state, action) => {
+  updateIntermediateVelocities: action => {
     const { intermediateVelocities } = action;
     state.intermediateVelocities = intermediateVelocities;
   },
-  UPDATE_INTERMEDIATE_VALUES: (state, action) => {
+  updateIntermediateValues: action => {
     const { intermediateValues } = action;
     state.intermediateValues = intermediateValues;
   },
-  UPDATE_PREV_TIME: (state, action) => {
+  updatePrevTime: action => {
     const { prevTime } = action;
     state.prevTime = prevTime;
   },
-  UPDATE_ACCUMULATED_TIME: (state, action) => {
+  updateAccumulatedTime: action => {
     const { accumulatedTime } = action;
     state.accumulatedTime = accumulatedTime;
   },
-  INCREMENT_NUM_ITERATIONS: (state, action) => {
+  incrementNumIterations: action => {
     state.numIterations++;
   },
 });
@@ -92,48 +92,40 @@ const calculateValues = state => {
   );
 };
 
-const syncToLatestFrame = (state, dispatch) => numFramesBehind => {
+const syncToLatestFrame = (state, mutators) => numFramesBehind => {
   for (let i = 0; i < numFramesBehind; i++) {
-    dispatch({
-      type: 'UPDATE_VELOCITIES',
-      velocities: calculateVelocities(state),
-    });
-    dispatch({
-      type: 'UPDATE_VALUES',
-      values: calculateValues(state),
-    });
+    const velocities = calculateVelocities(state);
+    mutators.updateVelocities({ velocities });
+
+    const values = calculateValues(state);
+    mutators.updateValues({ values });
   }
 };
 
-const moveToNextFrame = (state, dispatch) => progress => {
-  dispatch({
-    type: 'UPDATE_INTERMEDIATE_VELOCITIES',
-    intermediateVelocities: calculateVelocities(state),
-  });
-  dispatch({
-    type: 'UPDATE_INTERMEDIATE_VALUES',
-    intermediateValues: calculateValues(state),
-  });
-  dispatch({
-    type: 'UPDATE_VELOCITIES',
-    velocities: state.velocities.map(
-      (velocity, index) => interpolateValue(
-        velocity,
-        state.intermediateVelocities[index],
-        progress
-      )
-    ),
-  });
-  dispatch({
-    type: 'UPDATE_VALUES',
-    values: state.values.map(
-      (value, index) => interpolateValue(
-        value,
-        state.intermediateValues[index],
-        progress
-      )
+const moveToNextFrame = (state, mutators) => progress => {
+  const intermediateVelocities = calculateVelocities(state);
+  mutators.updateIntermediateVelocities({ intermediateVelocities });
+
+  const intermediateValues = calculateValues(state);
+  mutators.updateIntermediateValues({ intermediateValues });
+
+  const velocities = state.velocities.map(
+    (velocity, index) => interpolateValue(
+      velocity,
+      state.intermediateVelocities[index],
+      progress
     )
-  });
+  );
+  mutators.updateVelocities({ velocities });
+
+  const values = state.values.map(
+    (value, index) => interpolateValue(
+      value,
+      state.intermediateValues[index],
+      progress
+    )
+  );
+  mutators.updateValues({ values })
 }
 
 const isStopped = state => (
@@ -141,7 +133,7 @@ const isStopped = state => (
   && state.numIterations > MIN_ITERATIONS
 );
 
-const runNextFrame = (state, dispatch) => (
+const runNextFrame = (state, mutators) => (
   onNext: Function = noop,
   onComplete: Function = noop
 ) => {
@@ -156,28 +148,24 @@ const runNextFrame = (state, dispatch) => (
       onComplete(updatedStyles);
       return;
     } else {
-      dispatch({ type: 'INCREMENT_NUM_STOPS' });
+      mutators.incrementNumStops();
     }
   }
 
   const currentTime = Date.now();
   const timeSinceLastFrame = currentTime - state.prevTime;
 
-  dispatch({
-    type: 'UPDATE_PREV_TIME',
-    prevTime: currentTime
-  });
-  dispatch({
-    type: 'UPDATE_ACCUMULATED_TIME',
+  mutators.updatePrevTime({ prevTime: currentTime });
+  mutators.updateAccumulatedTime({
     accumulatedTime: state.accumulatedTime + timeSinceLastFrame,
-  });
+  })
 
   const numFramesBehind = Math.floor(state.accumulatedTime / MS_PER_ANIMATION_FRAME);
   const remainingTime = numFramesBehind * MS_PER_ANIMATION_FRAME;
   const progress = (state.accumulatedTime - remainingTime) / MS_PER_ANIMATION_FRAME;
 
-  syncToLatestFrame(state, dispatch)(numFramesBehind);
-  moveToNextFrame(state, dispatch)(progress);
+  syncToLatestFrame(state, mutators)(numFramesBehind);
+  moveToNextFrame(state, mutators)(progress);
 
   const updatedStyles = reconstructStyles(
     state.fromStyles,
@@ -187,11 +175,10 @@ const runNextFrame = (state, dispatch) => (
   );
   onNext(updatedStyles);
 
-  dispatch({
-    type: 'UPDATE_ACCUMULATED_TIME',
-    accumulatedTime: state.accumulatedTime - (numFramesBehind * MS_PER_ANIMATION_FRAME)
+  mutators.updateAccumulatedTime({
+    accumulatedTime: state.accumulatedTime - (numFramesBehind * MS_PER_ANIMATION_FRAME),
   });
-  dispatch({ type: 'INCREMENT_NUM_ITERATIONS' });
+  mutators.incrementNumIterations();
 }
 
 export const makeSpringMachine = machinist => (
@@ -218,15 +205,10 @@ export const makeSpringMachine = machinist => (
     intermediateVelocities: styleNames.map(() => 0),
   };
 
-  const sideEffects = makeSideEffects(machinist);
-
-  const dispatch = action => {
-    const { type } = action;
-    sideEffects[type](state, action);
-  };
+  const mutators = makeMutators(machinist, state);
 
   const springMachine = {
-    runNextFrame: runNextFrame(state, dispatch),
+    runNextFrame: runNextFrame(state, mutators),
   };
 
   return springMachine;
