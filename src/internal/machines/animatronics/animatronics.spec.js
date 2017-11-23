@@ -91,33 +91,36 @@ test('machines/animatronics/makeReducers', () => {
     }
   };
 
-  const reducers = makeReducers(machinist);
-
-  const animationName = 'foobar';
   const state = {
     animationCountdownMachines: {},
     phasesCountdownMachines: {},
     timedJobMachines: {},
   };
 
-  reducers.CREATE_ANIMATION_COUNTDOWN_MACHINE(
-    state,
-    { numAnimations: 4, job: () => {}, animationName }
-  );
+  const reducers = makeReducers(machinist, state);
+
+  const animationName = 'foobar';
+
+  reducers.createAnimationCountdownMachine({
+    numAnimations: 4,
+    job: () => {},
+    animationName,
+  });
 
   expect(state.animationCountdownMachines.foobar).toBeTruthy();
 
-  reducers.CREATE_PHASES_COUNTDOWN_MACHINE(
-    state,
-    { numPhases: 3, job: () => {}, animationName }
-  );
+  reducers.createPhasesCountdownMachine({
+    numPhases: 3,
+    job: () => {},
+    animationName,
+  });
 
   expect(state.phasesCountdownMachines.foobar).toBeTruthy();
 
-  reducers.CREATE_TIMED_JOB_MACHINE(
-    state,
-    { componentName: 'foobar', duration: 400 }
-  );
+  reducers.createTimedJobMachine({
+    componentName: 'foobar',
+    duration: 400,
+  });
 
   expect(state.timedJobMachines.foobar).toBeTruthy();
 });
