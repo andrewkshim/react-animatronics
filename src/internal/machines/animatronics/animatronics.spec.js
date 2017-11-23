@@ -12,7 +12,7 @@ import {
 
 import {
   DEFAULT_ANIMATION_NAME
-} from '../constants'
+} from '../../constants'
 
 test('machines/animatronics/calculateEasingProgress', assert => {
   assert.equals(

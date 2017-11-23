@@ -1,13 +1,13 @@
 import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
-import { constructStyles } from '../fashionistas/timed'
-import { makeError, flatten } from '../utils'
+import { constructStyles } from '../../fashionistas/timed'
+import { makeError, flatten } from '../../utils'
 
 import {
   DEFAULT_ANIMATION_NAME,
   IS_DEVELOPMENT,
-} from '../constants'
+} from '../../constants'
 
 const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
