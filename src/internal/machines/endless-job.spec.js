@@ -2,30 +2,26 @@ import sinon from 'sinon'
 import lolex from 'lolex'
 
 import {
-  makeReducers,
+  makeMutators,
   start,
   stop,
 } from './endless-job'
 
-test('machines/endless-job/makeReducers', () => {
-  const machinist = {};
-  const reducers = makeReducers(machinist);
+test('machines/endless-job/makeMutators', () => {
   const state = {
     frame: null,
     jobs: [],
     isStopped: true,
   };
+  const mutators = makeMutators({}, state);
 
-  reducers.REGISTER_JOB(state, { job: 'foobar' });
-
+  mutators.registerJob({ job: 'foobar' });
   expect(state.jobs).toEqual(['foobar']);
 
-  reducers.START_MACHINE(state, {});
-
+  mutators.startMachine();
   expect(state.isStopped).toBe(false);
 
-  reducers.STOP_MACHINE(state, {});
-
+  mutators.stopMachine();
   expect(state).toEqual(
     { frame: null, jobs: [], isStopped: true }
   );
@@ -33,12 +29,12 @@ test('machines/endless-job/makeReducers', () => {
 
 test('machines/endless-job/start', () => {
   const clock = lolex.createClock();
-  const dispatch = () => {};
   const state = {
     isStopped: false,
     jobs: [],
     requestAnimationFrame: callback => clock.setTimeout(callback, 10),
   };
+  const mutators = makeMutators({}, state);
 
   const expectedCallCount = 5;
   let callCount = 0;
@@ -51,7 +47,7 @@ test('machines/endless-job/start', () => {
   }
   state.jobs.push(job);
 
-  start(state, dispatch)();
+  start(state, mutators)();
   clock.runAll();
 
   expect(callCount).toBe(expectedCallCount);
@@ -59,14 +55,14 @@ test('machines/endless-job/start', () => {
 
 test('machines/endless-job/stop', () => {
   const clock = lolex.createClock();
-  const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();
   const state = {
     frame: 'hello',
     cancelAnimationFrame,
   };
+  const mutators = makeMutators({}, state);
 
-  stop(state, dispatch)();
+  stop(state, mutators)();
 
   expect(cancelAnimationFrame.firstCall.args[0]).toBe('hello');
 });

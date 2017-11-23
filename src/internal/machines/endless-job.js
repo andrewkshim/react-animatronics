@@ -1,14 +1,10 @@
-const registerJob = (state, dispatch) => job => {
-  dispatch({
-    type: 'REGISTER_JOB',
-    job,
-  });
+const registerJob = (state, mutators) => job => {
+  mutators.registerJob({ job });
 }
 
-// IMPROVE: How to better manage state so its more consistent with the other
-// reducers?
-export const start = (state, dispatch) => () => {
-  dispatch({ type: 'START_MACHINE' });
+// IMPROVE: How to better manage state so its more consistent with the other mutators?
+export const start = (state, mutators) => () => {
+  mutators.startMachine();
   const tick = () => {
     state.frame = state.requestAnimationFrame(executeJobs);
   }
@@ -20,26 +16,30 @@ export const start = (state, dispatch) => () => {
   tick();
 }
 
-export const stop = (state, dispatch) => () => {
+export const stop = (state, mutators) => () => {
   if (state.frame) {
     state.cancelAnimationFrame(state.frame);
   }
-  dispatch({ type: 'STOP_MACHINE' });
+  mutators.stopMachine();
 }
 
-export const makeReducers = machinist => ({
-  REGISTER_JOB: (state, action) => {
+export const makeMutators = (machinist, state) => ({
+
+  registerJob: action => {
     const { job } = action;
     state.jobs.push(job);
   },
-  START_MACHINE: (state, action) => {
+
+  startMachine: action => {
     state.isStopped = false;
   },
-  STOP_MACHINE: (state, action) => {
+
+  stopMachine: action => {
     state.frame = null;
     state.jobs = [];
     state.isStopped = true;
   },
+
 });
 
 export const makeEndlessJobMachine = machinist => (
@@ -54,17 +54,12 @@ export const makeEndlessJobMachine = machinist => (
     cancelAnimationFrame,
   };
 
-  const reducers = makeReducers(machinist);
-
-  const dispatch = action => {
-    const { type } = action;
-    reducers[type](state, action);
-  };
+  const mutators = makeMutators(machinist, state);
 
   const endlessJobMachine = {
-    registerJob: registerJob(state, dispatch),
-    start: start(state, dispatch),
-    stop: stop(state, dispatch),
+    registerJob: registerJob(state, mutators),
+    start: start(state, mutators),
+    stop: stop(state, mutators),
   };
 
   return endlessJobMachine;
