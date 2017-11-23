@@ -84,6 +84,14 @@ const withAnimatronics = (
     }
 
     class AnimatronicsComponent extends React.Component<Props> {
+      // FIXME: There must be a better way vs setting these instance methods
+      _cancelAnimation: Function
+      _playAnimation: Function
+      _registerComponent: Function
+      _resetAnimation: Function
+      _setCreateAnimationSequences: Function
+      _unregisterComponent: Function
+
       constructor(props: Props) {
         super(props);
 
