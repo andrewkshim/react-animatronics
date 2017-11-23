@@ -1,11 +1,10 @@
-import test from 'tape'
 import sinon from 'sinon'
 
 import {
   makeReducers,
 } from './countdown-job'
 
-test('machines/countdown-job/makeReducers', assert => {
+test('machines/countdown-job/makeReducers', () => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const job = sinon.spy();
@@ -16,25 +15,13 @@ test('machines/countdown-job/makeReducers', assert => {
 
   reducers.REGISTER_JOB(state, { job });
 
-  assert.deepEquals(
-    state.jobs,
-    [ job ],
-    'REGISTER_JOB should add a job'
-  );
+  expect(state.jobs).toEqual([ job ]);
 
   reducers.COUNTDOWN(state, {}),
 
-  assert.equals(
-    state.count, 1,
-    'COUNTDOWN should decrement the count'
-  );
+  expect(state.count).toBe(1);
 
   reducers.COUNTDOWN(state, {}),
 
-  assert.true(
-    job.calledOnce,
-    'COUNTDOWN should call the jobs when the count reaches 0'
-  );
-
-  assert.end();
+  expect(job.calledOnce).toBe(true);
 });

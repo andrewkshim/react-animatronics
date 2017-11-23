@@ -1,12 +1,11 @@
 import React from 'react'
 import lolex from 'lolex'
 import sinon from 'sinon'
-import test from 'tape'
 import { mount } from 'enzyme'
 
 import { withAnimatronics, withControl } from '../src'
 
-test('runs each animation phase', assert => {
+test('runs each animation phase', () => {
   class Base extends React.Component {
     render() {
       return <div/>;
@@ -63,8 +62,7 @@ test('runs each animation phase', assert => {
   playAnimation(
     () => {
       const elapsedTime = Date.now() - startTime;
-      assert.true(elapsedTime >= 550, 'the animation took the expected amount of time');
-      assert.end();
+      expect(elapsedTime).toBeGreaterThanOrEqual(550);
     },
   );
 

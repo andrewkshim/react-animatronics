@@ -1,20 +1,11 @@
-// @flow
-import test from 'tape'
-
 import { makeError } from './index'
 
-test('utils.makeError', assert => {
+test('utils.makeError', () => {
   const spaceErr = makeError('hello', 'world');
-  assert.equals(
-    spaceErr.message, 'hello world',
-    'correctly formats spaces'
-  );
+  expect(spaceErr.message).toBe('hello world');
 
   const newlineErr = makeError('hello', '\n', 'world');
-  assert.equals(
-    newlineErr.message, 'hello\nworld',
-    'correctly formats newlines'
-  );
+  expect(newlineErr.message).toBe('hello\nworld');
 
   const spaceAndNewlineErr = makeError(
     'there should be a space between',
@@ -22,11 +13,7 @@ test('utils.makeError', assert => {
     '\n',
     'be a space at the start of this line'
   );
-  assert.equals(
-    spaceAndNewlineErr.message,
-    'there should be a space between these lines but there should not\nbe a space at the start of this line',
-    'correctly formats a combination of spaces and newlines'
+  expect(spaceAndNewlineErr.message).toBe(
+  'there should be a space between these lines but there should not\nbe a space at the start of this line'
   );
-
-  assert.end();
 });

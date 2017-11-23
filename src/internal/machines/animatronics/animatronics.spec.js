@@ -1,4 +1,3 @@
-import test from 'tape'
 import sinon from 'sinon'
 
 import {
@@ -14,128 +13,97 @@ import {
   DEFAULT_ANIMATION_NAME
 } from '../../constants'
 
-test('machines/animatronics/calculateEasingProgress', assert => {
-  assert.equals(
-    calculateEasingProgress(x => x, 500, 250), 0.5,
-    'should return the result of the easing(elapsedTime / duration)'
-  );
-
-  assert.equals(
-    calculateEasingProgress(x => x, 0, 250), 1,
-    'should return the result of the easing(1) when duration is 0'
-  );
-
-  assert.end();
+test('machines/animatronics/calculateEasingProgress', () => {
+  expect(calculateEasingProgress(x => x, 500, 250)).toBe(0.5);
+  expect(calculateEasingProgress(x => x, 0, 250)).toBe(1.0);
 });
 
-test('machines/animatronics/throwIfAnimationNotValid', assert => {
-  assert.throws(
+test('machines/animatronics/throwIfAnimationNotValid', () => {
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       stiffness: 200,
       damping: 20,
     }),
-    /must specify either/,
-    'should throw when animation is both timed and spring'
-  );
+  ).toThrow(/must specify either/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       stiffness: 20,
     }),
-    /with both a 'duration' and a 'stiffness'/,
-  );
+  ).toThrow(/with both a 'duration' and a 'stiffness'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       damping: 20,
-    }),
-    /with both a 'duration' and a 'damping'/,
-  );
+    })
+  ).toThrow(/with both a 'duration' and a 'damping'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 'foobar',
-    }),
-    /'duration' must always be a number/,
-    'should throw when the duration is not a number'
-  );
+    })
+  ).toThrow(/'duration' must always be a number/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       stiffness: 'foobar',
       damping: 20,
-    }),
-    /'stiffness' must always be a number/,
-    'should throw when the stiffness is not a number'
-  );
+    })
+  ).toThrow(/'stiffness' must always be a number/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       stiffness: 200,
       damping: 'foobar',
-    }),
-    /'damping' must always be a number/,
-    'should throw when the damping is not a number'
-  );
+    })
+  ).toThrow(/'damping' must always be a number/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       stiffness: 200,
     }),
-    /with a 'stiffness' but not a 'damping'/,
-    'should throw when a spring animation has stiffness but not damping'
-  );
+  ).toThrow(/with a 'stiffness' but not a 'damping'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       damping: 20,
-    }),
-    /with a 'damping' but not a 'stiffness'/,
-    'should throw when a spring animation has damping but not stiffness'
-  );
+    })
+  ).toThrow(/with a 'damping' but not a 'stiffness'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       from: {},
-    }),
-    /with a 'from' but not an 'to'/,
-    'should throw when an animation has a from but no to'
-  );
+    })
+  ).toThrow(/with a 'from' but not an 'to'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       to: {},
-    }),
-    /with an 'to' but not a 'from'/,
-    'should throw when an animation has an to but no from'
-  );
+    })
+  ).toThrow(/with an 'to' but not a 'from'/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       from: 'foobar',
       to: {},
-    }),
-    /'from' must always be a plain object/,
-    'should throw when from is not an object'
-  );
+    })
+  ).toThrow(/'from' must always be a plain object/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       from: {},
       to: 'foobar',
-    }),
-    /'to' must always be a plain object/,
-    'should throw when to is not an object'
-  );
+    })
+  ).toThrow(/'to' must always be a plain object/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       from: {
         scaleA: 0,
@@ -143,36 +111,29 @@ test('machines/animatronics/throwIfAnimationNotValid', assert => {
       to: {
         scaleA: 1,
       }
-    }),
-    /specify one or the other/,
-    'should throw when neither a duration or stiffness are specified'
-  );
+    })
+  ).toThrow(/specify one or the other/);
 
-  assert.throws(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       delay: 'foobar',
       from: {},
       to: {},
-    }),
-    /'delay' must always be a number/,
-    'should throw when delay is not a number'
-  );
+    })
+  ).toThrow(/'delay' must always be a number/);
 
-  assert.doesNotThrow(
+  expect(
     () => throwIfAnimationNotValid({
       duration: 100,
       from: {},
       to: {},
-    }),
-    'should not throw when the animation is valid'
-  );
-
-  assert.end();
+    })
+  ).not.toThrow();
 });
 
-test('machines/animatronics/throwIfPhaseNotValid', assert => {
-  assert.throws(
+test('machines/animatronics/throwIfPhaseNotValid', () => {
+  expect(
     () => {
       throwIfPhaseNotValid(
         { bar: {
@@ -182,14 +143,12 @@ test('machines/animatronics/throwIfPhaseNotValid', assert => {
         } },
         { foo: null }
       );
-    },
-    /isn't aware of any component with that name/
-  );
-  assert.end();
+    }
+  ).toThrow(/isn't aware of any component with that name/);
 });
 
-test('machines/animatronics/makeSequence', assert => {
-  assert.deepEquals(
+test('machines/animatronics/makeSequence', () => {
+  expect(
     makeSequence(
       {
         createAnimationSequences: () => ({
@@ -205,7 +164,8 @@ test('machines/animatronics/makeSequence', assert => {
         }),
         nodes: { circle: {} },
       }
-    )('hello'),
+    )('hello')
+  ).toEqual(
     [
       {
         circle: {
@@ -214,17 +174,13 @@ test('machines/animatronics/makeSequence', assert => {
           to: { left: '200px' },
         }
       }
-    ],
-    'should make a basic sequence'
+    ]
   );
 
   makeSequence(
     {
       createAnimationSequences: ({ circle }) => {
-        assert.deepEquals(
-          circle, { message: 'foobar' },
-          'should pass nodes into static sequences'
-        );
+        expect(circle).toEqual({ message: 'foobar' });
         return [];
       },
       nodes: { circle: { message: 'foobar' } },
@@ -235,10 +191,7 @@ test('machines/animatronics/makeSequence', assert => {
     {
       createAnimationSequences: {
         hey: ({ circle }) => {
-          assert.deepEquals(
-            circle, { message: 'hey hey' },
-            'should pass nodes into dynamic sequences'
-          );
+          expect(circle).toEqual({ message: 'hey hey' });
           return [];
         }
       },
@@ -246,7 +199,7 @@ test('machines/animatronics/makeSequence', assert => {
     }
   )('hey'),
 
-  assert.throws(() => {
+  expect(() => {
     makeSequence(
       {
         createAnimationSequences: () => ({
@@ -255,15 +208,11 @@ test('machines/animatronics/makeSequence', assert => {
         }),
         nodes: {},
       }
-    )('woo'),
-    /there is no such named animation/,
-    'should throw when you try to run a named animation that does not exist'
-  });
-
-  assert.end();
+    )('woo')
+  }).toThrow(/there is no such named animation/);
 });
 
-test('machines/animatronics/makeReducers', assert => {
+test('machines/animatronics/makeReducers', () => {
   const machinist = {
     makeCountdownJobMachine: () => {
       return { registerJob: () => {} };
@@ -287,30 +236,19 @@ test('machines/animatronics/makeReducers', assert => {
     { numAnimations: 4, job: () => {}, animationName }
   );
 
-  assert.ok(
-    state.animationCountdownMachines.foobar,
-    'CREATE_ANIMATION_COUNTDOWN_MACHINE should create a countdown machine'
-  );
+  expect(state.animationCountdownMachines.foobar).toBeTruthy();
 
   reducers.CREATE_PHASES_COUNTDOWN_MACHINE(
     state,
     { numPhases: 3, job: () => {}, animationName }
   );
 
-  assert.ok(
-    state.phasesCountdownMachines.foobar,
-    'CREATE_PHASES_COUNTDOWN_MACHINE should create a countdown machine'
-  );
+  expect(state.phasesCountdownMachines.foobar).toBeTruthy();
 
   reducers.CREATE_TIMED_JOB_MACHINE(
     state,
     { componentName: 'foobar', duration: 400 }
   );
 
-  assert.ok(
-    state.timedJobMachines.foobar,
-    'CREATE_TIMED_JOB_MACHINE should create a timed job machine for the component'
-  );
-
-  assert.end();
+  expect(state.timedJobMachines.foobar).toBeTruthy();
 });

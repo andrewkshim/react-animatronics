@@ -1,10 +1,9 @@
 import React from 'react'
-import test from 'tape'
 import { mount } from 'enzyme'
 
 import withAnimatronics from './withAnimatronics'
 
-test('withAnimatronics', assert => {
+test('withAnimatronics', () => {
   const createAnimationSequences = () => [
     {
       base: {
@@ -18,24 +17,18 @@ test('withAnimatronics', assert => {
   const Animated = withAnimatronics(createAnimationSequences)(() => <div/>);
   const element = React.createElement(Animated);
 
-  assert.true(React.isValidElement(element), 'creates a valid React element');
+  expect(React.isValidElement(element)).toBe(true);
 
-  assert.throws(
-    () => withAnimatronics(),
+  expect(() => withAnimatronics()).toThrow(
     /expects its first argument to be a function/,
-    'correctly throws when provided incorrect arguments'
   );
 
-  assert.throws(
-    () => withAnimatronics(() => [])(undefined),
+  expect(() => withAnimatronics(() => [])(undefined)).toThrow(
     /must be used to wrap a React component/,
-    'correctly throws when provided an incorrect BaseComponent'
   );
-
-  assert.end();
 });
 
-test('withAnimatronics.playAnimation', assert => {
+test('withAnimatronics.playAnimation', () => {
   const Base = () => <div/>;
   const createAnimationSequences = () => [
     {
@@ -51,24 +44,14 @@ test('withAnimatronics.playAnimation', assert => {
   const wrapper = mount(<Animated/>);
   const playAnimation = wrapper.find(Base).prop('playAnimation');
 
-  assert.true(
-    typeof playAnimation === 'function',
-    'supplies playAnimation() to the wrapped component'
-  );
+  expect(typeof playAnimation === 'function').toBe(true);
 
-  assert.throws(
-    () => playAnimation({}),
+  expect(() => playAnimation({})).toThrow(
     /expects its first argument to be the string name of your animation/,
-    'correctly throws when provided incorrect arguments',
   );
 
   const wrapperTwo = mount(<Animated/>);
   const playAnimationTwo = wrapperTwo.find(Base).prop('playAnimation');
 
-  assert.notEqual(
-    playAnimation, playAnimationTwo,
-    'creates separate animatronics for each component'
-  );
-
-  assert.end();
+  expect(playAnimation).not.toBe(playAnimationTwo);
 });

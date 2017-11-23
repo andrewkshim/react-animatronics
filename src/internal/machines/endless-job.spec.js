@@ -1,4 +1,3 @@
-import test from 'tape'
 import sinon from 'sinon'
 import lolex from 'lolex'
 
@@ -8,7 +7,7 @@ import {
   stop,
 } from './endless-job'
 
-test('machines/endless-job/makeReducers', assert => {
+test('machines/endless-job/makeReducers', () => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const state = {
@@ -19,31 +18,20 @@ test('machines/endless-job/makeReducers', assert => {
 
   reducers.REGISTER_JOB(state, { job: 'foobar' });
 
-  assert.deepEquals(
-    state.jobs,
-    ['foobar'],
-    'REGISTER_JOB should add a job'
-  );
+  expect(state.jobs).toEqual(['foobar']);
 
   reducers.START_MACHINE(state, {});
 
-  assert.false(
-    state.isStopped,
-    'START_MACHINE should mark the machine as started'
-  );
+  expect(state.isStopped).toBe(false);
 
   reducers.STOP_MACHINE(state, {});
 
-  assert.deepEquals(
-    state,
-    { frame: null, jobs: [], isStopped: true },
-    'STOP_MACHINE should reset the machine state'
+  expect(state).toEqual(
+    { frame: null, jobs: [], isStopped: true }
   );
-
-  assert.end();
 });
 
-test('machines/endless-job/start', assert => {
+test('machines/endless-job/start', () => {
   const clock = lolex.createClock();
   const dispatch = () => {};
   const state = {
@@ -66,15 +54,10 @@ test('machines/endless-job/start', assert => {
   start(state, dispatch)();
   clock.runAll();
 
-  assert.equals(
-    callCount, expectedCallCount,
-    'should run the job as long as the machine is not stopped'
-  );
-
-  assert.end();
+  expect(callCount).toBe(expectedCallCount);
 });
 
-test('machines/endless-job/stop', assert => {
+test('machines/endless-job/stop', () => {
   const clock = lolex.createClock();
   const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();
@@ -85,10 +68,5 @@ test('machines/endless-job/stop', assert => {
 
   stop(state, dispatch)();
 
-  assert.equals(
-    cancelAnimationFrame.firstCall.args[0], 'hello',
-    'should calll cancelAnimationFrame with the current frame'
-  );
-
-  assert.end();
+  expect(cancelAnimationFrame.firstCall.args[0]).toBe('hello');
 });

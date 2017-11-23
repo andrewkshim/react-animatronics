@@ -1,10 +1,9 @@
 import React from 'react'
-import test from 'tape'
 import { mount } from 'enzyme'
 
 import Animatronics from './Animatronics'
 
-test('Animatronics', assert => {
+test('<Animatronics />', () => {
   const Base = () => <div/>;
   const createAnimationSequences = () => [];
 
@@ -14,9 +13,5 @@ test('Animatronics', assert => {
     </Animatronics>
   );
 
-  assert.equals(
-    wrapper.find('AnimatronicsComponent').length, 1,
-    'contains the underlying withAnimatronics component'
-  );
-  assert.end();
+  expect(wrapper.find('AnimatronicsComponent').length).toBe(1);
 });

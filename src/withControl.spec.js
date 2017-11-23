@@ -1,42 +1,36 @@
 import React from 'react'
 import sinon from 'sinon'
-import test from 'tape'
 import { mount } from 'enzyme'
 
 import withControl from './withControl'
 
-test('withControl creates a valid React element', assert => {
+test('withControl creates a valid React element', () => {
   const Controlled = withControl('base', { useStringRefs: true })(() => <div/>);
   const element = React.createElement(Controlled);
-  assert.true(React.isValidElement(element));
-  assert.end();
+  expect(React.isValidElement(element)).toBe(true);
 });
 
-test('withControl throws a well-formed error when it does not have the correct context', assert => {
+test('withControl throws a well-formed error when it does not have the correct context', () => {
   class Base extends React.Component {
     render() {
       return <div/>;
     }
   }
   const Controlled = withControl('base', { useStringRefs: true })(Base);
-  assert.throws(
+  expect(
     () => {
       mount(<Controlled/>, { context: {} });
-    },
-    /forgot to use an animatronics component/,
-  );
-  assert.end();
+    }
+  ).toThrow(/forgot to use an animatronics component/);
 });
 
-test('withControl throws a well-formed error when it does not receive a React component', assert => {
-  assert.throws(
-    () => withControl('base', { useStringRefs: true })(undefined),
-    /must be used to wrap a React component/,
-  );
-  assert.end();
+test('withControl throws a well-formed error when it does not receive a React component', () => {
+  expect(
+    () => withControl('base', { useStringRefs: true })(undefined)
+  ).toThrow(/must be used to wrap a React component/);
 });
 
-test('withControl registers the component when mounted', assert => {
+test('withControl registers the component when mounted', () => {
   class Base extends React.Component {
     render() {
       return <div/>;
@@ -52,11 +46,10 @@ test('withControl registers the component when mounted', assert => {
       },
     },
   });
-  assert.true(registerComponent.calledOnce);
-  assert.end();
+  expect(registerComponent.calledOnce).toBe(true);
 });
 
-test('withControl unregisters the component when unmounted', assert => {
+test('withControl unregisters the component when unmounted', () => {
   class Base extends React.Component {
     render() {
       return <div/>;
@@ -73,11 +66,10 @@ test('withControl unregisters the component when unmounted', assert => {
     },
   });
   wrapper.unmount();
-  assert.true(unregisterComponent.calledOnce);
-  assert.end();
+  expect(unregisterComponent.calledOnce).toBe(true);
 });
 
-test('withControl sets the ref to the DOM node', assert => {
+test('withControl sets the ref to the DOM node', () => {
   class Base extends React.Component {
     render() {
       return <div/>;
@@ -99,11 +91,10 @@ test('withControl sets the ref to the DOM node', assert => {
   });
 
   const expectedDOMNode = wrapper.find('div').getDOMNode();
-  assert.equal(actualDOMNode, expectedDOMNode);
-  assert.end();
+  expect(actualDOMNode,).toBe(expectedDOMNode);
 });
 
-test('withControl sees the latest DOM node', assert => {
+test('withControl sees the latest DOM node', () => {
   class Base extends React.Component {
     render() {
       const { shouldRender } = this.props;
@@ -131,6 +122,5 @@ test('withControl sees the latest DOM node', assert => {
   wrapper.setProps({ shouldRender: true });
   wrapper.update();
   const expectedDOMNode = wrapper.find('div').getDOMNode();
-  assert.equal(actualDOMNode, expectedDOMNode);
-  assert.end();
+  expect(actualDOMNode).toBe(expectedDOMNode);
 });

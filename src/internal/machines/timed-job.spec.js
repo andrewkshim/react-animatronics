@@ -1,4 +1,3 @@
-import test from 'tape'
 import sinon from 'sinon'
 import lolex from 'lolex'
 
@@ -8,7 +7,7 @@ import {
   makeReducers,
 } from './timed-job'
 
-test('machines/timed-job/makeReducers', assert => {
+test('machines/timed-job/makeReducers', () => {
   const machinist = {};
   const reducers = makeReducers(machinist);
   const state = {
@@ -20,39 +19,24 @@ test('machines/timed-job/makeReducers', assert => {
 
   reducers.REGISTER_JOB(state, { job: 'hello' }),
 
-  assert.deepEquals(
-    state.jobs,
-    ['hello'],
-    'REGISTER_JOB should add a job'
-  );
+  expect(state.jobs).toEqual(['hello']);
 
   reducers.REGISTER_ON_COMPLETED_JOB(state, { job: 'foobar' }),
 
-  assert.deepEquals(
-    state.onCompletedJobs,
-    ['foobar'],
-    'REGISTER_ON_COMPLETED_JOB should add an onCompleted job'
-  );
+  expect(state.onCompletedJobs).toEqual(['foobar']);
 
   reducers.START_MACHINE(state, {}),
 
-  assert.false(
-    state.isStopped,
-    'START_MACHINE marks the machine as started'
-  );
+  expect(state.isStopped).toBe(false);
 
   reducers.STOP_MACHINE(state, {}),
 
-  assert.deepEquals(
-    state,
-    { frame: null, isStopped: true, jobs: [], onCompletedJobs: [] },
-    'STOP_MACHINE resets the machine'
+  expect(state).toEqual(
+    { frame: null, isStopped: true, jobs: [], onCompletedJobs: [] }
   );
-
-  assert.end();
 });
 
-test('machines/timed-job/start', assert => {
+test('machines/timed-job/start', () => {
   const clock = lolex.createClock();
   const job = sinon.spy();
   const onCompletedJob = sinon.spy();
@@ -69,20 +53,12 @@ test('machines/timed-job/start', assert => {
   start(state, dispatch)();
   clock.runAll();
 
-  assert.equals(
-    job.callCount, 5,
-    'should call the job the expected number of times'
-  );
+  expect(job.callCount).toBe(5);
 
-  assert.true(
-    onCompletedJob.calledOnce,
-    'should call the onCompletedJob when it finishes'
-  );
-
-  assert.end();
+  expect(onCompletedJob.calledOnce).toBe(true);
 });
 
-test('machines/timed-job/stop', assert => {
+test('machines/timed-job/stop', () => {
   const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();
   const state = {
@@ -92,10 +68,5 @@ test('machines/timed-job/stop', assert => {
 
   stop(state, dispatch)();
 
-  assert.equals(
-    cancelAnimationFrame.firstCall.args[0], 42,
-    'should call cancelAnimationFrame with the current frame'
-  )
-
-  assert.end();
+  expect(cancelAnimationFrame.firstCall.args[0]).toBe(42);
 });
