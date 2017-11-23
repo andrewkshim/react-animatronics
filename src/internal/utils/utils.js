@@ -44,3 +44,6 @@ export const makeError = (...messages: string[]): Error => {
 
 export const flatten = <T>(arrays: Array<Array<T>>): Array<T> =>
   arrays.reduce((flat, arr) => flat.concat(arr), []);
+
+export const stringify = (obj: Object): String => JSON.stringify(obj, null, 2);
+

@@ -1,7 +1,12 @@
 import Debug from 'debug'
 
 import { constructStyles } from '../../fashionistas/timed'
-import { makeError, flatten } from '../../utils'
+
+import {
+  flatten,
+  makeError,
+  stringify,
+} from '../../utils'
 
 import {
   DEFAULT_ANIMATION_NAME,
@@ -10,8 +15,6 @@ import {
 } from '../../constants'
 
 const debug = Debug('react-animatronics:machines:animatronics');
-
-const stringify = obj => JSON.stringify(obj, null, 2);
 
 const isUsingTime = (animation: Object): boolean =>
   animation.duration != null;
