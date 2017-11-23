@@ -1,27 +1,24 @@
 import sinon from 'sinon'
 
 import {
-  makeReducers,
+  makeMutators,
 } from './countdown-job'
 
-test('machines/countdown-job/makeReducers', () => {
+test('machines/countdown-job/makeMutators', () => {
   const machinist = {};
-  const reducers = makeReducers(machinist);
-  const job = sinon.spy();
   const state = {
     jobs: [],
     count: 2,
   };
+  const mutators = makeMutators(machinist, state);
+  const job = sinon.spy();
 
-  reducers.REGISTER_JOB(state, { job });
-
+  mutators.registerJob({ job });
   expect(state.jobs).toEqual([ job ]);
 
-  reducers.COUNTDOWN(state, {}),
-
+  mutators.countdown();
   expect(state.count).toBe(1);
 
-  reducers.COUNTDOWN(state, {}),
-
+  mutators.countdown();
   expect(job.calledOnce).toBe(true);
 });
