@@ -4,7 +4,7 @@ import {
   calculateEasingProgress,
   play,
   makeSequence,
-  makeReducers,
+  makeMutators,
 } from './animatronics'
 
 import {
@@ -81,7 +81,7 @@ test('machines/animatronics/makeSequence', () => {
   }).toThrow(/there is no such named animation/);
 });
 
-test('machines/animatronics/makeReducers', () => {
+test('machines/animatronics/makeMutators', () => {
   const machinist = {
     makeCountdownJobMachine: () => {
       return { registerJob: () => {} };
@@ -97,11 +97,11 @@ test('machines/animatronics/makeReducers', () => {
     timedJobMachines: {},
   };
 
-  const reducers = makeReducers(machinist, state);
+  const mutators = makeMutators(machinist, state);
 
   const animationName = 'foobar';
 
-  reducers.createAnimationCountdownMachine({
+  mutators.createAnimationCountdownMachine({
     numAnimations: 4,
     job: () => {},
     animationName,
@@ -109,7 +109,7 @@ test('machines/animatronics/makeReducers', () => {
 
   expect(state.animationCountdownMachines.foobar).toBeTruthy();
 
-  reducers.createPhasesCountdownMachine({
+  mutators.createPhasesCountdownMachine({
     numPhases: 3,
     job: () => {},
     animationName,
@@ -117,7 +117,7 @@ test('machines/animatronics/makeReducers', () => {
 
   expect(state.phasesCountdownMachines.foobar).toBeTruthy();
 
-  reducers.createTimedJobMachine({
+  mutators.createTimedJobMachine({
     componentName: 'foobar',
     duration: 400,
   });

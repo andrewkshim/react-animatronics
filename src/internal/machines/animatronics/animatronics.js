@@ -68,7 +68,7 @@ const getNumPhases = state => animationName => {
   return sequence.length;
 };
 
-const runTimedAnimation = reducers => (animationName, componentName, animation, index) => {
+const runTimedAnimation = mutators => (animationName, componentName, animation, index) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -76,7 +76,7 @@ const runTimedAnimation = reducers => (animationName, componentName, animation, 
     easingFn = DEFAULT_EASING_FN,
   } = animation;
 
-  reducers.createTimedJobMachine({
+  mutators.createTimedJobMachine({
     index,
     componentName,
     duration,
@@ -85,20 +85,20 @@ const runTimedAnimation = reducers => (animationName, componentName, animation, 
   const job = elapsedTime => {
     const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
     const updatedStyles = constructStyles(fromStyles, toStyles, progress);
-    reducers.updateComponentStyles({ componentName, updatedStyles });
+    mutators.updateComponentStyles({ componentName, updatedStyles });
   }
 
   const onCompleteJob = () => {
-    reducers.updateComponentStyles({ componentName, toStyles });
-    reducers.countdownAnimations({ animationName });
+    mutators.updateComponentStyles({ componentName, toStyles });
+    mutators.countdownAnimations({ animationName });
   }
 
-  reducers.registerTimedJob({ index, componentName, job });
-  reducers.registerTimedOnCompletedJob({ index, componentName, onCompleteJob });
-  reducers.startTimedJob({ index, componentName });
+  mutators.registerTimedJob({ index, componentName, job });
+  mutators.registerTimedOnCompletedJob({ index, componentName, onCompleteJob });
+  mutators.startTimedJob({ index, componentName });
 };
 
-const runSpringAnimation = reducers => (animationName, componentName, animation, index) => {
+const runSpringAnimation = mutators => (animationName, componentName, animation, index) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -106,7 +106,7 @@ const runSpringAnimation = reducers => (animationName, componentName, animation,
     damping,
   } = animation;
 
-  reducers.createSpringMachine({
+  mutators.createSpringMachine({
     index,
     componentName,
     fromStyles,
@@ -114,27 +114,27 @@ const runSpringAnimation = reducers => (animationName, componentName, animation,
     stiffness,
     damping,
   });
-  reducers.createEndlessJobMachine({ index, componentName });
+  mutators.createEndlessJobMachine({ index, componentName });
 
   const onNext = updatedStyles => {
-    reducers.updateComponentStyles({ componentName, updatedStyles });
+    mutators.updateComponentStyles({ componentName, updatedStyles });
   }
 
   const onComplete = updatedStyles => {
-    reducers.updateComponentStyles({ componentName, updatedStyles });
-    reducers.stopEndlessJobMachine({ index, componentName });
-    reducers.countdownAnimations({ animationName });
+    mutators.updateComponentStyles({ componentName, updatedStyles });
+    mutators.stopEndlessJobMachine({ index, componentName });
+    mutators.countdownAnimations({ animationName });
   }
 
   const job = () => {
-    reducers.runNextSpringFrame({ index, componentName, onNext, onComplete });
+    mutators.runNextSpringFrame({ index, componentName, onNext, onComplete });
   }
 
-  reducers.registerEndlessJob({ index, componentName, job });
-  reducers.startEndlessJobMachine({ index, componentName });
+  mutators.registerEndlessJob({ index, componentName, job });
+  mutators.startEndlessJobMachine({ index, componentName });
 };
 
-export const play = (state, reducers) => (animationName, onComplete) => {
+export const play = (state, mutators) => (animationName, onComplete) => {
   // IMPROVE: It's weird that getNumPhases calls makeSequence internally, but
   // things are the way they are so the user does not need to write each
   // phase as a function - having this inefficiency makes the API nicer.
@@ -153,7 +153,7 @@ export const play = (state, reducers) => (animationName, onComplete) => {
     }
   }
 
-  reducers.createPhasesCountdownMachine({
+  mutators.createPhasesCountdownMachine({
     animationName,
     job: onComplete,
     numPhases,
@@ -174,13 +174,13 @@ export const play = (state, reducers) => (animationName, onComplete) => {
     );
 
     const job = () => {
-      reducers.countdownPhases({ animationName });
+      mutators.countdownPhases({ animationName });
       if (phaseIndex < (numPhases - 1)) {
         runPhase(phaseIndex + 1);
       }
     }
 
-    reducers.createAnimationCountdownMachine({
+    mutators.createAnimationCountdownMachine({
       animationName,
       job,
       numAnimations,
@@ -192,9 +192,9 @@ export const play = (state, reducers) => (animationName, onComplete) => {
 
       const runAnimation = (animation, index) => {
         if (isUsingTime(animation)) {
-          runTimedAnimation(reducers)(animationName, componentName, animation, index);
+          runTimedAnimation(mutators)(animationName, componentName, animation, index);
         } else if (isUsingSpring(animation)) {
-          runSpringAnimation(reducers)(animationName, componentName, animation, index);
+          runSpringAnimation(mutators)(animationName, componentName, animation, index);
         }
       };
 
@@ -203,7 +203,7 @@ export const play = (state, reducers) => (animationName, onComplete) => {
         if (delay == null) {
           runAnimation(animation, index);
         } else {
-          reducers.runDelayedAnimation({ componentName, delay, runAnimation, animation, index });
+          mutators.runDelayedAnimation({ componentName, delay, runAnimation, animation, index });
         }
       });
     });
@@ -212,17 +212,17 @@ export const play = (state, reducers) => (animationName, onComplete) => {
   runPhase(0);
 };
 
-const stop = (state, reducers) => () => {
-  reducers.stopMachine();
+const stop = (state, mutators) => () => {
+  mutators.stopMachine();
 };
 
-const reset = (state, reducers) => () => {
+const reset = (state, mutators) => () => {
   reducer.stopMachine();
   reducer.resetMachine();
 };
 
-const registerComponent = (state, reducers) => (componentName, node, styleUpdater, styleResetter) => {
-  reducers.registerComponent({
+const registerComponent = (state, mutators) => (componentName, node, styleUpdater, styleResetter) => {
+  mutators.registerComponent({
     componentName,
     node,
     styleUpdater,
@@ -230,18 +230,18 @@ const registerComponent = (state, reducers) => (componentName, node, styleUpdate
   });
 }
 
-const unregisterComponent = (state, reducers) => componentName => {
-  reducers.unregisterComponent({ componentName });
+const unregisterComponent = (state, mutators) => componentName => {
+  mutators.unregisterComponent({ componentName });
 }
 
-const setCreateAnimationSequences = (state, reducers) => createAnimationSequences => {
-  reducers.setCreateAnimationSequences({
+const setCreateAnimationSequences = (state, mutators) => createAnimationSequences => {
+  mutators.setCreateAnimationSequences({
     createAnimationSequences,
   });
 }
 
 // EXPERIMENT: Isolating any shared state mutations here.
-export const makeReducers = (machinist, state) => ({
+export const makeMutators = (machinist, state) => ({
 
   createSpringMachine: action => {
     const {
@@ -421,15 +421,15 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
     createAnimationSequences,
   };
 
-  const reducers = makeReducers(machinist, state);
+  const mutators = makeMutators(machinist, state);
 
   const animatronicsMachine = {
-    play: play(state, reducers),
-    stop: stop(state, reducers),
-    reset: reset(state, reducers),
-    registerComponent: registerComponent(state, reducers),
-    unregisterComponent: unregisterComponent(state, reducers),
-    setCreateAnimationSequences: setCreateAnimationSequences(state, reducers),
+    play: play(state, mutators),
+    stop: stop(state, mutators),
+    reset: reset(state, mutators),
+    registerComponent: registerComponent(state, mutators),
+    unregisterComponent: unregisterComponent(state, mutators),
+    setCreateAnimationSequences: setCreateAnimationSequences(state, mutators),
   };
 
   return animatronicsMachine;
