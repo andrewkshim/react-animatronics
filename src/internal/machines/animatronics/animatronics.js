@@ -30,7 +30,6 @@ export const calculateEasingProgress = (
   easingFn(elapsedTime / (duration === 0 ? elapsedTime : duration))
 );
 
-
 export const makeSequence = state => animationName => {
   const { createAnimationSequences, nodes } = state;
   const areSequencesStatic = typeof createAnimationSequences === 'function';
