@@ -13,7 +13,7 @@ import type { Styles } from './internal/flow-types'
 import ContextTypes from './internal/context-types'
 
 import {
-  IS_DEVELOPMENT,
+  IS_PRODUCTION,
 } from './internal/constants'
 
 import {
@@ -43,7 +43,7 @@ const withControl = (
 
   type BaseRef = Element<typeof BaseComponent>;
 
-  if (IS_DEVELOPMENT) {
+  if (!IS_PRODUCTION) {
     if (!isReactComponent(BaseComponent)) {
       throw makeError(
         `withControl() must be used to wrap a React component`
@@ -87,7 +87,7 @@ const withControl = (
       // $FlowFixMe: flow thinks the ref is an object type for some reason
       const domNode = ReactDOM.findDOMNode(ref);
 
-      if (IS_DEVELOPMENT) {
+      if (!IS_PRODUCTION) {
         if (!animatronics) {
           throw makeError(
             `Can't find the right context in the following controlled component: ${ name }.`,

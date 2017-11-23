@@ -12,7 +12,7 @@ export const SECONDS_PER_ANIMATION_FRAME: number = MS_PER_ANIMATION_FRAME / 1000
 
 export const DEFAULT_ANIMATION_NAME: string = 'DEFAULT_ANIMATION_NAME';
 
-export const IS_DEVELOPMENT = process.env.NODE_ENV !== 'development';
+export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 export const IS_WINDOW_AVAILABLE = typeof window !== 'undefined';
 

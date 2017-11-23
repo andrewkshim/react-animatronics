@@ -18,7 +18,7 @@ import {
   DEFAULT_NOW,
   DEFAULT_REQUEST_ANIMATION_FRAME,
   DEFAULT_SET_TIMEOUT,
-  IS_DEVELOPMENT,
+  IS_PRODUCTION,
 } from './internal/constants'
 
 import {
@@ -52,7 +52,7 @@ const withAnimatronics = (
   }: Options = {}
 ) => {
 
-  if (IS_DEVELOPMENT) {
+  if (!IS_PRODUCTION) {
     if (typeof createAnimationSequences !== 'function') {
       throw makeError(
         `withAnimatronics() expects its first argument to be a function,`,
@@ -62,7 +62,7 @@ const withAnimatronics = (
   }
 
   return (BaseComponent: Object): Object => {
-    if (IS_DEVELOPMENT) {
+    if (!IS_PRODUCTION) {
       if (!isReactComponent(BaseComponent)) {
         throw makeError(
           `withAnimatronics() must be used to wrap a React component.`
@@ -113,7 +113,7 @@ const withAnimatronics = (
             onComplete = animationName;
             animationName = DEFAULT_ANIMATION_NAME;
           }
-          if (IS_DEVELOPMENT) {
+          if (!IS_PRODUCTION) {
             if (typeof animationName !== 'string') {
               throw makeError(
                 `playAnimation() expects its first argument to be the string name of`,

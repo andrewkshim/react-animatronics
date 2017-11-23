@@ -11,8 +11,8 @@ import {
 
 import {
   DEFAULT_ANIMATION_NAME,
-  IS_DEVELOPMENT,
   DEFAULT_EASING_FN,
+  IS_PRODUCTION,
 } from '../../constants'
 
 import {
@@ -42,7 +42,7 @@ export const makeSequence = state => animationName => {
     ? { [DEFAULT_ANIMATION_NAME]: sequences }
     : sequences;
 
-  if (IS_DEVELOPMENT) {
+  if (!IS_PRODUCTION) {
     if (namedSequences[animationName] == null) {
       throw makeError(
         `Attempted to run an animation named "${ animationName }", but there is no such`
@@ -56,7 +56,7 @@ export const makeSequence = state => animationName => {
     ? namedSequences[animationName]
     : namedSequences[animationName](nodes);
 
-  if (IS_DEVELOPMENT) {
+  if (!IS_PRODUCTION) {
     sequence.forEach(phase => throwIfPhaseNotValid(phase, nodes));
   }
 
@@ -140,7 +140,7 @@ export const play = (state, mutators) => (animationName, onComplete) => {
   // phase as a function - having this inefficiency makes the API nicer.
   const numPhases = getNumPhases(state)(animationName);
 
-  if (IS_DEVELOPMENT) {
+  if (!IS_PRODUCTION) {
     if (numPhases === 0) {
       throw makeError(
         `Attemped to run an empty animation sequence. Check <Animatronics/>`
