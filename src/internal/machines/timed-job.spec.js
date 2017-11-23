@@ -4,35 +4,31 @@ import lolex from 'lolex'
 import {
   start,
   stop,
-  makeReducers,
+  makeMutators,
 } from './timed-job'
 
-test('machines/timed-job/makeReducers', () => {
+test('machines/timed-job/makeMutators', () => {
   const machinist = {};
-  const reducers = makeReducers(machinist);
   const state = {
     frame: null,
     jobs: [],
-    onCompletedJobs: [],
+    onCompleteJobs: [],
     isStopped: true,
   };
+  const mutators = makeMutators(machinist, state);
 
-  reducers.REGISTER_JOB(state, { job: 'hello' }),
-
+  mutators.registerJob({ job: 'hello' }),
   expect(state.jobs).toEqual(['hello']);
 
-  reducers.REGISTER_ON_COMPLETED_JOB(state, { job: 'foobar' }),
+  mutators.registerOnCompleteJob({ onCompleteJob: 'foobar' }),
+  expect(state.onCompleteJobs).toEqual(['foobar']);
 
-  expect(state.onCompletedJobs).toEqual(['foobar']);
-
-  reducers.START_MACHINE(state, {}),
-
+  mutators.startMachine(),
   expect(state.isStopped).toBe(false);
 
-  reducers.STOP_MACHINE(state, {}),
-
+  mutators.stopMachine(),
   expect(state).toEqual(
-    { frame: null, isStopped: true, jobs: [], onCompletedJobs: [] }
+    { frame: null, isStopped: true, jobs: [], onCompleteJobs: [] }
   );
 });
 
@@ -40,17 +36,17 @@ test('machines/timed-job/start', () => {
   const clock = lolex.createClock();
   const job = sinon.spy();
   const onCompletedJob = sinon.spy();
-  const dispatch = () => {};
   const state = {
     isStopped: false,
     now: clock.Date.now,
     requestAnimationFrame: callback => clock.setTimeout(callback, 100),
     duration: 500,
     jobs: [ job ],
-    onCompletedJobs: [ onCompletedJob ],
+    onCompleteJobs: [ onCompletedJob ],
   };
+  const mutators = makeMutators({}, state);
 
-  start(state, dispatch)();
+  start(state, mutators)();
   clock.runAll();
 
   expect(job.callCount).toBe(5);
@@ -59,14 +55,14 @@ test('machines/timed-job/start', () => {
 });
 
 test('machines/timed-job/stop', () => {
-  const dispatch = () => {};
   const cancelAnimationFrame = sinon.spy();
   const state = {
     frame: 42,
     cancelAnimationFrame,
   };
+  const mutators = makeMutators({}, state);
 
-  stop(state, dispatch)();
+  stop(state, mutators)();
 
   expect(cancelAnimationFrame.firstCall.args[0]).toBe(42);
 });

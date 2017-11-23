@@ -2,26 +2,19 @@ import Debug from 'debug'
 
 const debug = Debug('react-animatronics:machines:timed-job');
 
-const registerJob = (state, dispatch) => job => {
-  dispatch({
-    type: 'REGISTER_JOB',
-    job,
-  });
+const registerJob = (state, mutators) => job => {
+  mutators.registerJob({ job });
 }
 
-const registerOnCompleteJob = (state, dispatch) => job => {
-  dispatch({
-    type: 'REGISTER_ON_COMPLETED_JOB',
-    job
-  });
+const registerOnCompleteJob = (state, mutators) => onCompleteJob => {
+  mutators.registerOnCompleteJob({ onCompleteJob });
 }
 
-// IMPROVE: How to better manage state so its more consistent with the other
-// reducers?
-export const start = (state, dispatch) => () => {
+// IMPROVE: How to better manage state so its more consistent with the other reducers?
+export const start = (state, mutators) => () => {
   debug('starting timed job machine');
 
-  dispatch({ type: 'START_MACHINE' });
+  mutators.startMachine();
 
   const startTime = state.now();
 
@@ -35,7 +28,7 @@ export const start = (state, dispatch) => () => {
       const elapsedTime = state.now() - startTime;
       job(elapsedTime);
       if (elapsedTime >= state.duration) {
-        state.onCompletedJobs.forEach(j => j());
+        state.onCompleteJobs.forEach(j => j());
         state.frame = null;
         state.isStopped = true;
         state.jobs = [];
@@ -47,30 +40,30 @@ export const start = (state, dispatch) => () => {
   tick();
 }
 
-export const stop = (state, dispatch) => () => {
+export const stop = (state, mutators) => () => {
   if (state.frame) {
     state.cancelAnimationFrame(state.frame);
   }
-  dispatch({ type: 'STOP_MACHINE' });
+  mutators.stopMachine();
 }
 
-export const makeReducers = machinist => ({
-  REGISTER_JOB: (state, action) => {
+export const makeMutators = (machinist, state) => ({
+  registerJob: action => {
     const { job } = action;
     state.jobs.push(job);
   },
-  REGISTER_ON_COMPLETED_JOB: (state, action) => {
-    const { job } = action;
-    state.onCompletedJobs.push(job);
+  registerOnCompleteJob: action => {
+    const { onCompleteJob } = action;
+    state.onCompleteJobs.push(onCompleteJob);
   },
-  START_MACHINE: (state, action) => {
+  startMachine: action => {
     state.isStopped = false;
   },
-  STOP_MACHINE: (state, action) => {
+  stopMachine: action => {
     state.frame = null;
     state.isStopped = true;
     state.jobs = [];
-    state.onCompletedJobs = [];
+    state.onCompleteJobs = [];
   },
 });
 
@@ -83,7 +76,7 @@ export const makeTimedJobMachine = machinist => (
   const state = {
     frame: null,
     jobs: [],
-    onCompletedJobs: [],
+    onCompleteJobs: [],
     isStopped: true,
     duration,
     requestAnimationFrame,
@@ -91,18 +84,13 @@ export const makeTimedJobMachine = machinist => (
     now,
   };
 
-  const reducers = makeReducers(machinist);
-
-  const dispatch = action => {
-    const { type } = action;
-    reducers[type](state, action);
-  };
+  const mutators = makeMutators(machinist, state);
 
   const timedJobMachine = {
-    registerJob: registerJob(state, dispatch),
-    registerOnCompleteJob: registerOnCompleteJob(state, dispatch),
-    start: start(state, dispatch),
-    stop: stop(state, dispatch),
+    registerJob: registerJob(state, mutators),
+    registerOnCompleteJob: registerOnCompleteJob(state, mutators),
+    start: start(state, mutators),
+    stop: stop(state, mutators),
   };
 
   return timedJobMachine;
