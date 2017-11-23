@@ -47,3 +47,8 @@ export const flatten = <T>(arrays: Array<Array<T>>): Array<T> =>
 
 export const stringify = (obj: Object): string => JSON.stringify(obj, null, 2);
 
+export const isUsingTime = (animation: Object): boolean =>
+  animation.duration != null;
+
+export const isUsingSpring = (animation: Object): boolean =>
+  animation.stiffness != null && animation.damping != null;
