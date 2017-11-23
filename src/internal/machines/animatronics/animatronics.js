@@ -1,4 +1,3 @@
-import BezierEasing from 'bezier-easing'
 import Debug from 'debug'
 
 import { constructStyles } from '../../fashionistas/timed'
@@ -7,9 +6,8 @@ import { makeError, flatten } from '../../utils'
 import {
   DEFAULT_ANIMATION_NAME,
   IS_DEVELOPMENT,
+  DEFAULT_EASING_FN,
 } from '../../constants'
-
-const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
 const debug = Debug('react-animatronics:machines:animatronics');
 

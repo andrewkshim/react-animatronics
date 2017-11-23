@@ -4,6 +4,7 @@
  *
  * @module internal/constants
  */
+import BezierEasing from 'bezier-easing'
 
 export const MS_PER_ANIMATION_FRAME: number = 1000 / 60;
 
@@ -45,3 +46,5 @@ export const DEFAULT_CLEAR_TIMEOUT: Function = (
 );
 
 export const DEFAULT_NOW: Function = Date.now;
+
+export const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
