@@ -16,8 +16,6 @@ import type {
   Fashion,
 } from '../flow-types'
 
-import { createPackageString } from '../utils'
-
 const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
 const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX: RegExp = /\D+/;
