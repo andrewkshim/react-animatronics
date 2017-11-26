@@ -42,6 +42,9 @@ const calculateValue = (currentValue: number, velocity: number): number =>
 // https://github.com/chenglou/react-motion/blob/b1cde24f27ef6f7d76685dceb0a951ebfaa10f85/src/Motion.js
 
 export const makeMutators = (machinist, state) => ({
+  incrementNumIterations: action => {
+    state.numIterations++;
+  },
   incrementNumStops: action => {
     state.numStops++;
   },
@@ -68,9 +71,6 @@ export const makeMutators = (machinist, state) => ({
   updateAccumulatedTime: action => {
     const { accumulatedTime } = action;
     state.accumulatedTime = accumulatedTime;
-  },
-  incrementNumIterations: action => {
-    state.numIterations++;
   },
 });
 
