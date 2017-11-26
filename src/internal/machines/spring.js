@@ -48,6 +48,9 @@ export const makeMutators = (machinist, state) => ({
   incrementNumStops: action => {
     state.numStops++;
   },
+  now: () => {
+    return machinist.now();
+  },
   updateVelocities: action => {
     const { velocities } = action;
     state.velocities = velocities;
@@ -152,7 +155,7 @@ const runNextFrame = (state, mutators) => (
     }
   }
 
-  const currentTime = Date.now();
+  const currentTime = mutators.now();
   const timeSinceLastFrame = currentTime - state.prevTime;
 
   mutators.updatePrevTime({ prevTime: currentTime });
