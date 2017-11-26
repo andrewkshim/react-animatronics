@@ -1,6 +1,7 @@
 import Debug from 'debug'
 
 import { constructStyles } from '../../fashionistas/timed'
+import Recorder from '../../recorder'
 
 import {
   flatten,
@@ -68,7 +69,7 @@ const getNumPhases = state => animationName => {
   return sequence.length;
 };
 
-const runTimedAnimation = mutators => (animationName, componentName, animation, index) => {
+const runTimedAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -82,10 +83,19 @@ const runTimedAnimation = mutators => (animationName, componentName, animation, 
     duration,
   });
 
+  if (!IS_PRODUCTION) {
+    Recorder.reset(animationName);
+  }
+
   const job = elapsedTime => {
     const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
     const updatedStyles = constructStyles(fromStyles, toStyles, progress);
     mutators.updateComponentStyles({ componentName, updatedStyles });
+
+    if (!IS_PRODUCTION) {
+      const updateStyles = state.styleUpdaters[componentName];
+      Recorder.record({ animationName, componentName, elapsedTime, updatedStyles, updateStyles });
+    }
   }
 
   const onCompleteJob = () => {
@@ -98,13 +108,17 @@ const runTimedAnimation = mutators => (animationName, componentName, animation, 
   mutators.startTimedJob({ index, componentName });
 };
 
-const runSpringAnimation = mutators => (animationName, componentName, animation, index) => {
+const runSpringAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
   const {
     from: fromStyles,
     to: toStyles,
     stiffness,
     damping,
   } = animation;
+  let startTime;
+  if (!IS_PRODUCTION) {
+    startTime = mutators.now();
+  }
 
   mutators.createSpringMachine({
     index,
@@ -116,8 +130,18 @@ const runSpringAnimation = mutators => (animationName, componentName, animation,
   });
   mutators.createEndlessJobMachine({ index, componentName });
 
+  if (!IS_PRODUCTION) {
+    Recorder.reset(animationName);
+  }
+
   const onNext = updatedStyles => {
     mutators.updateComponentStyles({ componentName, updatedStyles });
+
+    if (!IS_PRODUCTION) {
+      const updateStyles = state.styleUpdaters[componentName];
+      const elapsedTime = mutators.now() - startTime;
+      Recorder.record({ animationName, componentName, elapsedTime, updatedStyles, updateStyles });
+    }
   }
 
   const onComplete = updatedStyles => {
@@ -192,9 +216,9 @@ export const play = (state, mutators) => (animationName, onComplete) => {
 
       const runAnimation = (animation, index) => {
         if (isUsingTime(animation)) {
-          runTimedAnimation(mutators)(animationName, componentName, animation, index);
+          runTimedAnimation(state, mutators)(animationName, componentName, animation, index);
         } else if (isUsingSpring(animation)) {
-          runSpringAnimation(mutators)(animationName, componentName, animation, index);
+          runSpringAnimation(state, mutators)(animationName, componentName, animation, index);
         }
       };
 
@@ -312,6 +336,10 @@ export const makeMutators = (machinist, state) => ({
   countdownPhases: action => {
     const { animationName } = action;
     state.phasesCountdownMachines[animationName].countdown();
+  },
+
+  now: () => {
+    return machinist.now();
   },
 
   registerComponent: action => {
