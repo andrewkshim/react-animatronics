@@ -10,7 +10,7 @@ export const MS_PER_ANIMATION_FRAME: number = 1000 / 60;
 
 export const SECONDS_PER_ANIMATION_FRAME: number = MS_PER_ANIMATION_FRAME / 1000;
 
-export const DEFAULT_ANIMATION_NAME: string = 'DEFAULT_ANIMATION_NAME';
+export const DEFAULT_ANIMATION_NAME: string = 'default';
 
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
