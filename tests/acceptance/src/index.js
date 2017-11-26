@@ -19,7 +19,12 @@ import {
   SML_FONT_SIZE,
 } from './internal/styles'
 
-import { withControl, withAnimatronics, BezierEasing } from '../../../src'
+import {
+  BezierEasing,
+  DebugPanel,
+  withAnimatronics,
+  withControl,
+} from '../../../src'
 
 const BASIC = 'basic';
 const SPRINGS = 'springs';
@@ -327,6 +332,7 @@ class App extends React.Component {
         display: 'flex',
         flexDirection: 'row',
       }}>
+        <DebugPanel />
         <div style={{
           minWidth: '272px',
           height: '100%',
@@ -428,6 +434,6 @@ class App extends React.Component {
 const AnimatedApp = withAnimatronics(() => [])(App);
 
 ReactDOM.render(
-  <AnimatedApp/>,
+  <AnimatedApp />,
   document.getElementById('app'),
 );
