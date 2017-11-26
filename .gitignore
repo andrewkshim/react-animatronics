@@ -8,3 +8,6 @@ node_modules/
 lib/
 bundle.js
 yarn-error.log
+
+# catch-all ignore directory
+ignore/
