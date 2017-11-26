@@ -1,3 +1,4 @@
+// @flow
 import {
   createColorFashion,
   createNumberFashion,
@@ -48,13 +49,13 @@ test('parseStyle', () => {
 
   expect(parseStyle(42)).toEqual(createNumberFashion(42));
 
-  expect(parseStyle('rotateX(90deg) translateY(100px)')).toEqual(
+  expect(parseStyle('rotateX(90deg) translateY(100px)', 'transform')).toEqual(
     createTransformFashion('rotateX(90deg) translateY(100px)')
   );
 
   expect(
     // $FlowFixMe: flow doesn't know that this will only create a transform fashion
-    parseStyle('scale(1.5)').styles[0]
+    parseStyle('scale(1.5)', 'transform').styles[0]
   ).toEqual(createNumberFashion(1.5));
 
   expect(parseStyle('240rem')).toEqual(createUnitFashion('240rem'));

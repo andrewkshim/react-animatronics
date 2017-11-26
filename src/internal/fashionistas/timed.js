@@ -65,8 +65,8 @@ export const constructStyles = (
 ): Styles =>
   Object.keys(fromStyles).reduce(
     (currentStyles: Styles, styleName: string) => {
-      const startFashion: Fashion = parseStyle(fromStyles[styleName]);
-      const endFashion: Fashion = parseStyle(toStyles[styleName]);
+      const startFashion: Fashion = parseStyle(fromStyles[styleName], styleName);
+      const endFashion: Fashion = parseStyle(toStyles[styleName], styleName);
       currentStyles[styleName] = stringifyFashion(
         calculateFashion(startFashion, endFashion, progress)
       );

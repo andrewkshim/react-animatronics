@@ -41,11 +41,11 @@ export const reconstructStyles = (
   springValues: number[],
 ): Styles =>
   styleNames.reduce(
-    (reconstructed, name, index) => {
-      const from = parseStyle(fromStyles[name]);
-      const to = parseStyle(toStyles[name]);
+    (reconstructed, styleName, index) => {
+      const from = parseStyle(fromStyles[styleName], styleName);
+      const to = parseStyle(toStyles[styleName], styleName);
       const value = springValues[index];
-      reconstructed[name] = stringifyFashion(
+      reconstructed[styleName] = stringifyFashion(
         from.isBasicType && to.isBasicType ?
           interpolateFashion(from, to, value)
         : from.isTransformType && to.isTransformType ?
