@@ -13,6 +13,7 @@ import {
   stringifyFashion,
 
   isColorString,
+  haveConvertibleUnits,
 } from './common'
 
 test('createColorFashion creates a valid ColorFashion', () => {
@@ -147,4 +148,11 @@ test('stringifyStyle creates the correct style strings', () => {
   const actualUnitStyleStr = stringifyFashion(unitFashion);
   const expectedUnitStyleStr = stringifyUnit(unitFashion);
   expect(actualUnitStyleStr).toBe(expectedUnitStyleStr);
+});
+
+test('haveConvertibleUnits', () => {
+  expect(haveConvertibleUnits('10px', '30px')).toBe(false);
+  expect(haveConvertibleUnits('10px', '30rem')).toBe(true);
+  expect(haveConvertibleUnits(20, 40)).toBe(false);
+  expect(haveConvertibleUnits('scale(0)', 'scale(1)', 'transform')).toBe(true);
 });

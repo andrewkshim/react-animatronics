@@ -20,7 +20,12 @@ import {
   makeError,
 } from '../utils'
 
+import {
+  TRANSFORM,
+} from '../constants'
+
 const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
+const ALL_COMMAS_REGEX: RegExp = /, /g;
 const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX: RegExp = /\D+/;
 
@@ -65,10 +70,14 @@ const parseTransformName = (transform: string): string =>
 const parseTransformStyle = (transform: string): Fashion =>
   parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
+const normalizeRawTransform = (raw: string): string => raw
+  .replace(ALL_COMMAS_REGEX, ',')
+  .split(' ');
+
 export const createTransformFashion = (raw: string): CompositeFashion => ({
   isCompositeType: true,
-  names: raw.split(' ').map(parseTransformName),
-  styles: raw.split(' ').map(parseTransformStyle),
+  names: normalizeRawTransform(raw).map(parseTransformName),
+  styles: normalizeRawTransform(raw).map(parseTransformStyle),
 });
 
 /**
@@ -99,6 +108,12 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
   };
 };
 
+const createCommaFashion = (raw: string): CompositeFashion => ({
+  isCompositeType: true,
+  isCommaType: true,
+  styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(parseStyle),
+});
+
 export const parseStyle = (raw: string|number, name?: string): Fashion => (
   typeof raw === 'number' ?
     createNumberFashion(raw)
@@ -106,10 +121,12 @@ export const parseStyle = (raw: string|number, name?: string): Fashion => (
     createNumberFashion(raw)
   : isColorString(raw) ?
     createColorFashion(raw)
-  : typeof raw === 'string' && name === 'transform' ?
+  : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
+  : raw.includes(',') ?
+    createCommaFashion(raw)
   :
     createUnitFashion(raw)
 );
@@ -129,7 +146,7 @@ export const stringifyComposite = (composite: CompositeFashion) => composite.sty
         : stringifyFashion(style)
     );
   }, [])
-  .join(' ');
+  .join(composite.isCommaType ? ', ' : ' ');
 
 const stringifyBasic = (style: Fashion): string => (
   style.isColorType ?
@@ -148,3 +165,12 @@ export const stringifyFashion = (style: Fashion): string => (
   : // default: unknown style
     stringifyBasic(style)
 );
+
+export const haveConvertibleUnits = (rawA: string, rawB: string, styleName: string): boolean => {
+  if (styleName === TRANSFORM) return true;
+  const fashionA = parseStyle(rawA, styleName);
+  const fashionB = parseStyle(rawB, styleName);
+  return (!fashionA.unit || !fashionB.unit)
+    ? false
+    : fashionA.unit !== fashionB.unit;
+};

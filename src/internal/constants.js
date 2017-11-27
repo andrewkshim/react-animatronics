@@ -6,6 +6,8 @@
  */
 import BezierEasing from 'bezier-easing'
 
+export const TRANSFORM = 'transform';
+
 export const MS_PER_ANIMATION_FRAME: number = 1000 / 60;
 
 export const SECONDS_PER_ANIMATION_FRAME: number = MS_PER_ANIMATION_FRAME / 1000;

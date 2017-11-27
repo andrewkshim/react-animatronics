@@ -51,7 +51,7 @@ const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: 
           // There might be an issue with detecting disjoint types via multiple conditions.
           // $FlowFixMe
           const from: Fashion = startFashion.styles[index];
-          return calculateBasic(from, to, progress);
+          return calculateFashion(from, to, progress);
         }),
     }
   :

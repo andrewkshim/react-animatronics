@@ -1,5 +1,6 @@
 import Debug from 'debug'
 
+import { haveConvertibleUnits } from '../../fashionistas/common'
 import { constructStyles } from '../../fashionistas/timed'
 import Recorder from '../../recorder'
 
@@ -14,6 +15,7 @@ import {
   DEFAULT_ANIMATION_NAME,
   DEFAULT_EASING_FN,
   IS_PRODUCTION,
+  TRANSFORM,
 } from '../../constants'
 
 import {
@@ -77,6 +79,9 @@ const runTimedAnimation = (state, mutators) => (animationName, componentName, an
     easingFn = DEFAULT_EASING_FN,
   } = animation;
 
+  const normalizedFrom = { ...fromStyles };
+  const normalizedTo = { ...toStyles };
+
   mutators.createTimedJobMachine({
     index,
     componentName,
@@ -87,9 +92,43 @@ const runTimedAnimation = (state, mutators) => (animationName, componentName, an
     Recorder.reset(animationName);
   }
 
+  const node = state.nodes[componentName];
+  Object.keys(normalizedFrom).map(styleName => {
+    const rawFromStyle = normalizedFrom[styleName];
+    const rawToStyle = normalizedTo[styleName];
+    if (haveConvertibleUnits(rawFromStyle, rawToStyle, styleName)) {
+      if (!node) {
+        // FIXME: More detailed error detection for transform styles? It's
+        // tough to know whether or not we need to throw an error when using a
+        // transform style since we need to know whether each individual
+        // transformation pair is actually using a different unit.
+        if (styleName !== TRANSFORM) {
+          throw makeError(
+            `You specified "from" and "to" styles that have different units, but there`
+            + ` is no ref available for the component "${ componentName }". You must`
+            + ` either change one of the styles [`
+              + `{${styleName}: ${rawFromStyle}}, `
+              + `{${styleName}: ${rawToStyle}}`
+            + `] so they have the same units or make the ${ componentName }`
+            + ` component a class component.`
+          );
+        }
+        return;
+      }
+      // FIXME: don't use window directly
+      node.style[styleName] = rawToStyle;
+      const computedTo = window.getComputedStyle(node);
+      normalizedTo[styleName] = computedTo[styleName];
+
+      node.style[styleName] = rawFromStyle;
+      const computedFrom = window.getComputedStyle(node);
+      normalizedFrom[styleName] = computedFrom[styleName];
+    }
+  })
+
   const job = elapsedTime => {
     const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
-    const updatedStyles = constructStyles(fromStyles, toStyles, progress);
+    const updatedStyles = constructStyles(normalizedFrom, normalizedTo, progress);
     mutators.updateComponentStyles({ componentName, updatedStyles });
 
     if (!IS_PRODUCTION) {
@@ -99,7 +138,7 @@ const runTimedAnimation = (state, mutators) => (animationName, componentName, an
   }
 
   const onCompleteJob = () => {
-    mutators.updateComponentStyles({ componentName, toStyles });
+    mutators.updateComponentStyles({ componentName, updatedStyles: toStyles });
     mutators.countdownAnimations({ animationName });
   }
 
