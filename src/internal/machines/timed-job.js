@@ -10,7 +10,6 @@ const registerOnCompleteJob = (state, mutators) => onCompleteJob => {
   mutators.registerOnCompleteJob({ onCompleteJob });
 }
 
-// IMPROVE: How to better manage state so its more consistent with the other reducers?
 export const start = (state, mutators) => () => {
   debug('starting timed job machine');
 
