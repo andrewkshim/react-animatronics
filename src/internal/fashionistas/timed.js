@@ -52,7 +52,8 @@ const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: 
           // $FlowFixMe
           const from: Fashion = startFashion.styles[index];
           return calculateFashion(from, to, progress);
-        }),
+        }
+      )
     }
   :
     endFashion

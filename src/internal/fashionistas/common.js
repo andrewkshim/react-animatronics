@@ -23,6 +23,7 @@ import {
 } from '../utils'
 
 import {
+  BOX_SHADOW,
   TRANSFORM,
 } from '../constants'
 
@@ -110,9 +111,9 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
   const numSegments = segments.filter(s => !!s).length;
   if (numSegments < 1 || numSegments > 4) {
     throw makeError(
-      `Received an invalid style for ${ name || "margin/padding" }: "${ raw }".`
-      + ` Margins/paddings should have between 1 to 4 values (no less than 1 and`
-      + ` no more than 4).`
+      `Received an invalid style for ${ name || "margin/padding" }: "${ raw }".`,
+      `Margins/paddings should have between 1 to 4 values (no less than 1 and`,
+      `no more than 4).`
     );
   }
   const parsed = segments.map(createUnitFashion);
@@ -140,9 +141,9 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
   const numSegments = segments.filter(s => !!s).length;
   if (numSegments < 3 || numSegments > 5) {
     throw makeError(
-      `Received an invalid style for box-shadow: "${ raw }".`
-      + ` Box-shadows should have between 3 to 5 values:`
-      + ` https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow`
+      `Received an invalid style for box-shadow: "${ raw }".`,
+      `Box-shadows should have between 3 to 5 values:`,
+      `https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow`
     );
   }
 
@@ -201,7 +202,7 @@ export const parseStyle = (raw: string|number, name?: string): Fashion => (
     createTransformFashion(raw)
   : raw.includes(',') ?
     createCommaFashion(raw)
-  : name === 'box-shadow' ?
+  : name === BOX_SHADOW ?
     createBoxShadowFashion(raw, name)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)

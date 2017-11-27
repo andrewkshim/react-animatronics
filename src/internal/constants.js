@@ -6,6 +6,7 @@
  */
 import BezierEasing from 'bezier-easing'
 
+export const BOX_SHADOW = 'box-shadow';
 export const TRANSFORM = 'transform';
 
 export const MS_PER_ANIMATION_FRAME: number = 1000 / 60;
