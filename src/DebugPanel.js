@@ -18,7 +18,7 @@ const SEPARATE_WINDOW_RECT = `
 `;
 
 const PRIMARY_COLOR = '#709DCC';
-const PANEL_HEIGHT = '240px';
+const PANEL_HEIGHT = '200px';
 
 const NAME_COLUMN_WIDTH = '200px';
 const TOTAL_COLUMN_WIDTH = '140px';
@@ -341,8 +341,10 @@ const PanelBody = ({ recordings }) => (
   <div style={{
     boxSizing: 'border-box',
     fontSize: '14px',
-    paddingLeft: '12px',
+    height: PANEL_HEIGHT,
+    overflowY: 'scroll',
     paddingBottom: '12px',
+    paddingLeft: '12px',
   }}>
     <AnimationHeader />
     {
@@ -398,18 +400,16 @@ class InlinePanel extends React.Component {
         border: '1px solid black',
         boxSizing: 'border-box',
         fontFamily: 'monospace',
-        height: PANEL_HEIGHT,
         minWidth: TABLE_WIDTH,
         opacity: '0.8',
-        overflowY: 'scroll',
         padding: '6px 12px',
         position: 'relative',
         resize: 'both',
-        top: isHidden ? PANEL_HEIGHT : '0px',
+        top: isHidden ? '253px' : '0px',
         width: '100vw',
       }}>
         <PanelHeader
-      panelPosition={ PANEL_POSITION_BOTTOM }
+          panelPosition={ PANEL_POSITION_BOTTOM }
           onPositionButtonClick={nextPanelPosition => {
             if (nextPanelPosition === PANEL_POSITION_BOTTOM) return;
             setPanelPosition(nextPanelPosition);
