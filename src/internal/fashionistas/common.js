@@ -6,13 +6,15 @@
  * @module internal/fashionistas/common
  */
 
+import Debug from 'debug'
 import chroma from 'chroma-js'
 
 import type {
   ColorFashion,
+  CompositeFashion,
   Fashion,
   NumberFashion,
-  CompositeFashion,
+  StaticFashion,
   UnitFashion,
 } from '../flow-types'
 
@@ -28,6 +30,9 @@ const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
 const ALL_COMMAS_REGEX: RegExp = /, /g;
 const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 const NON_NUMER_REGEX: RegExp = /\D+/;
+const EMPTY_UNIT: string = '0px';
+
+const debug = Debug('react-animatronics:fashionistas:common');
 
 export const isColorString = (str: string): boolean => {
   let color;
@@ -40,9 +45,14 @@ export const isColorString = (str: string): boolean => {
 }
 
 // replace decimals otherwise it'll get caught by the NON_NUMBER_REGEX
-const isNumberStr = (str: string): boolean => (
+export const isNumberString = (str: string): boolean => (
   !isNaN(parseFloat(str))
   && !NON_NUMER_REGEX.test(str.replace('.', ''))
+);
+
+// FIXME: can have false positives
+export const isUnitString = (str: string): boolean => (
+  NUMBER_REGEX.test(str)
 );
 
 export const createColorFashion = (raw: string): ColorFashion => ({
@@ -51,18 +61,29 @@ export const createColorFashion = (raw: string): ColorFashion => ({
   value: chroma(raw).hex(),
 });
 
-export const createNumberFashion = (raw: string | number): NumberFashion => ({
+export const createStaticFashion = (raw: string): StaticFashion => ({
+  isBasicType: true,
+  isStaticType: true,
+  value: raw,
+});
+
+export const createNumberFashion = (raw: string|number): NumberFashion => ({
   isBasicType: true,
   isNumberType: true,
   value: parseFloat(raw),
 });
 
-export const createUnitFashion = (raw: string): UnitFashion => ({
-  isBasicType: true,
-  isUnitType: true,
-  value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
-  unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
-});
+// EXPERIMENT: Perhaps departing from implicit returns since they make
+// debugging more difficult.
+export const createUnitFashion = (raw: string): UnitFashion => {
+  debug('creating unit fashion for "%s"', raw);
+  return {
+    isBasicType: true,
+    isUnitType: true,
+    value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
+    unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
+  }
+};
 
 const parseTransformName = (transform: string): string =>
   transform.slice(0, transform.indexOf('('));
@@ -108,16 +129,71 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
   };
 };
 
-const createCommaFashion = (raw: string): CompositeFashion => ({
+export const createCommaFashion = (raw: string): CompositeFashion => ({
   isCompositeType: true,
   isCommaType: true,
   styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(parseStyle),
 });
 
+export const createBoxShadowFashion = (raw: string): CompositeFashion => {
+  const segments = raw.split(' ');
+  const numSegments = segments.filter(s => !!s).length;
+  if (numSegments < 3 || numSegments > 5) {
+    throw makeError(
+      `Received an invalid style for box-shadow: "${ raw }".`
+      + ` Box-shadows should have between 3 to 5 values:`
+      + ` https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow`
+    );
+  }
+
+  // Possible formats:
+    // offset-x | offset-y | color
+    // offset-x | offset-y | blur-radius | color
+    // offset-x | offset-y | blur-radius | spread-radius | color
+    // inset | offset-x | offset-y | color
+  // Target format:
+    // offset-x | offset-y | blur-radius | spread-radius | color
+
+  return {
+    isCompositeType: true,
+    styles: numSegments === 3 ?
+      [
+        createUnitFashion(segments[0]),
+        createUnitFashion(segments[1]),
+        createUnitFashion(EMPTY_UNIT),
+        createUnitFashion(EMPTY_UNIT),
+        createColorFashion(segments[2])
+      ]
+    : (numSegments === 4 && segments[0] === 'inset') ?
+      [
+        createStaticFashion(segments[0]),
+        createUnitFashion(segments[1]),
+        createUnitFashion(segments[2]),
+        createColorFashion(segments[3])
+      ]
+    : (numSegments === 4) ?
+      [
+        createUnitFashion(segments[0]),
+        createUnitFashion(segments[1]),
+        createUnitFashion(segments[2]),
+        createUnitFashion(EMPTY_UNIT),
+        createColorFashion(segments[3])
+      ]
+    : // numSegments === 5
+      [
+        createUnitFashion(segments[0]),
+        createUnitFashion(segments[1]),
+        createUnitFashion(segments[2]),
+        createUnitFashion(segments[3]),
+        createColorFashion(segments[4])
+      ]
+  };
+}
+
 export const parseStyle = (raw: string|number, name?: string): Fashion => (
   typeof raw === 'number' ?
     createNumberFashion(raw)
-  : isNumberStr(raw) ?
+  : isNumberString(raw) ?
     createNumberFashion(raw)
   : isColorString(raw) ?
     createColorFashion(raw)
@@ -125,10 +201,14 @@ export const parseStyle = (raw: string|number, name?: string): Fashion => (
     createTransformFashion(raw)
   : raw.includes(',') ?
     createCommaFashion(raw)
+  : name === 'box-shadow' ?
+    createBoxShadowFashion(raw, name)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
-  :
+  : isUnitString(raw) ?
     createUnitFashion(raw)
+  :
+    createStaticFashion(raw)
 );
 
 export const stringifyColor = (color: ColorFashion) => `${ chroma(color.value).hex() }`;

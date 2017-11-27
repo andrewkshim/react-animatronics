@@ -4,6 +4,9 @@ import {
   createTransformFashion,
   createUnitFashion,
   createSpacingFashion,
+  createStaticFashion,
+  createBoxShadowFashion,
+  createCommaFashion,
   parseStyle,
 
   stringifyColor,
@@ -13,6 +16,8 @@ import {
   stringifyFashion,
 
   isColorString,
+  isNumberString,
+  isUnitString,
   haveConvertibleUnits,
 } from './common'
 
@@ -76,6 +81,52 @@ test('createSpacingFashion', () => {
     .toThrow(/should have between 1 to 4/);
 });
 
+test('createStaticFashion', () => {
+  const staticFashion = createStaticFashion('hello');
+  expect(staticFashion.isStaticType).toBe(true);
+  expect(staticFashion.value).toBe('hello');
+});
+
+test('createBoxShadowFashion', () => {
+  expect(createBoxShadowFashion('10px 10px blue').styles).toEqual([
+    createUnitFashion('10px'),
+    createUnitFashion('10px'),
+    createUnitFashion('0px'),
+    createUnitFashion('0px'),
+    createColorFashion('blue'),
+  ]);
+
+  expect(createBoxShadowFashion('5px 4px 20px red').styles).toEqual([
+    createUnitFashion('5px'),
+    createUnitFashion('4px'),
+    createUnitFashion('20px'),
+    createUnitFashion('0px'),
+    createColorFashion('red'),
+  ]);
+
+  expect(createBoxShadowFashion('1px 2px 3px -4rem #000').styles).toEqual([
+    createUnitFashion('1px'),
+    createUnitFashion('2px'),
+    createUnitFashion('3px'),
+    createUnitFashion('-4rem'),
+    createColorFashion('#000'),
+  ]);
+
+  expect(createBoxShadowFashion('inset 4px 2px purple').styles).toEqual([
+    createStaticFashion('inset'),
+    createUnitFashion('4px'),
+    createUnitFashion('2px'),
+    createColorFashion('purple'),
+  ]);
+});
+
+test('createCommaFashion', () => {
+  expect(createCommaFashion('0, 1').styles).toEqual([
+    createNumberFashion(0),
+    createNumberFashion(1),
+  ]);
+});
+
 test('parseStyle', () => {
   expect(parseStyle('white')).toEqual(createColorFashion('white'));
 
@@ -98,6 +149,10 @@ test('parseStyle', () => {
 
   expect(parseStyle('10px 20px', 'padding')).toEqual(
     createSpacingFashion('10px 20px')
+  );
+
+  expect(parseStyle('1px 2px blue', 'box-shadow')).toEqual(
+    createBoxShadowFashion('1px 2px blue')
   );
 });
 
@@ -155,4 +210,19 @@ test('haveConvertibleUnits', () => {
   expect(haveConvertibleUnits('10px', '30rem')).toBe(true);
   expect(haveConvertibleUnits(20, 40)).toBe(false);
   expect(haveConvertibleUnits('scale(0)', 'scale(1)', 'transform')).toBe(true);
+});
+
+test('isNumberString', () => {
+  expect(isNumberString('123')).toBe(true);
+  expect(isNumberString('123px')).toBe(false);
+  expect(isNumberString('hello')).toBe(false);
+});
+
+test('isUnitString', () => {
+  expect(isUnitString('12px')).toBe(true);
+  expect(isUnitString('foobar')).toBe(false);
+
+  // FIXME: this test should fail in a more thorough implementation,
+  // we could check the actual unit string to see if its valid.
+  expect(isUnitString('24unknownunit')).toBe(true);
 });

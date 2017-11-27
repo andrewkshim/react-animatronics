@@ -42,6 +42,12 @@ export type UnitFashion = {|
   unit: string,
 |}
 
+export type StaticFashion = {|
+  isBasicType: true,
+  isStaticType: true,
+  value: string,
+|}
+
 export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
 
 export type CompositeFashion = {|
