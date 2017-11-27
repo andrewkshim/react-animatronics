@@ -9,7 +9,7 @@ import chroma from 'chroma-js'
 
 import { parseStyle, stringifyFashion } from './common'
 
-import type { TransformFashion, Fashion, Styles } from '../flow-types'
+import type { Fashion, Styles } from '../flow-types'
 
 export const calculateCurrentValue = (
   startValue: number,
@@ -41,13 +41,13 @@ const calculateBasic = (startFashion: Fashion, endFashion: Fashion, progress: nu
 const calculateFashion = (startFashion: Fashion, endFashion: Fashion, progress: number): Fashion => (
   startFashion.isBasicType && endFashion.isBasicType ?
     calculateBasic(startFashion, endFashion, progress)
-  : startFashion.isTransformType && endFashion.isTransformType ?
+  : startFashion.isCompositeType && endFashion.isCompositeType ?
     {
       ...startFashion,
       styles: endFashion.styles.map(
         (to: Fashion, index: number): Fashion => {
           // Flow isn't playing nicely with disjoint types here. I'd expect it to know
-          // that startFashion isTransformType, but flow isn't recognizing it as such.
+          // that startFashion isCompositeType, but flow isn't recognizing it as such.
           // There might be an issue with detecting disjoint types via multiple conditions.
           // $FlowFixMe
           const from: Fashion = startFashion.styles[index];

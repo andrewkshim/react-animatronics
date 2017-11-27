@@ -1,14 +1,14 @@
-// @flow
 import {
   createColorFashion,
   createNumberFashion,
   createTransformFashion,
   createUnitFashion,
+  createSpacingFashion,
   parseStyle,
 
   stringifyColor,
   stringifyNumber,
-  stringifyTransform,
+  stringifyComposite,
   stringifyUnit,
   stringifyFashion,
 
@@ -28,7 +28,7 @@ test('createNumberFashion creates a valid NumberFashion', () => {
 test('createTransformFashion creates a valid TransformFashion', () => {
   const transformFashion = createTransformFashion('scale(0) rotateZ(90deg)');
 
-  expect(transformFashion.isTransformType).toBeTruthy();
+  expect(transformFashion.isCompositeType).toBeTruthy();
 
   const actualTransformNames = transformFashion.names;
   const expectedTransformNames = ['scale', 'rotateZ'];
@@ -42,6 +42,37 @@ test('createTransformFashion creates a valid TransformFashion', () => {
 test('createUnitFashion creates a valid UnitFashion', () => {
   const unitFashion = createUnitFashion('10px');
   expect(unitFashion.isUnitType).toBeTruthy();
+});
+
+test('createSpacingFashion', () => {
+  expect(createSpacingFashion('10px').styles).toEqual([
+    createUnitFashion('10px'),
+    createUnitFashion('10px'),
+    createUnitFashion('10px'),
+    createUnitFashion('10px')
+  ]);
+  expect(createSpacingFashion('10px 20px').styles).toEqual([
+    createUnitFashion('10px'),
+    createUnitFashion('20px'),
+    createUnitFashion('10px'),
+    createUnitFashion('20px')
+  ]);
+  expect(createSpacingFashion('10px 20px 14px').styles).toEqual([
+    createUnitFashion('10px'),
+    createUnitFashion('20px'),
+    createUnitFashion('14px'),
+    createUnitFashion('20px')
+  ]);
+  expect(createSpacingFashion('10px 20px 14px 44px').styles).toEqual([
+    createUnitFashion('10px'),
+    createUnitFashion('20px'),
+    createUnitFashion('14px'),
+    createUnitFashion('44px')
+  ]);
+  expect(() => createSpacingFashion(''))
+    .toThrow(/should have between 1 to 4/);
+  expect(() => createSpacingFashion('1px 2px 3px 4px 5px'))
+    .toThrow(/should have between 1 to 4/);
 });
 
 test('parseStyle', () => {
@@ -63,6 +94,10 @@ test('parseStyle', () => {
   expect(parseStyle('rgba(0, 0, 0, 0)')).toEqual(
     createColorFashion('rgba(0, 0, 0, 0)')
   );
+
+  expect(parseStyle('10px 20px', 'padding')).toEqual(
+    createSpacingFashion('10px 20px')
+  );
 });
 
 test('stringifyColor creates the correct style string', () => {
@@ -77,8 +112,8 @@ test('stringifyNumber creates the correct style string', () => {
   expect(actualNumberStyleStr).toBe(expectedNumberStyleStr);
 });
 
-test('stringifyTransform creates the correct style string', () => {
-  const actualTransformStyleStr = stringifyTransform(createTransformFashion('scale(0.5)'));
+test('stringifyComposite creates the correct style string', () => {
+  const actualTransformStyleStr = stringifyComposite(createTransformFashion('scale(0.5)'));
   const expectedTransformStyleStr = 'scale(0.5)';
   expect(actualTransformStyleStr).toBe(expectedTransformStyleStr);
 });
@@ -101,9 +136,12 @@ test('stringifyStyle creates the correct style strings', () => {
   expect(actualNumberStyleStr).toBe(expectedNumberStyleStr);
 
   const transformFashion = createTransformFashion('translateZ(42deg)');
-  const actualTransformStyleStr = stringifyFashion(transformFashion);
-  const expectedTransformStyleStr = stringifyTransform(transformFashion);
-  expect(actualTransformStyleStr).toBe(expectedTransformStyleStr);
+  expect(stringifyFashion(transformFashion))
+    .toBe(stringifyComposite(transformFashion));
+
+  const spacingFashion = createSpacingFashion('10px 20px');
+  expect(stringifyFashion(spacingFashion))
+    .toBe(stringifyComposite(spacingFashion));
 
   const unitFashion = createUnitFashion('42px');
   const actualUnitStyleStr = stringifyFashion(unitFashion);

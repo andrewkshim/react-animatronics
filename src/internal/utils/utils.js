@@ -5,7 +5,6 @@
  * @module internal/utils
  */
 
-
 export const noop = (): void => {};
 
 export const isStatelessComponent = (Component: Object): boolean => !Component.prototype.render;

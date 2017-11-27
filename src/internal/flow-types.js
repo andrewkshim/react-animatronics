@@ -44,13 +44,13 @@ export type UnitFashion = {|
 
 export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
 
-export type TransformFashion = {|
-  isTransformType: true,
-  names: string[],
+export type CompositeFashion = {|
+  isCompositeType: true,
+  names?: string[],
   styles: Fashion[],
 |}
 
-export type Fashion = BasicFashion | TransformFashion;
+export type Fashion = BasicFashion | CompositeFashion;
 
 export type Styles = { [string]: string | number };
 

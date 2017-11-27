@@ -10,11 +10,15 @@ import chroma from 'chroma-js'
 
 import type {
   ColorFashion,
-  NumberFashion,
-  UnitFashion,
-  TransformFashion,
   Fashion,
+  NumberFashion,
+  CompositeFashion,
+  UnitFashion,
 } from '../flow-types'
+
+import {
+  makeError,
+} from '../utils'
 
 const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
 const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
@@ -61,11 +65,39 @@ const parseTransformName = (transform: string): string =>
 const parseTransformStyle = (transform: string): Fashion =>
   parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
-export const createTransformFashion = (raw: string): TransformFashion => ({
-  isTransformType: true,
+export const createTransformFashion = (raw: string): CompositeFashion => ({
+  isCompositeType: true,
   names: raw.split(' ').map(parseTransformName),
   styles: raw.split(' ').map(parseTransformStyle),
 });
+
+/**
+ * @param raw - e.g. "6px 12px" (margin/padding shorthand)
+ * @returns CompositeFashion
+ */
+export const createSpacingFashion = (raw: string, name: string): CompositeFashion => {
+  const segments = raw.split(' ');
+  const numSegments = segments.filter(s => !!s).length;
+  if (numSegments < 1 || numSegments > 4) {
+    throw makeError(
+      `Received an invalid style for ${ name || "margin/padding" }: "${ raw }".`
+      + ` Margins/paddings should have between 1 to 4 values (no less than 1 and`
+      + ` no more than 4).`
+    );
+  }
+  const parsed = segments.map(createUnitFashion);
+  return {
+    isCompositeType: true,
+    styles: numSegments === 1 ?
+      [parsed[0], parsed[0], parsed[0], parsed[0]]
+    : numSegments === 2 ?
+      [parsed[0], parsed[1], parsed[0], parsed[1]]
+    : numSegments === 3 ?
+      [parsed[0], parsed[1], parsed[2], parsed[1]]
+    : // numSegments === 4
+      [parsed[0], parsed[1], parsed[2], parsed[3]]
+  };
+};
 
 export const parseStyle = (raw: string|number, name?: string): Fashion => (
   typeof raw === 'number' ?
@@ -76,6 +108,8 @@ export const parseStyle = (raw: string|number, name?: string): Fashion => (
     createColorFashion(raw)
   : typeof raw === 'string' && name === 'transform' ?
     createTransformFashion(raw)
+  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
+    createSpacingFashion(raw, name)
   :
     createUnitFashion(raw)
 );
@@ -86,10 +120,14 @@ export const stringifyNumber = (number: NumberFashion) => `${ number.value }`;
 
 export const stringifyUnit = (style: UnitFashion) => `${ style.value }${ style.unit }`;
 
-export const stringifyTransform = (transform: TransformFashion) => transform.names
-  .reduce((arr: string[], name: string, index: number) => {
-    const style: Fashion = transform.styles[index];
-    return arr.concat(`${ name }(${ stringifyFashion(style) })`);
+export const stringifyComposite = (composite: CompositeFashion) => composite.styles
+  .reduce((arr: string[], style: Fashion, index: number) => {
+    const name: ?string = composite.names && composite.names[index];
+    return arr.concat(
+      name
+        ? `${ name }(${ stringifyFashion(style) })`
+        : stringifyFashion(style)
+    );
   }, [])
   .join(' ');
 
@@ -105,8 +143,8 @@ const stringifyBasic = (style: Fashion): string => (
 );
 
 export const stringifyFashion = (style: Fashion): string => (
-  style.isTransformType ?
-    stringifyTransform(style)
+  style.isCompositeType ?
+    stringifyComposite(style)
   : // default: unknown style
     stringifyBasic(style)
 );

@@ -48,7 +48,7 @@ export const reconstructStyles = (
       reconstructed[styleName] = stringifyFashion(
         from.isBasicType && to.isBasicType ?
           interpolateFashion(from, to, value)
-        : from.isTransformType && to.isTransformType ?
+        : from.isCompositeType && to.isCompositeType ?
           {
             ...from,
             styles: from.styles.map(
