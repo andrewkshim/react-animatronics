@@ -18,6 +18,7 @@ import {
 import {
   heightAnimationFrames,
   transformAnimationFrames,
+  boxShadowAnimationFrames,
 } from './fixtures'
 
 test('machines/animatronics/calculateEasingProgress', () => {
@@ -198,5 +199,13 @@ test('runTimedAnimation', () => {
       duration: 200,
     })
   ).toEqual(transformAnimationFrames);
+
+  expect(
+    runTimedAnimationMocked({
+      from: { 'box-shadow': '0px 0px blue' },
+      to: { 'box-shadow': '10px 20px red' },
+      duration: 200,
+    })
+  ).toEqual(boxShadowAnimationFrames);
 });
 
