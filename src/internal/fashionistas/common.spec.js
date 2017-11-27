@@ -151,7 +151,7 @@ test('parseStyle', () => {
     createSpacingFashion('10px 20px')
   );
 
-  expect(parseStyle('1px 2px blue', 'box-shadow')).toEqual(
+  expect(parseStyle('1px 2px blue', 'boxShadow')).toEqual(
     createBoxShadowFashion('1px 2px blue')
   );
 });

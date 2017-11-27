@@ -119,24 +119,24 @@ test('machines/animatronics/validator/throwIfAnimationNotValid', () => {
   expect(
     () => throwIfAnimationNotValid({
       duration: 100,
-      from: { 'box-shadow': '10px 20px blue, 30px 40px red' },
-      to: { 'box-shadow': '0px 0px black' },
+      from: { boxShadow: '10px 20px blue, 30px 40px red' },
+      to: { boxShadow: '0px 0px black' },
     })
   ).toThrow(/different number of box-shadows/);
 
   expect(
     () => throwIfAnimationNotValid({
       duration: 100,
-      from: { 'box-shadow': '10px 20px blue, 30px 40px red' },
-      to: { 'box-shadow': '0px 0px black, 0px 0px black' },
+      from: { boxShadow: '10px 20px blue, 30px 40px red' },
+      to: { boxShadow: '0px 0px black, 0px 0px black' },
     })
   ).not.toThrow();
 
   expect(
     () => throwIfAnimationNotValid({
       duration: 100,
-      from: { 'box-shadow': 'inset 10px 20px blue' },
-      to: { 'box-shadow': '0px 0px black' },
+      from: { boxShadow: 'inset 10px 20px blue' },
+      to: { boxShadow: '0px 0px black' },
     })
   ).toThrow(/must have "insets" for the same shadow/);
 });
