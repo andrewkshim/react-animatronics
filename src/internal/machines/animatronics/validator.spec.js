@@ -131,6 +131,14 @@ test('machines/animatronics/validator/throwIfAnimationNotValid', () => {
       to: { 'box-shadow': '0px 0px black, 0px 0px black' },
     })
   ).not.toThrow();
+
+  expect(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      from: { 'box-shadow': 'inset 10px 20px blue' },
+      to: { 'box-shadow': '0px 0px black' },
+    })
+  ).toThrow(/must have "insets" for the same shadow/);
 });
 
 test('machines/animatronics/validator/throwIfPhaseNotValid', () => {

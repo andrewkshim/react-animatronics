@@ -9,10 +9,19 @@ import {
   BOX_SHADOW,
 } from '../../constants'
 
-const hasInvalidBoxShadows = (animation: Animation): boolean => (
+const hasUnequalBoxShadows = (animation: Animation): boolean => (
   animation.from[BOX_SHADOW]
   && animation.to[BOX_SHADOW]
   && animation.from[BOX_SHADOW].split(',').length !== animation.to[BOX_SHADOW].split(',').length
+);
+
+const hasInvalidInsetBoxShadow = (animation: Animation): boolean => (
+  animation.from[BOX_SHADOW]
+  && animation.to[BOX_SHADOW]
+  && (
+    animation.from[BOX_SHADOW].split(',').map(shadow => shadow.includes('inset')).join('')
+    !== animation.to[BOX_SHADOW].split(',').map(shadow => shadow.includes('inset')).join('')
+  )
 );
 
 export const throwIfAnimationNotValid = (animation: Animation) => {
@@ -150,12 +159,23 @@ export const throwIfAnimationNotValid = (animation: Animation) => {
       `\n`,
       `The 'delay' must always be a number (in milliseconds).`
     );
-  } else if (hasInvalidBoxShadows(animation)) {
+  } else if (hasUnequalBoxShadows(animation)) {
     throw makeError(
       `You declared an animation with a different number of box-shadows`,
       `in the "from" and "to". It's unclear what react-animatronics`,
       `should do in this case, so it throws :). Make sure to declare the`,
-      `same number of box-shadows in your animation:`,
+      `same number of box-shadows in your animation. Here's what your current`,
+      `animation looks like:`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`
+    );
+  } else if (hasInvalidInsetBoxShadow(animation)) {
+    throw makeError(
+      `You declared an animation with invalid "from" and "to" box-shadows.`,
+      `The box-shadows must have "insets" for the same shadow. If you have`,
+      `an "inset" in your first shadow in "from", there must be an "inset"`,
+      `in your first shadow in "to". Here's what your current animation looks like:`,
       `\n`,
       `${ stringify(animation) }`,
       `\n`
