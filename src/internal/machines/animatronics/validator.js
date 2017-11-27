@@ -5,6 +5,16 @@ import {
   stringify,
 } from '../../utils'
 
+import {
+  BOX_SHADOW,
+} from '../../constants'
+
+const hasInvalidBoxShadows = (animation: Animation): boolean => (
+  animation.from[BOX_SHADOW]
+  && animation.to[BOX_SHADOW]
+  && animation.from[BOX_SHADOW].split(',').length !== animation.to[BOX_SHADOW].split(',').length
+);
+
 export const throwIfAnimationNotValid = (animation: Animation) => {
   if (isUsingTime(animation) && isUsingSpring(animation)) {
     throw makeError(
@@ -139,6 +149,16 @@ export const throwIfAnimationNotValid = (animation: Animation) => {
       `${ stringify(animation) }`,
       `\n`,
       `The 'delay' must always be a number (in milliseconds).`
+    );
+  } else if (hasInvalidBoxShadows(animation)) {
+    throw makeError(
+      `You declared an animation with a different number of box-shadows`,
+      `in the "from" and "to". It's unclear what react-animatronics`,
+      `should do in this case, so it throws :). Make sure to declare the`,
+      `same number of box-shadows in your animation:`,
+      `\n`,
+      `${ stringify(animation) }`,
+      `\n`
     );
   }
 }

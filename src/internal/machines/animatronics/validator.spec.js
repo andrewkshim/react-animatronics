@@ -115,6 +115,22 @@ test('machines/animatronics/validator/throwIfAnimationNotValid', () => {
       to: {},
     })
   ).not.toThrow();
+
+  expect(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      from: { 'box-shadow': '10px 20px blue, 30px 40px red' },
+      to: { 'box-shadow': '0px 0px black' },
+    })
+  ).toThrow(/different number of box-shadows/);
+
+  expect(
+    () => throwIfAnimationNotValid({
+      duration: 100,
+      from: { 'box-shadow': '10px 20px blue, 30px 40px red' },
+      to: { 'box-shadow': '0px 0px black, 0px 0px black' },
+    })
+  ).not.toThrow();
 });
 
 test('machines/animatronics/validator/throwIfPhaseNotValid', () => {
