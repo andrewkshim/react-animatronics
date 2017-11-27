@@ -71,7 +71,44 @@ const getNumPhases = state => animationName => {
   return sequence.length;
 };
 
-const runTimedAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
+const normalizeStyles = (getComputedStyle, node, fromStyles, toStyles) => {
+  const normalizedFrom = { ...fromStyles };
+  const normalizedTo = { ...toStyles };
+  Object.keys(normalizedFrom).map(styleName => {
+    const rawFromStyle = normalizedFrom[styleName];
+    const rawToStyle = normalizedTo[styleName];
+    if (!haveConvertibleUnits(rawFromStyle, rawToStyle, styleName)) return;
+    if (!node && styleName === TRANSFORM) return;
+    if (!node && styleName !== TRANSFORM) {
+      // FIXME: More detailed error detection for transform styles? It's
+      // tough to know whether or not we need to throw an error when using a
+      // transform style since we need to know whether each individual
+      // transformation pair is actually using a different unit.
+      if (styleName !== TRANSFORM) {
+        throw makeError(
+          `You specified "from" and "to" styles that have different units, but there`
+          + ` is no ref available for the component "${ componentName }". You must`
+          + ` either change one of the styles [`
+            + `{${styleName}: ${rawFromStyle}}, `
+            + `{${styleName}: ${rawToStyle}}`
+          + `] so they have the same units or make the ${ componentName }`
+          + ` component a class component.`
+        );
+      }
+    }
+    node.style[styleName] = rawToStyle;
+    const computedTo = getComputedStyle(node);
+    normalizedTo[styleName] = computedTo[styleName];
+
+    // FIXME: can make more efficient by not calling getComputedStyle more than twice
+    node.style[styleName] = rawFromStyle;
+    const computedFrom = getComputedStyle(node);
+    normalizedFrom[styleName] = computedFrom[styleName];
+  });
+  return { normalizedFrom, normalizedTo };
+}
+
+export const runTimedAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -79,8 +116,12 @@ const runTimedAnimation = (state, mutators) => (animationName, componentName, an
     easingFn = DEFAULT_EASING_FN,
   } = animation;
 
-  const normalizedFrom = { ...fromStyles };
-  const normalizedTo = { ...toStyles };
+  const { normalizedFrom, normalizedTo } = normalizeStyles(
+    mutators.getComputedStyle,
+    state.nodes[componentName],
+    fromStyles,
+    toStyles
+  );
 
   mutators.createTimedJobMachine({
     index,
@@ -91,40 +132,6 @@ const runTimedAnimation = (state, mutators) => (animationName, componentName, an
   if (!IS_PRODUCTION) {
     Recorder.reset(animationName);
   }
-
-  const node = state.nodes[componentName];
-  Object.keys(normalizedFrom).map(styleName => {
-    const rawFromStyle = normalizedFrom[styleName];
-    const rawToStyle = normalizedTo[styleName];
-    if (haveConvertibleUnits(rawFromStyle, rawToStyle, styleName)) {
-      if (!node) {
-        // FIXME: More detailed error detection for transform styles? It's
-        // tough to know whether or not we need to throw an error when using a
-        // transform style since we need to know whether each individual
-        // transformation pair is actually using a different unit.
-        if (styleName !== TRANSFORM) {
-          throw makeError(
-            `You specified "from" and "to" styles that have different units, but there`
-            + ` is no ref available for the component "${ componentName }". You must`
-            + ` either change one of the styles [`
-              + `{${styleName}: ${rawFromStyle}}, `
-              + `{${styleName}: ${rawToStyle}}`
-            + `] so they have the same units or make the ${ componentName }`
-            + ` component a class component.`
-          );
-        }
-        return;
-      }
-      // FIXME: don't use window directly
-      node.style[styleName] = rawToStyle;
-      const computedTo = window.getComputedStyle(node);
-      normalizedTo[styleName] = computedTo[styleName];
-
-      node.style[styleName] = rawFromStyle;
-      const computedFrom = window.getComputedStyle(node);
-      normalizedFrom[styleName] = computedFrom[styleName];
-    }
-  })
 
   const job = elapsedTime => {
     const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
@@ -375,6 +382,11 @@ export const makeMutators = (machinist, state) => ({
   countdownPhases: action => {
     const { animationName } = action;
     state.phasesCountdownMachines[animationName].countdown();
+  },
+
+  getComputedStyle: element => {
+    // FIXME: don't use window directly
+    window.getComputedStyle(element);
   },
 
   now: () => {

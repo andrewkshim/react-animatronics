@@ -66,6 +66,8 @@ export const makeMutators = (machinist, state) => ({
   },
 });
 
+// FIXME: machinist arg isn't used but it here for sake of completeness wrt some
+// of the other machines
 export const makeTimedJobMachine = machinist => (
   duration,
   requestAnimationFrame,

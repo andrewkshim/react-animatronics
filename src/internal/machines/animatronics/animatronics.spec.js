@@ -1,15 +1,24 @@
+import lolex from 'lolex'
 import sinon from 'sinon'
 
 import {
   calculateEasingProgress,
-  play,
-  makeSequence,
   makeMutators,
+  makeSequence,
+  play,
+  runTimedAnimation,
 } from './animatronics'
+
+import { makeTimedJobMachine } from '../timed-job'
 
 import {
   DEFAULT_ANIMATION_NAME
 } from '../../constants'
+
+import {
+  heightAnimationFrames,
+  transformAnimationFrames,
+} from './fixtures'
 
 test('machines/animatronics/calculateEasingProgress', () => {
   expect(calculateEasingProgress(x => x, 500, 250)).toBe(0.5);
@@ -124,3 +133,70 @@ test('machines/animatronics/makeMutators', () => {
 
   expect(state.timedJobMachines.foobar).toBeTruthy();
 });
+
+const runTimedAnimationMocked = animation => {
+  let timedJobMachine;
+  const animationName = '';
+  const componentName = 'foobar';
+  const index = 0;
+  const frames = [];
+
+  const clock = lolex.createClock();
+  const machinist = {};
+  const state = {
+    nodes: { foobar: { style: {} } },
+    styleUpdaters: {},
+  };
+  const mutators = {
+    createTimedJobMachine: ({ duration }) => {
+      timedJobMachine = makeTimedJobMachine(machinist)(
+        duration,
+        callback => clock.setTimeout(callback, 10),
+        clock.clearTimeout,
+        clock.Date.now
+      );
+    },
+    updateComponentStyles: ({ updatedStyles }) => {
+      frames.push(updatedStyles);
+    },
+    countdownAnimations: () => {},
+    registerTimedJob: ({ job }) => {
+      timedJobMachine.registerJob(job);
+    },
+    registerTimedOnCompletedJob: ({ onCompleteJob }) => {
+      timedJobMachine.registerOnCompleteJob(onCompleteJob);
+    },
+    startTimedJob: () => {
+      timedJobMachine.start();
+    },
+    getComputedStyle: element => element.style,
+  };
+
+  runTimedAnimation(state, mutators)(
+    animationName,
+    componentName,
+    animation,
+    index,
+  );
+
+  clock.runAll();
+
+  return frames;
+}
+
+test('runTimedAnimation', () => {
+  expect(runTimedAnimationMocked({
+    from: { height: '10px' },
+    to: { height: '100px' },
+    duration: 200,
+  })).toEqual(heightAnimationFrames);
+
+  expect(
+    runTimedAnimationMocked({
+      from: { transform: 'translate(0px, 0rem)' },
+      to: { transform: 'translate(100px, 20rem)' },
+      duration: 200,
+    })
+  ).toEqual(transformAnimationFrames);
+});
+
