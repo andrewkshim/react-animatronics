@@ -156,6 +156,13 @@ test('parseStyle', () => {
   );
 });
 
+test('parseStyle multiple box shadows', () => {
+  expect(parseStyle('0px 0px blue, 10px 10px red', 'boxShadow').styles).toEqual([
+    createBoxShadowFashion('0px 0px blue'),
+    createBoxShadowFashion('10px 10px red'),
+  ]);
+});
+
 test('stringifyColor creates the correct style string', () => {
   const actualColorStyleStr = stringifyColor(createColorFashion('black'));
   const expectedColorStyleStr = '#000000';

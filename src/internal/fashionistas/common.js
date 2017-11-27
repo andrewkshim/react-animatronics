@@ -130,10 +130,10 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
   };
 };
 
-export const createCommaFashion = (raw: string): CompositeFashion => ({
+export const createCommaFashion = (raw: string, name: string): CompositeFashion => ({
   isCompositeType: true,
   isCommaType: true,
-  styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(parseStyle),
+  styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(style => parseStyle(style, name)),
 });
 
 export const createBoxShadowFashion = (raw: string): CompositeFashion => {
@@ -191,26 +191,26 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
   };
 }
 
-export const parseStyle = (raw: string|number, name?: string): Fashion => (
-  typeof raw === 'number' ?
-    createNumberFashion(raw)
-  : isNumberString(raw) ?
+export const parseStyle = (raw: string|number, name?: string): Fashion => {
+  return typeof raw === 'number' ?
     createNumberFashion(raw)
   : isColorString(raw) ?
     createColorFashion(raw)
   : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
-  : raw.includes(',') ?
-    createCommaFashion(raw)
+  : typeof raw === 'string' && raw.includes(',') ?
+    createCommaFashion(raw, name)
   : name === BOX_SHADOW ?
-    createBoxShadowFashion(raw, name)
+    createBoxShadowFashion(raw)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
+  : isNumberString(raw) ?
+    createNumberFashion(raw)
   : isUnitString(raw) ?
     createUnitFashion(raw)
   :
     createStaticFashion(raw)
-);
+};
 
 export const stringifyColor = (color: ColorFashion) => `${ chroma(color.value).hex() }`;
 
