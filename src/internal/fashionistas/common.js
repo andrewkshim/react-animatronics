@@ -123,10 +123,10 @@ export const parseStyle = (raw: string|number, name?: string): Fashion => (
     createColorFashion(raw)
   : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
-  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
-    createSpacingFashion(raw, name)
   : raw.includes(',') ?
     createCommaFashion(raw)
+  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
+    createSpacingFashion(raw, name)
   :
     createUnitFashion(raw)
 );
