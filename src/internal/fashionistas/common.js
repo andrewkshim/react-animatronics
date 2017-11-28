@@ -92,7 +92,7 @@ const parseTransformName = (transform: string): string =>
 const parseTransformStyle = (transform: string): Fashion =>
   parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
 
-const normalizeRawTransform = (raw: string): string => raw
+const normalizeRawTransform = (raw: string): string[] => raw
   .replace(ALL_COMMAS_REGEX, ',')
   .split(' ');
 
@@ -130,7 +130,7 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
   };
 };
 
-export const createCommaFashion = (raw: string, name: string): CompositeFashion => ({
+export const createCommaFashion = (raw: string, name: ?string): CompositeFashion => ({
   isCompositeType: true,
   isCommaType: true,
   styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(style => parseStyle(style, name)),
@@ -191,7 +191,7 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
   };
 }
 
-export const parseStyle = (raw: string|number, name?: string): Fashion => {
+export const parseStyle = (raw: string|number, name: ?string): Fashion => {
   return typeof raw === 'number' ?
     createNumberFashion(raw)
   : isColorString(raw) ?

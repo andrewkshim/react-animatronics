@@ -52,11 +52,12 @@ export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
 
 export type CompositeFashion = {|
   isCompositeType: true,
+  isCommaType?: boolean,
   names?: string[],
   styles: Fashion[],
 |}
 
-export type Fashion = BasicFashion | CompositeFashion;
+export type Fashion = BasicFashion | CompositeFashion | StaticFashion;
 
 export type Styles = { [string]: string | number };
 
