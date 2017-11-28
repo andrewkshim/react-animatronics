@@ -386,7 +386,7 @@ export const makeMutators = (machinist, state) => ({
 
   getComputedStyle: element => {
     // FIXME: don't use window directly
-    window.getComputedStyle(element);
+    return window.getComputedStyle(element);
   },
 
   now: () => {
