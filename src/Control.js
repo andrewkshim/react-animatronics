@@ -108,6 +108,7 @@ class Control extends React.Component<Props, State> {
 
   componentWillUnmount() {
     const { animatronics } = this.context;
+    const { name } = this.props;
     animatronics.unregisterComponent(name);
   }
 
