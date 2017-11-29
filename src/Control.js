@@ -1,6 +1,6 @@
 // @flow
 /**
- * @module withControl
+ * @module Control
  */
 
 import React from 'react'
