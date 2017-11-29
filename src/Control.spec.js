@@ -89,7 +89,6 @@ test('<Control> should update the DOM node when the component updates', () => {
 
 test('<Control> should unregister when it unmounts', () => {
   const Base = () => <div />;
-  const unregisterComponent = sinon.spy();
 
   const wrapper = mount(
     <Control name='base'>{ () =>
@@ -99,13 +98,14 @@ test('<Control> should unregister when it unmounts', () => {
       context: {
         animatronics: {
           registerComponent: () => {},
-          unregisterComponent,
+          unregisterComponent: name => {
+            expect(name).toBe('base');
+          },
         }
       }
     }
   );
   wrapper.unmount();
-  expect(unregisterComponent.calledOnce).toBe(true);
 });
 
 test('<Control> should throw when it receives an invalid "name"', () => {
