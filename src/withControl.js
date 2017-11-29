@@ -14,11 +14,9 @@ import { isStatelessComponent } from './internal/utils'
 
 type Props = {};
 
-type State = {};
-
 const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
 
-  class ControlledComponent extends React.Component<Props, State> {
+  class ControlledComponent extends React.Component<Props> {
     static contextTypes: Object = ContextTypes
 
     render() {

@@ -6,7 +6,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import type { Ref } from 'react'
+import type { Ref, ElementType } from 'react'
 import type { Styles } from './internal/flow-types'
 
 import ContextTypes from './internal/context-types'
@@ -19,17 +19,18 @@ type Props = {
 };
 
 type State = {
-  style: Object,
+  animatronicStyles: Object,
 };
 
 class Control extends React.Component<Props, State> {
 
   static contextTypes: Object = ContextTypes
 
-  _ref: ?Ref
+  _ref: any
   _onRef: Function
-  _setComponentStyle: Function
+  _registerComponent: Function
   _resetComponentStyle: Function
+  _setComponentStyle: Function
 
   constructor(props: Props) {
     super(props);
@@ -53,9 +54,9 @@ class Control extends React.Component<Props, State> {
 
     this._ref = null;
     this._onRef = this._onRef.bind(this);
-    this._setComponentStyle = this._setComponentStyle.bind(this);
-    this._resetComponentStyle = this._resetComponentStyle.bind(this);
     this._registerComponent = this._registerComponent.bind(this);
+    this._resetComponentStyle = this._resetComponentStyle.bind(this);
+    this._setComponentStyle = this._setComponentStyle.bind(this);
   }
 
   _setComponentStyle(updatedStyles: Styles) {
@@ -71,7 +72,7 @@ class Control extends React.Component<Props, State> {
     this.setState({ animatronicStyles: {} });
   }
 
-  _onRef(ref: ?Ref) {
+  _onRef(ref: any) {
     this._ref = ref;
   }
 
