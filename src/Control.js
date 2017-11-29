@@ -45,7 +45,7 @@ class Control extends React.Component<Props, State> {
       if (typeof props.children !== 'function') {
         throw makeError(
           `<Control> must receive a function "children" prop that returns a`,
-          `single React component.`
+          `single React element.`
         );
       }
     }
