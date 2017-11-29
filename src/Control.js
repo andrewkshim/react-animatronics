@@ -1,42 +1,125 @@
 // @flow
 /**
- * @module Control
+ * @module withControl
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import ReactDOM from 'react-dom'
 
-import type { Element } from 'react'
+import type { Ref } from 'react'
+import type { Styles } from './internal/flow-types'
 
 import ContextTypes from './internal/context-types'
-import withControl from './withControl'
+import { IS_PRODUCTION } from './internal/constants'
+import { makeError } from './internal/utils'
 
 type Props = {
-  children: Element<any>,
-  mergeProps?: Function,
+  children: Function,
   name: string,
-  useStringRefs?: boolean,
 };
 
-class Control extends React.Component<Props> {
+type State = {
+  style: Object,
+};
+
+class Control extends React.Component<Props, State> {
 
   static contextTypes: Object = ContextTypes
 
-  static defaultProps: Object = {
-    useStringRefs: false,
+  _ref: ?Ref
+  _onRef: Function
+  _setComponentStyle: Function
+  _resetComponentStyle: Function
+
+  constructor(props: Props) {
+    super(props);
+
+    if (!IS_PRODUCTION) {
+      if (typeof props.name !== 'string') {
+        // TODO: check for name uniqueness
+        throw makeError(
+          `<Control> must receive a string "name" prop.`
+        );
+      }
+      if (typeof props.children !== 'function') {
+        throw makeError(
+          `<Control> must receive a function "children" prop that returns a`,
+          `single React component.`
+        );
+      }
+    }
+
+    this.state = { animatronicStyles: {} };
+
+    this._ref = null;
+    this._onRef = this._onRef.bind(this);
+    this._setComponentStyle = this._setComponentStyle.bind(this);
+    this._resetComponentStyle = this._resetComponentStyle.bind(this);
+    this._registerComponent = this._registerComponent.bind(this);
+  }
+
+  _setComponentStyle(updatedStyles: Styles) {
+    this.setState(state => ({
+      animatronicStyles: {
+        ...state.animatronicStyles,
+        ...updatedStyles,
+      },
+    }));
+  }
+
+  _resetComponentStyle() {
+    this.setState({ animatronicStyles: {} });
+  }
+
+  _onRef(ref: ?Ref) {
+    this._ref = ref;
+  }
+
+  _registerComponent() {
+    const { animatronics } = this.context;
+    const { name } = this.props;
+
+    if (!IS_PRODUCTION) {
+      if (!animatronics) {
+        throw makeError(
+          `Can't find the right context in the following controlled component: ${ name }.`,
+          `This likely means you forgot to use an animatronics component. Check to see that`,
+          `you're using either <Animatronics/> or withAnimatronics() and that your controlled`,
+          `component is a descendant of it.`
+        );
+      }
+    }
+
+    animatronics.registerComponent(
+      name,
+      ReactDOM.findDOMNode(this._ref),
+      this._setComponentStyle,
+      this._resetComponentStyle,
+    );
+  }
+
+  componentDidMount() {
+    this._registerComponent();
+  }
+
+  componentDidUpdate() {
+    this._registerComponent();
+  }
+
+  componentWillUnmount() {
+    const { animatronics } = this.context;
+    animatronics.unregisterComponent(name);
   }
 
   render() {
-    const { name, mergeProps, children, useStringRefs } = this.props;
-    const enhance = withControl(name, { mergeProps, useStringRefs });
-    class BaseComponent extends React.Component<{}> {
-      render() {
-        return React.cloneElement(children, this.props);
-      }
-    }
-    const ControlledComponent = enhance(BaseComponent);
-    return <ControlledComponent/>;
+    const { children } = this.props;
+    const { animatronicStyles } = this.state;
+    return children({
+      animatronicStyles,
+      ref: this._onRef,
+    });
   }
+
 }
 
 export default Control;
