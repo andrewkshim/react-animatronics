@@ -31,7 +31,7 @@ import {
 
 type Props = {
   animations: Function,
-  children: Element<any>,
+  children: Function,
   requestAnimationFrame?: Function,
   cancelAnimationFrame?: Function,
   setTimeout?: Function,
@@ -52,8 +52,9 @@ class Animatronics extends React.Component<Props> {
   }
 
   _animatronics: AnimatronicsMachine
+  _setCreateAnimationSequences: Function
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     const {
