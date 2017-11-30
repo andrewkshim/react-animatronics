@@ -30,7 +30,7 @@ test('machines/animatronics/makeSequence', () => {
   expect(
     makeSequence(
       {
-        createAnimationSequences: () => ({
+        animations: () => ({
           hello: [
             {
               circle: {
@@ -58,7 +58,7 @@ test('machines/animatronics/makeSequence', () => {
 
   makeSequence(
     {
-      createAnimationSequences: ({ circle }) => {
+      animations: ({ circle }) => {
         expect(circle).toEqual({ message: 'foobar' });
         return [];
       },
@@ -68,7 +68,7 @@ test('machines/animatronics/makeSequence', () => {
 
   makeSequence(
     {
-      createAnimationSequences: {
+      animations: {
         hey: ({ circle }) => {
           expect(circle).toEqual({ message: 'hey hey' });
           return [];
@@ -81,7 +81,7 @@ test('machines/animatronics/makeSequence', () => {
   expect(() => {
     makeSequence(
       {
-        createAnimationSequences: () => ({
+        animations: () => ({
           foo: [],
           bar: [],
         }),

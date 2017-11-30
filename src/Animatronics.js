@@ -52,7 +52,7 @@ class Animatronics extends React.Component<Props> {
   }
 
   _animatronics: AnimatronicsMachine
-  _setCreateAnimationSequences: Function
+  _setAnimations: Function
 
   constructor(props: Props) {
     super(props);
@@ -91,13 +91,13 @@ class Animatronics extends React.Component<Props> {
     );
 
     this._animatronics = machinist.makeAnimatronicsMachine(animations);
-    this._setCreateAnimationSequences = this._setCreateAnimationSequences.bind(this);
+    this._setAnimations = this._setAnimations.bind(this);
   }
 
-  _setCreateAnimationSequences() {
+  _setAnimations() {
     const { animations } = this.props;
     if (animations != null) {
-      this._animatronics.setCreateAnimationSequences(animations);
+      this._animatronics.setAnimations(animations);
     }
   }
 
@@ -111,11 +111,11 @@ class Animatronics extends React.Component<Props> {
   }
 
   componentWillMount() {
-    this._setCreateAnimationSequences();
+    this._setAnimations();
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    this._setCreateAnimationSequences();
+    this._setAnimations();
   }
 
   componentWillUnmount() {

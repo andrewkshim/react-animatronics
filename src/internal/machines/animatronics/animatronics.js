@@ -35,12 +35,12 @@ export const calculateEasingProgress = (
 );
 
 export const makeSequence = state => animationName => {
-  const { createAnimationSequences, nodes } = state;
-  const areSequencesStatic = typeof createAnimationSequences === 'function';
+  const { animations, nodes } = state;
+  const areSequencesStatic = typeof animations === 'function';
 
   const sequences = areSequencesStatic
-    ? createAnimationSequences(nodes)
-    : createAnimationSequences;
+    ? animations(nodes)
+    : animations;
 
   const namedSequences = Array.isArray(sequences)
     ? { [DEFAULT_ANIMATION_NAME]: sequences }
@@ -238,10 +238,10 @@ export const playAnimation = (state, mutators) => (
       throw makeError(
         `Attemped to run an empty animation sequence. Check <Animatronics/>`
         + ` or withAnimatronics and make sure youre're returning either an Array or`
-        + ` an Object from the "createAnimationSequences" function. Here's what your`
+        + ` an Object from the "animations" function. Here's what your`
         + ` function looks like right now:`
         + `\n`
-        + `${ state.createAnimationSequences.toString() }`
+        + `${ state.animations.toString() }`
       );
     }
   }
@@ -327,10 +327,8 @@ const unregisterComponent = (state, mutators) => componentName => {
   mutators.unregisterComponent({ componentName });
 }
 
-const setCreateAnimationSequences = (state, mutators) => createAnimationSequences => {
-  mutators.setCreateAnimationSequences({
-    createAnimationSequences,
-  });
+const setAnimations = (state, mutators) => animations => {
+  mutators.setAnimations({ animations });
 }
 
 // EXPERIMENT: Isolating any shared state mutations here.
@@ -463,10 +461,10 @@ export const makeMutators = (machinist, state) => ({
     );
   },
 
-  setCreateAnimationSequences: action => {
-    const { createAnimationSequences } = action;
-    debug('setting updated createAnimationSequences %s', createAnimationSequences);
-    state.createAnimationSequences = createAnimationSequences;
+  setAnimations: action => {
+    const { animations } = action;
+    debug('setting updated animations %s', animations);
+    state.animations = animations;
   },
 
   startTimedJob: action => {
@@ -509,8 +507,9 @@ export const makeMutators = (machinist, state) => ({
   }
 });
 
-export const makeAnimatronicsMachine = machinist => createAnimationSequences => {
+export const makeAnimatronicsMachine = machinist => animations => {
   const state = {
+    animations,
     nodes: {},
     styleUpdaters: {},
     styleResetters: {},
@@ -520,7 +519,6 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
     timeouts: {},
     animationCountdownMachines: {},
     phasesCountdownMachines: {},
-    createAnimationSequences,
   };
 
   const mutators = makeMutators(machinist, state);
@@ -531,7 +529,7 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
     resetAnimation: resetAnimation(state, mutators),
     registerComponent: registerComponent(state, mutators),
     unregisterComponent: unregisterComponent(state, mutators),
-    setCreateAnimationSequences: setCreateAnimationSequences(state, mutators),
+    setAnimations: setAnimations(state, mutators),
   };
 
   return animatronicsMachine;
