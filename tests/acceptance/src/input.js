@@ -3,7 +3,7 @@ import React from 'react'
 import Example from './internal/components/Example'
 import Circle from './internal/components/Circle'
 import { SERIF_FONT, COLOR_A, COLOR_B, COLOR_C } from './internal/styles'
-import { withAnimatronics, withControl } from '../../../src'
+import { Animatronics, withAnimatronics, withControl } from '../../../src'
 
 const COLORS = [
   COLOR_A,
@@ -11,7 +11,7 @@ const COLORS = [
   COLOR_C,
 ];
 
-const Letters = withAnimatronics(() => [])(class extends React.Component {
+class Letters extends React.Component {
 
   constructor(props) {
     super(props);
@@ -78,7 +78,7 @@ const Letters = withAnimatronics(() => [])(class extends React.Component {
     );
   }
 
-});
+};
 
 class Input extends React.Component {
 
@@ -125,40 +125,42 @@ class Input extends React.Component {
           marginTop: '2.5%',
           marginLeft: '2.5%',
         }}>
-          <Letters
-            didAnimate={ didAnimate }
-            text={ text }
-            createAnimationSequences={() => ({
-              reveal: [
-                text.split('').reduce(
-                  (result, letter, index) => {{
-                    result[`${ letter }-${ index }`] = {
-                      duration: 250,
-                      delay: index * 100,
-                      from: { transform: 'scale(0)' },
-                      to: { transform: 'scale(1)' }
-                    }
-                    return result;
-                  }},
-                  {}
-                )
-              ],
-              hide: [
-                text.split('').reduce(
-                  (result, letter, index) => {{
-                    result[`${ letter }-${ index }`] = {
-                      duration: 250,
-                      delay: index * 100,
-                      from: { transform: 'scale(1)' },
-                      to: { transform: 'scale(0)' }
-                    }
-                    return result;
-                  }},
-                  {}
-                )
-              ]
-            })}
-          />
+          <Animatronics animations={() => ({
+            reveal: [
+              text.split('').reduce(
+                (result, letter, index) => {{
+                  result[`${ letter }-${ index }`] = {
+                    duration: 250,
+                    delay: index * 100,
+                    from: { transform: 'scale(0)' },
+                    to: { transform: 'scale(1)' }
+                  }
+                  return result;
+                }},
+                {}
+              )
+            ],
+            hide: [
+              text.split('').reduce(
+                (result, letter, index) => {{
+                  result[`${ letter }-${ index }`] = {
+                    duration: 250,
+                    delay: index * 100,
+                    from: { transform: 'scale(1)' },
+                    to: { transform: 'scale(0)' }
+                  }
+                  return result;
+                }},
+                {}
+              )
+            ]
+          })}>{({ playAnimation }) =>
+            <Letters
+              didAnimate={ didAnimate }
+              text={ text }
+              playAnimation={ playAnimation }
+            />
+          }</Animatronics>
         </div>
       </div>
     );
