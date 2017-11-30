@@ -9,6 +9,7 @@ import {
   isUsingSpring,
   isUsingTime,
   makeError,
+  noop,
 } from '../../utils'
 
 import {
@@ -204,7 +205,29 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
   mutators.startEndlessJobMachine({ index, componentName });
 };
 
-export const play = (state, mutators) => (animationName, onComplete) => {
+export const playAnimation = (state, mutators) => (
+  animationName = DEFAULT_ANIMATION_NAME,
+  onComplete = noop,
+) => {
+  if (typeof animationName === 'function') {
+    onComplete = animationName;
+    animationName = DEFAULT_ANIMATION_NAME;
+  }
+  if (!IS_PRODUCTION) {
+    if (typeof animationName !== 'string') {
+      throw makeError(
+        `playAnimation() expects its first argument to be a string name of`,
+        `your animation, but it received: ${ animationName }. You might be`,
+        `passing playAnimation directly into an event handler e.g.\n`,
+        `    onClick={playAnimation}`,
+        `\nbut that will pass in the event as the first argument, so you should`,
+        `instead be calling playAnimation directly e.g.\n`,
+        `    onClick={() => playAnimation()}`,
+        `\n`,
+      );
+    }
+  }
+
   // IMPROVE: It's weird that getNumPhases calls makeSequence internally, but
   // things are the way they are so the user does not need to write each
   // phase as a function - having this inefficiency makes the API nicer.
@@ -282,11 +305,11 @@ export const play = (state, mutators) => (animationName, onComplete) => {
   runPhase(0);
 };
 
-const stop = (state, mutators) => () => {
+const cancelAnimation = (state, mutators) => () => {
   mutators.stopMachine();
 };
 
-const reset = (state, mutators) => () => {
+const resetAnimation = (state, mutators) => () => {
   reducer.stopMachine();
   reducer.resetMachine();
 };
@@ -503,9 +526,9 @@ export const makeAnimatronicsMachine = machinist => createAnimationSequences => 
   const mutators = makeMutators(machinist, state);
 
   const animatronicsMachine = {
-    play: play(state, mutators),
-    stop: stop(state, mutators),
-    reset: reset(state, mutators),
+    playAnimation: playAnimation(state, mutators),
+    cancelAnimation: cancelAnimation(state, mutators),
+    resetAnimation: resetAnimation(state, mutators),
     registerComponent: registerComponent(state, mutators),
     unregisterComponent: unregisterComponent(state, mutators),
     setCreateAnimationSequences: setCreateAnimationSequences(state, mutators),

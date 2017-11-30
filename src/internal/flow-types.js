@@ -81,6 +81,10 @@ export type AnimationPhase = { [string]: Animation };
 // Machine
 //==========================================================
 
+export type Machinist = Object;
+
+export type AnimatronicsMachine = Object;
+
 export type TimeMachine = {
   isStopped: () => boolean,
   do: (job: Function, onFrame?: VoidFn) => TimeMachine,
@@ -89,7 +93,7 @@ export type TimeMachine = {
 };
 
 export type SpringMachine = {
-  isStopped: ()=> boolean,
+  isStopped: () => boolean,
   next: (onNext: Function, onComplete: Function) => void,
 }
 

@@ -5,14 +5,14 @@ import {
   calculateEasingProgress,
   makeMutators,
   makeSequence,
-  play,
+  playAnimation,
   runTimedAnimation,
 } from './animatronics'
 
 import { makeTimedJobMachine } from '../timed-job'
 
 import {
-  DEFAULT_ANIMATION_NAME
+  DEFAULT_ANIMATION_NAME,
 } from '../../constants'
 
 import {
@@ -207,5 +207,11 @@ test('runTimedAnimation', () => {
       duration: 200,
     })
   ).toEqual(boxShadowAnimationFrames);
+});
+
+test('playAnimation', () => {
+  expect(() => {
+    playAnimation()({});
+  }).toThrow(/expects its first argument to be a string/);
 });
 

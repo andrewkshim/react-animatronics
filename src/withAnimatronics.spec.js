@@ -3,55 +3,21 @@ import { mount } from 'enzyme'
 
 import withAnimatronics from './withAnimatronics'
 
-test('withAnimatronics', () => {
-  const createAnimationSequences = () => [
-    {
-      base: {
-        duration: 100,
-        from: { left: '100px' },
-        to: { left: '200px' },
+describe('withAnimatronics', () => {
+
+  test('should render its base component', () => {
+
+    class Base extends React.Component {
+      render() {
+        return <div id='test' />;
       }
     }
-  ];
 
-  const Animated = withAnimatronics(createAnimationSequences)(() => <div/>);
-  const element = React.createElement(Animated);
+    const Animated = withAnimatronics(() => {})(Base);
+    const wrapper = mount(<Animated />);
 
-  expect(React.isValidElement(element)).toBe(true);
+    expect(wrapper.find('#test').length).toBe(1);
+  });
 
-  expect(() => withAnimatronics()).toThrow(
-    /expects its first argument to be a function/,
-  );
-
-  expect(() => withAnimatronics(() => [])(undefined)).toThrow(
-    /must be used to wrap a React component/,
-  );
 });
 
-test('withAnimatronics.playAnimation', () => {
-  const Base = () => <div/>;
-  const createAnimationSequences = () => [
-    {
-      base: {
-        duration: 100,
-        from: { left: '100px' },
-        to: { left: '200px' },
-      }
-    }
-  ];
-
-  const Animated = withAnimatronics(createAnimationSequences)(Base);
-  const wrapper = mount(<Animated/>);
-  const playAnimation = wrapper.find(Base).prop('playAnimation');
-
-  expect(typeof playAnimation === 'function').toBe(true);
-
-  expect(() => playAnimation({})).toThrow(
-    /expects its first argument to be the string name of your animation/,
-  );
-
-  const wrapperTwo = mount(<Animated/>);
-  const playAnimationTwo = wrapperTwo.find(Base).prop('playAnimation');
-
-  expect(playAnimation).not.toBe(playAnimationTwo);
-});
