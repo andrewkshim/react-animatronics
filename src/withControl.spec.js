@@ -7,7 +7,7 @@ test('withControl()', () => {
 
   class Base extends React.Component {
     render() {
-      return <div />;
+      return <div id='test' />;
     }
   }
 
@@ -25,5 +25,5 @@ test('withControl()', () => {
     }
   );
 
-  expect(wrapper.find('ControlledComponent').length).toBe(1);
+  expect(wrapper.find('#test').length).toBe(1);
 });
