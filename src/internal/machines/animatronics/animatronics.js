@@ -231,14 +231,33 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
   mutators.startEndlessJobMachine({ animationName, index, componentName });
 };
 
-export const playAnimation = (state, mutators) => (
+// TODO: make this generic to multiple arguments, don't need it right now
+// but would be nice to have
+export const promisifyIfCallback = playAnimation => (
   animationName = DEFAULT_ANIMATION_NAME,
-  onComplete = noop,
+  onComplete,
 ) => {
   if (typeof animationName === 'function') {
     onComplete = animationName;
     animationName = DEFAULT_ANIMATION_NAME;
   }
+  return (onComplete != null)
+    ? playAnimation(animationName, onComplete)
+    : (
+      new Promise((resolve, reject) => {
+        try {
+          playAnimation(animationName, resolve);
+        } catch (err) {
+          reject(err);
+        }
+      })
+    );
+}
+
+// IMPROVE: All functions that touch state and mutators can become action generators
+// that produce a sequence of actions that should become applied. This will make it
+// easier to unit test and see which parts of the state these functions touch.
+export const playAnimation = (state, mutators) => promisifyIfCallback((animationName, onComplete) => {
   if (!IS_PRODUCTION) {
     if (typeof animationName !== 'string') {
       throw makeError(

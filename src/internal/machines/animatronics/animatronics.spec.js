@@ -6,6 +6,7 @@ import {
   makeMutators,
   makeSequence,
   playAnimation,
+  promisifyIfCallback,
   runTimedAnimation,
   makeAnimatronicsMachine,
 } from './animatronics'
@@ -214,8 +215,28 @@ test('runTimedAnimation', () => {
 
 test('playAnimation', () => {
   expect.assertions(2);
+
   expect(() => {
-    playAnimation()({});
+    playAnimation()({}, () => {});
   }).toThrow(/expects its first argument to be a string/);
+
+  playAnimation()({}).catch(e => {
+    expect(e.message).toMatch(/expects its first argument to be a string/);
+  })
+});
+
+test('promisifyIfCallback', () => {
+  expect.assertions(3);
+
+  const fn = (a, callback) => callback(a);
+  const wrapped = promisifyIfCallback(fn);
+  expect(wrapped().then).toBeTruthy();
+  expect(wrapped('hello', a => {})).toBe(undefined);
+
+  const fnThatThrows = (a, callback) => { throw new Error('foobar') };
+  const wrappedThrower = promisifyIfCallback(fnThatThrows);
+  wrappedThrower('hello').catch(e => {
+    expect(e.message).toBe('foobar');
+  })
 });
 
