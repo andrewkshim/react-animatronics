@@ -1,6 +1,8 @@
-import { makeError } from './index'
+import {
+  makeError,
+} from './utils'
 
-test('utils.makeError', () => {
+test('makeError', () => {
   const spaceErr = makeError('hello', 'world');
   expect(spaceErr.message).toBe('hello world');
 
@@ -17,3 +19,4 @@ test('utils.makeError', () => {
   'there should be a space between these lines but there should not\nbe a space at the start of this line'
   );
 });
+
