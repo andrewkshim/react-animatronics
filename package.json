@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "npm run lint && npm run test && npm run build",
-    "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/**/*.spec.js,src/**/*.test.js",
+    "clean": "rm -rf ./lib",
+    "build": "npm run clean && ./node_modules/.bin/babel src --out-dir lib --ignore src/**/*.spec.js,src/**/*.test.js",
     "acceptance": "./node_modules/.bin/webpack-dev-server --config tests/acceptance/webpack.config.js",
     "test": "./node_modules/.bin/jest",
     "lint": "./node_modules/.bin/flow status"
