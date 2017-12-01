@@ -1,3 +1,11 @@
+// To anyone who might judge me. Yes, this code is very stateful and ugly. It's an
+// experiment in vanilla javascript and stateful/imperative programming. I've long
+// since been a fan of functional programming with immutable data structures and
+// purity and referential integrity and all that jazz, but I wanted to go back to
+// my roots and try to bend stateful programming up until the point of breaking
+// (without actually breaking). There's a time and place for stateful programming,
+// and I think it's better to experiment with it than to completely forgo it.
+
 import Debug from 'debug'
 
 import { haveConvertibleUnits } from '../../fashionistas/common'
@@ -125,6 +133,7 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
   );
 
   mutators.createTimedJobMachine({
+    animationName,
     index,
     componentName,
     duration,
@@ -146,13 +155,16 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
   }
 
   const onCompleteJob = () => {
+    const isStopped = !state.animationCountdownMachines[animationName];
+    if (isStopped) return;
+
     mutators.updateComponentStyles({ componentName, updatedStyles: toStyles });
     mutators.countdownAnimations({ animationName });
   }
 
-  mutators.registerTimedJob({ index, componentName, job });
-  mutators.registerTimedOnCompletedJob({ index, componentName, onCompleteJob });
-  mutators.startTimedJob({ index, componentName });
+  mutators.registerTimedJob({ animationName, index, componentName, job });
+  mutators.registerTimedOnCompletedJob({ animationName, index, componentName, onCompleteJob });
+  mutators.startTimedJob({ animationName, index, componentName });
 };
 
 const runSpringAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
@@ -168,14 +180,19 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
   }
 
   mutators.createSpringMachine({
-    index,
+    animationName,
     componentName,
-    fromStyles,
-    toStyles,
-    stiffness,
     damping,
+    fromStyles,
+    index,
+    stiffness,
+    toStyles,
   });
-  mutators.createEndlessJobMachine({ index, componentName });
+  mutators.createEndlessJobMachine({
+    animationName,
+    componentName,
+    index,
+  });
 
   if (!IS_PRODUCTION) {
     Recorder.reset(animationName);
@@ -192,17 +209,26 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
   }
 
   const onComplete = updatedStyles => {
+    const isStopped = !state.animationCountdownMachines[animationName];
+    if (isStopped) return;
+
     mutators.updateComponentStyles({ componentName, updatedStyles });
-    mutators.stopEndlessJobMachine({ index, componentName });
+    mutators.stopEndlessJobMachine({ animationName, index, componentName });
     mutators.countdownAnimations({ animationName });
   }
 
   const job = () => {
-    mutators.runNextSpringFrame({ index, componentName, onNext, onComplete });
+    mutators.runNextSpringFrame({
+      animationName,
+      componentName,
+      index,
+      onComplete,
+      onNext,
+    });
   }
 
-  mutators.registerEndlessJob({ index, componentName, job });
-  mutators.startEndlessJobMachine({ index, componentName });
+  mutators.registerEndlessJob({ animationName, index, componentName, job });
+  mutators.startEndlessJobMachine({ animationName, index, componentName });
 };
 
 export const playAnimation = (state, mutators) => (
@@ -253,6 +279,9 @@ export const playAnimation = (state, mutators) => (
   });
 
   const runPhase = (phaseIndex) => {
+    const isStopped = !state.phasesCountdownMachines[animationName];
+    if (isStopped) return;
+
     const sequence = makeSequence(state)(animationName);
     const phase = sequence[phaseIndex];
     debug('executing phase %O', phase);
@@ -296,22 +325,53 @@ export const playAnimation = (state, mutators) => (
         if (delay == null) {
           runAnimation(animation, index);
         } else {
-          mutators.runDelayedAnimation({ componentName, delay, runAnimation, animation, index });
+          mutators.runDelayedAnimation({
+            animation,
+            animationName,
+            componentName,
+            delay,
+            index,
+            runAnimation,
+          });
         }
       });
     });
   }
 
   runPhase(0);
+});
+
+const cancelAnimation = (state, mutators) => (animationName) => {
+  mutators.stopMachine({ animationName });
 };
 
-const cancelAnimation = (state, mutators) => () => {
-  mutators.stopMachine();
-};
+const stopMachinesForAnimation = (state) => (animationName) => {
+  if (state.timedJobMachines[animationName]) {
+    flatten(Object.values(state.timedJobMachines[animationName]))
+      .forEach(machine => machine.stop());
+  }
 
-const resetAnimation = (state, mutators) => () => {
+  if (state.endlessJobMachines[animationName]) {
+    flatten(Object.values(state.endlessJobMachines[animationName]))
+      .forEach(machine => machine.stop());
+  }
+
+  if (state.timeouts[animationName]) {
+    Object.values(state.timeouts[animationName])
+      .forEach(timeout => machinist.clearTimeout(timeout));
+  }
+
+  state.animationCountdownMachines[animationName] = null;
+  state.endlessJobMachines[animationName] = null;
+  state.phasesCountdownMachines[animationName] = null;
+  state.springMachines[animationName] = null;
+  state.timedJobMachines[animationName] = null;
+  state.timeouts[animationName] = null;
+}
+
+const reset = (state, mutators) => () => {
   reducer.stopMachine();
-  reducer.resetMachine();
+  reducer.resetMachine(); // TODO
 };
 
 const registerComponent = (state, mutators) => (componentName, node, styleUpdater, styleResetter) => {
@@ -336,12 +396,13 @@ export const makeMutators = (machinist, state) => ({
 
   createSpringMachine: action => {
     const {
-      index,
+      animationName,
       componentName,
-      fromStyles,
-      toStyles,
-      stiffness,
       damping,
+      fromStyles,
+      index,
+      stiffness,
+      toStyles,
     } = action;
     const machine = machinist.makeSpringMachine(
       fromStyles,
@@ -349,22 +410,30 @@ export const makeMutators = (machinist, state) => ({
       stiffness,
       damping
     );
-    if (!state.springMachines[componentName]) {
-      state.springMachines[componentName] = [];
+    // YUCK
+    if (!state.springMachines[animationName]) {
+      state.springMachines[animationName] = {};
     }
-    state.springMachines[componentName][index] = machine;
+    if (!state.springMachines[animationName][componentName]) {
+      state.springMachines[animationName][componentName] = [];
+    }
+    state.springMachines[animationName][componentName][index] = machine;
   },
 
   createEndlessJobMachine: action => {
-    const { index, componentName } = action;
+    const { animationName, index, componentName } = action;
     const machine = machinist.makeEndlessJobMachine(
       machinist.requestAnimationFrame,
       machinist.cancelAnimationFrame
     );
-    if (!state.endlessJobMachines[componentName]) {
-      state.endlessJobMachines[componentName] = [];
+    // YUCK
+    if (!state.endlessJobMachines[animationName]) {
+      state.endlessJobMachines[animationName] = {};
     }
-    state.endlessJobMachines[componentName][index] = machine;
+    if (!state.endlessJobMachines[animationName][componentName]) {
+      state.endlessJobMachines[animationName][componentName] = [];
+    }
+    state.endlessJobMachines[animationName][componentName][index] = machine;
   },
 
   createAnimationCountdownMachine: action => {
@@ -382,17 +451,24 @@ export const makeMutators = (machinist, state) => ({
   },
 
   createTimedJobMachine: action => {
-    const { index, componentName, duration } = action;
+    const { animationName, index, componentName, duration } = action;
     const machine = machinist.makeTimedJobMachine(
       duration,
       machinist.requestAnimationFrame,
       machinist.cancelAnimationFrame,
       machinist.now,
     );
-    if (!state.timedJobMachines[componentName]) {
-      state.timedJobMachines[componentName] = [];
+    // IMPROVE: This is a good argument for adopting Immutable. It would make state
+    // management like this much easier. That said, I want to keep the number of
+    // external dependencies as low as possible, and adding Immutable isn't going
+    // to improve things enough to warrant adding it (for now).
+    if (!state.timedJobMachines[animationName]) {
+      state.timedJobMachines[animationName] = {};
     }
-    state.timedJobMachines[componentName][index] = machine;
+    if (!state.timedJobMachines[animationName][componentName]) {
+      state.timedJobMachines[animationName][componentName] = [];
+    }
+    state.timedJobMachines[animationName][componentName][index] = machine;
   },
 
   countdownAnimations: action => {
@@ -423,18 +499,18 @@ export const makeMutators = (machinist, state) => ({
   },
 
   registerEndlessJob: action => {
-    const { index, componentName, job } = action;
-    state.endlessJobMachines[componentName][index].registerJob(job);
+    const { animationName, index, componentName, job } = action;
+    state.endlessJobMachines[animationName][componentName][index].registerJob(job);
   },
 
   registerTimedJob: action => {
-    const { index, componentName, job } = action;
-    state.timedJobMachines[componentName][index].registerJob(job);
+    const { animationName, index, componentName, job } = action;
+    state.timedJobMachines[animationName][componentName][index].registerJob(job);
   },
 
   registerTimedOnCompletedJob: action => {
-    const { index, componentName, onCompleteJob } = action;
-    state.timedJobMachines[componentName][index].registerOnCompleteJob(onCompleteJob);
+    const { animationName, index, componentName, onCompleteJob } = action;
+    state.timedJobMachines[animationName][componentName][index].registerOnCompleteJob(onCompleteJob);
   },
 
   resetMachine: action => {
@@ -445,17 +521,28 @@ export const makeMutators = (machinist, state) => ({
 
   runNextSpringFrame: action => {
     const {
-      index,
+      animationName,
       componentName,
-      onNext,
+      index,
       onComplete,
+      onNext,
     } = action;
-    state.springMachines[componentName][index].runNextFrame(onNext, onComplete);
+    state.springMachines[animationName][componentName][index].runNextFrame(onNext, onComplete);
   },
 
   runDelayedAnimation: action => {
-    const { componentName, delay, runAnimation, animation, index } = action;
-    state.timeouts[componentName] = machinist.setTimeout(
+    const {
+      animation,
+      animationName,
+      componentName,
+      delay,
+      index,
+      runAnimation,
+    } = action;
+    if (!state.timeouts[animationName]) {
+      state.timeouts[animationName] = {};
+    }
+    state.timeouts[animationName][componentName] = machinist.setTimeout(
       () => runAnimation(animation, index),
       delay
     );
@@ -468,28 +555,31 @@ export const makeMutators = (machinist, state) => ({
   },
 
   startTimedJob: action => {
-    const { index, componentName } = action;
-    state.timedJobMachines[componentName][index].start();
+    const { animationName, index, componentName } = action;
+    state.timedJobMachines[animationName][componentName][index].start();
   },
 
   startEndlessJobMachine: action => {
     debug('starting endless job machine i.e. spring %O', action);
-    const { index, componentName } = action;
-    state.endlessJobMachines[componentName][index].start();
+    const { animationName, index, componentName } = action;
+    state.endlessJobMachines[animationName][componentName][index].start();
   },
 
   stopMachine: action => {
-    flatten(Object.values(state.timedJobMachines))
-      .forEach(machine => machine.stop());
-    Object.values(state.timeouts)
-      .forEach(timeout => machinist.clearTimeout(timeout));
-    state.timedJobMachines = {};
-    state.timeouts = {};
+    const { animationName } = action;
+
+    if (!animationName) {
+      Object.keys(state.phasesCountdownMachines).forEach(name => {
+        stopMachinesForAnimation(state)(name);
+      })
+    } else {
+       stopMachinesForAnimation(state)(animationName);
+    }
   },
 
   stopEndlessJobMachine: action => {
-    const { index, componentName } = action;
-    state.endlessJobMachines[componentName][index].stop();
+    const { animationName, index, componentName } = action;
+    state.endlessJobMachines[animationName][componentName][index].stop();
   },
 
   unregisterComponent: action => {
@@ -526,7 +616,7 @@ export const makeAnimatronicsMachine = machinist => animations => {
   const animatronicsMachine = {
     playAnimation: playAnimation(state, mutators),
     cancelAnimation: cancelAnimation(state, mutators),
-    resetAnimation: resetAnimation(state, mutators),
+    reset: reset(state, mutators),
     registerComponent: registerComponent(state, mutators),
     unregisterComponent: unregisterComponent(state, mutators),
     setAnimations: setAnimations(state, mutators),

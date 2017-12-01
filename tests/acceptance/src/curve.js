@@ -8,8 +8,8 @@ import { withAnimatronics, withControl } from '../../../src'
 
 const ControlledCircle = withControl('myCircle')(Circle);
 
-const BasicExample = ({ playAnimation }) => (
-  <Example playAnimation={ playAnimation }>
+const BasicExample = props => (
+  <Example { ...props }>
     <ControlledCircle
       dimension={ 100 }
       style={{

@@ -7,6 +7,7 @@ import {
   makeSequence,
   playAnimation,
   runTimedAnimation,
+  makeAnimatronicsMachine,
 } from './animatronics'
 
 import { makeTimedJobMachine } from '../timed-job'
@@ -128,16 +129,17 @@ test('machines/animatronics/makeMutators', () => {
   expect(state.phasesCountdownMachines.foobar).toBeTruthy();
 
   mutators.createTimedJobMachine({
-    componentName: 'foobar',
+    animationName: 'foo',
+    componentName: 'bar',
     duration: 400,
   });
 
-  expect(state.timedJobMachines.foobar).toBeTruthy();
+  expect(state.timedJobMachines.foo.bar).toBeTruthy();
 });
 
 const runTimedAnimationMocked = animation => {
   let timedJobMachine;
-  const animationName = '';
+  const animationName = 'hi';
   const componentName = 'foobar';
   const index = 0;
   const frames = [];
@@ -145,6 +147,7 @@ const runTimedAnimationMocked = animation => {
   const clock = lolex.createClock();
   const machinist = {};
   const state = {
+    animationCountdownMachines: { hi: true },
     nodes: { foobar: { style: {} } },
     styleUpdaters: {},
   };
@@ -210,6 +213,7 @@ test('runTimedAnimation', () => {
 });
 
 test('playAnimation', () => {
+  expect.assertions(2);
   expect(() => {
     playAnimation()({});
   }).toThrow(/expects its first argument to be a string/);

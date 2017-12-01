@@ -10,8 +10,8 @@ const CircleA = withControl('circleA')(Circle);
 const CircleB = withControl('circleB')(Circle);
 const CircleC = withControl('circleC')(Circle);
 
-const BasicExample = ({ playAnimation }) => (
-  <Example playAnimation={ playAnimation }>
+const BasicExample = props => (
+  <Example { ...props }>
     <CircleA
       dimension={ 100 }
       style={{

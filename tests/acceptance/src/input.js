@@ -173,9 +173,8 @@ const ControlledInput = withControl('input')( Input );
 class InputExample extends React.Component {
 
   render() {
-    const { playAnimation } = this.props;
     return (
-      <Example playAnimation={ playAnimation }>
+      <Example { ...this.props }>
         <ControlledInput/>
       </Example>
     );

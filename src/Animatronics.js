@@ -127,7 +127,7 @@ class Animatronics extends React.Component<Props> {
     return children({
       playAnimation: this._animatronics.playAnimation,
       cancelAnimation: this._animatronics.cancelAnimation,
-      resetAnimation: this._animatronics.resetAnimation,
+      reset: this._animatronics.reset,
     });
   }
 }

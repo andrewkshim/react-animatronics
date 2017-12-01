@@ -22,6 +22,11 @@ class Example extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    const { cancelAnimation } = this.props;
+    cancelAnimation();
+  }
+
   render() {
     const { children } = this.props;
     const { didAnimate } = this.state;

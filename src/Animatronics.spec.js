@@ -43,11 +43,11 @@ describe('<Animatronics>', () => {
       <Animatronics animations={ animations }>{({
         playAnimation,
         cancelAnimation,
-        resetAnimation,
+        reset,
       }) => {
         expect(typeof playAnimation === 'function').toBe(true);
         expect(typeof cancelAnimation === 'function').toBe(true);
-        expect(typeof resetAnimation === 'function').toBe(true);
+        expect(typeof reset === 'function').toBe(true);
         return <Base />;
       }}</Animatronics>
     );
