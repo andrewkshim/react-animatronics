@@ -34,7 +34,7 @@ that must be a function.
 > - ["Function as Child Components" by Merrick Christensen][facc]
 > - ["Use a Render Prop!" by Michael Jackson][render_prop]
 
-Here's a non-working code example just showing how you'd write the components:
+Here's a non-working code example just showing how you'd use the components:
 
 ```js
 import { Animatronics, Control } from 'react-animatronics'
@@ -64,15 +64,16 @@ const App = () => (
 );
 ```
 
+Let's start with the `<Animatronics>` component.
+
 The `<Animatronics>` component is the "animation runner". It provides functions
 and context to its children that allow you to run animations involving any
-controlled component in its decendants.
+**controlled component** in its decendants.
 
 The `<Animatronics>` component requires an `animations` prop that we'll
-describe in the last part of this section.  For now, let's focus on the props
-that it passes into its child. The most important prop is the `playAnimation`
-function. When you call `playAnimation`, react-animatronics will execute
-the `animations` you've declared.
+describe in the last part of this section.  For now, let's focus on the
+`playAnimation` prop it passes into its child.  When you call `playAnimation`,
+react-animatronics will execute the `animations` you've declared.
 
 If you need to execute logic after `playAnimation` has completed, you can either
 pass a callback or call `.then` on the returned promise:
@@ -95,22 +96,22 @@ In addition to `playAnimation`, the child also gets `cancelAnimation` and `reset
 }</Animatronics>
 ```
 
-The `cancelAnimation` function will stop currently running animations. The
-`reset` function will stop running animations and remove any styles that
+The `cancelAnimation` function will stop currently running animations.
+
+The `reset` function will stop running animations _and_ remove any styles that
 react-animatronics has applied to your components.
 
-Moving on to the `<Control>` component, it works in tandem with `<Animatronics>`,
-and it must have an `<Animatronics>` component as its ancestor.
+Now let's look into the `<Control>` component.
 
-The `<Control>` component registers its child with its `<Animatronics>`
-ancestor and makes its child a **controlled components**. In other words, it
-gives the `<Animatronics>` control over its child, and thus allows you to
-describe animations involving components **anywhere in the component
-hierarchy**.
+The `<Control>` component works in tandem with `<Animatronics>`. In fact, it must
+have an `<Animatronics>` component as its ancestor.
+
+The `<Control>` component makes its child a controlled component by registering
+the child with its `<Animatronics>` ancestor.
 
 `<Control>` takes a single `name` prop that must be a string which uniquely
 identifies its child component. The `name` prop is important when declaring
-your `animations`.
+your `animations` (more on this later).
 
 `<Control>` will pass a single `animatronicStyles` prop to it child. The
 `animatronicStyles` is an object that contains the interpolated values for your
@@ -124,6 +125,7 @@ you'll likely want to define `shouldComponentUpdate()` or reorganize your
 components such that the expensive parts are outside of `<Control>`.
 
 Finally, let's look into how to define the `animations` you pass into `<Animatronics>`.
+
 In its most basic form, the `animations` prop can be an array of objects:
 
 ```js
@@ -140,7 +142,7 @@ const animations = [
 
 Each element in the array describes a single **animation phase**. In the
 snippet above, we've declared an animation with a single phase. We'll go into
-declaring more than one phase in the [03. Multi-Phase Animations](#multi_phase)
+declaring more than one phase in the [Multi-Phase Animations](#multi_phase)
 section, but we're going to keep things simple in this section.
 
 That single phase describes how the controlled component named `"square"`
@@ -148,13 +150,9 @@ should be animated.
 
 When we call `playAnimation()`, that component will receive an updated
 `animatronicStyles` prop on every animation frame over the course of 500
-milliseconds. The `animatronicStyles` will contain the interpolated `left`
-attribute e.g. `"0px"`, `"11px"`, `"34px"` all the way up to `"200px"`.
+milliseconds.
 
-The `animations` prop can also be an object or a function, and we'll go over
-this in the TODO section.
-
-That's it for the basics! Next up, a short detour into an alternative API.
+That's it for the basics! Next up, a short detour into an alternative, HoC API.
 
 
 ## <a name='hocs'></a> 02. Higher-Order Components
@@ -239,20 +237,15 @@ const animations = [
 ```
 
 Instead of declaring a single phase, we've now declared two. When you call
-`playAnimation`, the `"square"` controlled component will first animate
-its `left`. That phase will complete in 500 milliseconds, after which the
-component will animate its `top`.
-
-To recap, the `animations` props is an array of objects where each object
-describes a single phase of your animation. The phases will occur in sequence,
-one after the other.
+`playAnimation`, the `"square"` controlled component will first animate its
+`left`, and then its `top`. The phases occur in sequence, one after the other.
 
 That's it! Next up, animating multiple attributes simultaneously.
 
 
 ## <a name='simultaneous_attrs'></a> 04. Animating Attributes Simultaneously
 
-In all of the previous `animation` examples, we've only declared a single
+In the previous `animation` examples, we've only declared a single
 attribute in `from` and `to`, but you can declare multiple attributes:
 
 ```
@@ -274,13 +267,13 @@ const animations = [
 ```
 
 This describes an animation that will animate the `left` and `top` attributes
-at the same time. In other words, the `"square"` component will move diagonally
-down to the right.
+at the same time such that the `"square"` component will move diagonally down to
+the right.
 
-But that's not all! There's another way to declare simultaneous attribute
-animations. Sometimes you'll want to animate different attributes in different
-ways while still animating them simultaneously. To so this, you can declare
-`animations` with a slightly different format:
+But that's not all! There's another way to animate attributes simultaneously.
+Sometimes you'll want to animate different attributes in different ways while
+still animating them simultaneously. To so this, you can declare `animations`
+with a slightly different format:
 
 ```js
 const animations = [
@@ -306,7 +299,7 @@ it as an array. Each object in the array describes an animation that will occur 
 parallel with the other animations in the array. Now, instead of moving in a straight
 line, the `"square"` component will curve down to the right.
 
-That's it! Next up, animating multiple **components** simultaneous.
+That's it! Next up, animating multiple components simultaneously.
 
 
 ## <a name='simultaneous_components'></a> 05. Animating Components Simultaneously
@@ -377,8 +370,8 @@ const App = () => (
 
 Take note of the `animations` prop. It has a single phase, but within that phase
 it describes animations for the two components `"squareOne"` and `"squareTwo"`.
-When you execute the animation, the components will animate simultaneously, so you'll
-see one square move right and the other move down at the same time.
+When you execute the animation, you'll see one square move right and the other
+move down at the same time.
 
 Now is a good time to note that most of what you learn about `animations` can
 be combined. For example, you can combine simultaneous attribute animations
@@ -413,7 +406,8 @@ const animations = [
 ];
 ```
 
-That's it! Next up, declaring different animations within the same `animations` prop.
+That's it! Next up, declaring different, named animations within the same
+`animations` prop.
 
 
 ## <a name='named_animations'></a> 06. Named Animations
@@ -455,7 +449,7 @@ playAnimation('moveRight');
 playAnimation('moveDown');
 ```
 
-Note, if you've declared named animations, you must pass a name into
+Note, if you've declared named animations, you **must** pass a name into
 `playAnimation`. Otherwise, it will default to playing an animation
 named `"default"`, which won't exist unless you've defined that too.
 
@@ -481,11 +475,11 @@ cancelAnimation('moveDown');
 You can call `cancelAnimation` with no arguments and it will cancel
 all currently running animations.
 
-Resetting your animations is different. The `reset` function never
-accepts any arguments and will always reset the styles for every
-controlled component under `<Animatronics>`. There are two reasons
-for this. One, it keeps the implementation simple, and two, the use
-cases for resetting individual, named animations seems sparse.
+However, resetting your animations is different. The `reset` function never
+accepts any arguments and will always reset the styles for every controlled
+component under `<Animatronics>`. There are two reasons for this. One, it keeps
+the implementation simple, and two, I haven't run into a use case for resetting
+named animations individually.
 
 That's it! Next up, accessing DOM nodes in your animations.
 
@@ -616,12 +610,12 @@ const App = () => (
 ```
 
 Note, `animations` is now a function that returns the array we're already
-familiar with. When `animations` is a function, react-animatronics will call
-it with an object. The object keys are the names of your controlled components
-and the values are their DOM nodes. React-animatronics is able to provide the
-DOM nodes because `<Control>` attaches a ref to its child. Make sure the returned
-component is a class component, and not a stateless, function component, because
-React does not allow refs on stateless components.
+familiar with. When `animations` is a function, react-animatronics will call it
+with an object. That object has keys that are the names of your controlled
+components and values that are their DOM nodes. React-animatronics is able to
+provide the DOM nodes because `<Control>` attaches a ref to its child (make
+sure the child function returns a class component, and not a stateless
+component because React does not allow refs on stateless components).
 
 In this example, we're animating three squares in a clockwise rotation. Each
 square is moving to the position of another square, and we're getting the
@@ -651,12 +645,13 @@ You can replay the animation by clicking the "Replay" button. You can also
 manually play back the animation by adjusting the slider or the "Current Frame"
 input.
 
-To hide the panel, you can click the blue tab in the upper left.
+To hide the panel, you can click the blue "Hide Debug Panel" tab in the upper
+left.
 
 To render the panel in a separate window, click on the "Window" button in the
 upper right.
 
-It's up to you to control when you render the `<DebugPanel>`. You'll probably
+It's up to you to determine when to render the `<DebugPanel>`. You'll probably
 want to put it behind a `NODE_ENV === 'production'` check or just leave it out
 entirely and only use it when needed.
 
@@ -684,11 +679,11 @@ const animations = [
 ```
 
 Instead of a millisecond `duration`, you can provide a `stiffness` and `damping`.
-If you haven't used spring animations, I higherly recommend looking through the
+If you haven't used spring animations, I highly recommend looking through the
 react-motion library. It'll give you a good feel for how they work.
 
 I adapted the spring implementation from react-motion into react-animatronics,
-so the `stiffness` and `damping` values should function in the same way.
+so the `stiffness` and `damping` values should function the same way.
 
 That's it! Next up, a return to timed animations.
 
@@ -722,7 +717,7 @@ That's it! Next up, delaying your animations.
 
 ## <a name='delays'></a> 11. Delays
 
-You can provide an optional millisecond `delay` to your `animations`:
+You can provide an optional, millisecond `delay` to your `animations`:
 
 ```js
 const animations = [
@@ -759,9 +754,9 @@ react-animatronics can interpolate.
 ## <a name='animatable'></a> 12. Animatable Values
 
 Up until now, we've been using strings in the `from` and `to` attributes of our
-animations. This is evidence of react-animatronics correctly interpolating
-strings such as from `"0px"` to `"100px"`. In order to do this, it does simple
-regex matching to extract the number from the units. However, it can work with
+animations, so we already know react-animatronics can correctly interpolate
+strings such `"0px"` to `"100px"`. In order to do this, it does a simple
+regex match to extract the number from the units. However, it can work with
 more than just unit strings:
 
 ```
@@ -797,7 +792,7 @@ It works with:
 - percentage strings
 - colors
 - transforms
-- box shadows (must have the same number of shadows)
+- box shadows (`from` and `to` must have the same number of shadows)
 
 
 But that's not all! You can also animate between any valid [CSS length][length]:
@@ -818,10 +813,11 @@ const animations = [
 ];
 ```
 
-Be cautious when doing this though. React-animatronics uses
-[`getComputedStyle`][getComputedStyle] to support this, and it will temporarily
-manipulate the `style` on the actual DOM nodes (so your controlled components
-need to be class components).
+However, be cautious when doing this. React-animatronics uses
+[`getComputedStyle`][getComputedStyle] to do this, so you may run into
+unexpected behavior accross different browsers. It also needs to temporarily
+manipulate the `style` on the actual DOM nodes, so your controlled components
+need to be class components.
 
 That's the end of the walkthrough. If any parts were confusing or unclear, please
 let me know by [filing an issue][issue] or [submitting a pull request][pr].

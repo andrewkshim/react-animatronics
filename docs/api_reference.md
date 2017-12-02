@@ -26,7 +26,7 @@ import {
 - [BezierEasing](#bezier)
 - [Declaring Animations](#animations)
 
-## <a name='animatronics'></a> Animatronics
+## <a name='animatronics'></a> \<Animatronics\>
 
 Usage:
 ```js
@@ -44,9 +44,11 @@ import { Animatronics } from 'react-animatronics'
 
 It will pass the following props to its `children`:
 
-- `playAnimation(name?: string)`: function that takes an optional string name
-  - when called with no arguments, it will run the `"default"` animation
-  - when called with a `name` argument, it will run the animation with that name
+- `playAnimation(name?: string, callback?: Function)`: function that takes an optional string name and optional callback function
+  - when called with no arguments, it will run the `"default"` animation and return a promise that resolves when the animation is finished
+  - when called with a single `name` argument, it will run the named animation and return a promise that resolve when the animation is finished
+  - when called with a single `callback` argument, it will run the `"default"` animation and call the `callback` when the animation is finished
+  - when called with a `name` and a `callback` argument, it will run the named animation and call the `callback` when the animation is finished
 - `cancelAnimation(name?: string)`: function that takes an optional string name
   - when called with no arguments, it will cancel all currently running animations
   - when called with a `name` argument, it will cancel the animation with that name
@@ -55,7 +57,7 @@ It will pass the following props to its `children`:
     for every controlled component to the empty object
 
 
-## <a name='control'></a> Control
+## <a name='control'></a> \<Control\>
 
 Usage:
 ```js

@@ -27,8 +27,6 @@ yarn add react-animatronics
 
 ## Quick Start
 
-We're going to start immediately with the code:
-
 ```js
 import React from 'react'
 import { Animatronics, Control } from 'react-animatronics'
@@ -70,18 +68,13 @@ const App = () => (
 );
 ```
 
-You can play with the example live in CodeSandbox: https://codesandbox.io/s/wq39rlvnk7
+Live CodeSandbox example: https://codesandbox.io/s/wq39rlvnk7
 
 
 ## Documentation
 
-**If you're new to react-animatronics**, I suggest going through the
-[Walkthrough][walkthrough].  It's a step-by-step guide that goes over every
-aspect of the library.
-
-**If you're already familiar with react-animatronics**, and just need to
-remember how to do that "one thing", you're probably looking for the [API
-Reference][api_reference].
+- [Walkthrough][walkthrough] - for those new to react-animatronics
+- [API Reference][api_reference] - for those that just need to remember how to do "that one thing"
 
 
 [walkthrough]:./docs/walkthrough.md
