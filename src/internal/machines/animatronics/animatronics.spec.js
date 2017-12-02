@@ -8,6 +8,7 @@ import {
   makeAnimation,
   playAnimation,
   promisifyIfCallback,
+  reset,
   runTimedAnimation,
   stopMachinesForAnimation,
 } from './animatronics'
@@ -338,3 +339,14 @@ test('stopMachinesForAnimation', () => {
   });
 });
 
+
+test('reset', () => {
+  const state = {};
+  const mutators = {
+    stopMachine: jest.fn(),
+    resetMachine: jest.fn(),
+  };
+  expect(reset(state, mutators)).not.toThrow();
+  expect(mutators.stopMachine).toHaveBeenCalledTimes(1);
+  expect(mutators.resetMachine).toHaveBeenCalledTimes(1);
+});

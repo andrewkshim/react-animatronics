@@ -384,9 +384,9 @@ export const stopMachinesForAnimation = (machinist, state) => animationName => {
   state.timeouts[animationName] = null;
 }
 
-const reset = (state, mutators) => () => {
-  reducer.stopMachine();
-  reducer.resetMachine(); // TODO
+export const reset = (state, mutators) => () => {
+  mutators.stopMachine();
+  mutators.resetMachine();
 };
 
 const registerComponent = (state, mutators) => (componentName, node, styleUpdater, styleResetter) => {
