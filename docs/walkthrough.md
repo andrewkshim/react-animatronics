@@ -622,7 +622,7 @@ nodes.
 
 That's it! Next up, debugging your animations.
 
-## <a name='dom_nodes'></a> 08. Debug Panel
+## <a name='debug'></a> 08. Debug Panel
 
 React-animatronics provides a helpful `<DebugPanel>` component:
 
