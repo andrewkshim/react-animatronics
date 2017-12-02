@@ -10,7 +10,7 @@ Declarative, coordinated animations for React components.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Quick Start](#quick-start)
+- [Quick Intro](#quick-intro)
 - [Documentation](#documentation)
 
 
@@ -25,21 +25,122 @@ yarn add react-animatronics
 ```
 
 
-## Quick Start
+## Quick Intro
+
+React-animatronics aims to expose a simple API that allows you to declare
+complex animations involving multiple React components.
+
+If you learn by looking at code first, here's an example demonstrating some of
+what react-animatronics can do:
 
 ```js
 import React from 'react'
 import { Animatronics, Control } from 'react-animatronics'
 
+const Square = ({ style, animatronicStyles }) => (
+  <div
+    style={{
+      height: '100px',
+      width: '100px',
+      cursor: 'pointer',
+      position: 'absolute',
+      ...style,
+      ...animatronicStyles
+    }}
+  />
+);
+
+const SquareOne = () => (
+  <Control name='squareOne'>{
+    ({ animatronicStyles }) => (
+      <Square
+        style={{
+          backgroundColor: 'blue',
+          top: '0px',
+          left: '0px'
+        }}
+        animatronicStyles={ animatronicStyles }
+      />
+    )
+  }</Control>
+);
+
+const SquareTwo = () => (
+  <Control name='squareTwo'>{
+    ({ animatronicStyles }) => (
+      <Square
+        style={{
+          backgroundColor: 'red',
+          top: '200px',
+          left: '0px'
+        }}
+        animatronicStyles={ animatronicStyles }
+      />
+    )
+  }</Control>
+);
+
+const SquareThree = () => (
+  <Control name='squareThree'>{
+    ({ animatronicStyles }) => (
+      <Square
+        style={{
+          backgroundColor: 'green',
+          top: '0px',
+          left: '200px'
+        }}
+        animatronicStyles={ animatronicStyles }
+      />
+    )
+  }</Control>
+);
+
 const animations = () => [
   {
-    hello: {
+    squareOne: {
       duration: 500,
       from: {
+        top: '0px',
         left: '0px'
       },
       to: {
+        top: '200px',
         left: '200px'
+      }
+    },
+    squareTwo: {
+      duration: 500,
+      from: {
+        top: '200px',
+        left: '0px'
+      },
+      to: {
+        top: '0px',
+        left: '0px'
+      }
+    },
+  },
+  {
+    squareOne: {
+      duration: 500,
+      from: {
+        top: '200px',
+        left: '200px'
+      },
+      to: {
+        top: '0px',
+        left: '200px'
+      }
+    },
+    squareThree: {
+      duration: 500,
+      from: {
+        top: '0px',
+        left: '200px'
+      },
+      to: {
+        top: '200px',
+        left: '0px'
       }
     }
   }
@@ -47,28 +148,30 @@ const animations = () => [
 
 const App = () => (
   <Animatronics animations={ animations }>{
-    ({ playAnimation }) => (
-      <Control name='hello'>{
-        ({ animatronicStyles }) => (
-          <div
-            style={{
-              backgroundColor: 'blue',
-              height: '100px',
-              width: '100px',
-              cursor: 'pointer',
-              position: 'absolute',
-              ...animatronicStyles
-            }}
-            onClick={() => playAnimation()}
-          />
-        )
-      }</Control>
+    ({ playAnimation, reset }) => (
+      <div
+        style={{ cursor: 'pointer' }}
+        onClick={() => {
+          playAnimation(() => {
+            setTimeout(() => {
+              reset();
+            }, 500);
+          });
+        }}
+      >
+        <SquareOne />
+        <SquareTwo />
+        <SquareThree />
+      </div>
     )
   }</Animatronics>
+
 );
 ```
 
 Live CodeSandbox example: https://codesandbox.io/s/wq39rlvnk7
+
+Read on for a more thorough understanding of what react-animatronics can do.
 
 
 ## Documentation

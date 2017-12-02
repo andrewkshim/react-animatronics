@@ -1,4 +1,4 @@
-# Walkthrough
+z Walkthrough
 
 A step-by-step guide that goes through every aspect of react-animatronics.
 
@@ -21,10 +21,8 @@ A step-by-step guide that goes through every aspect of react-animatronics.
 
 ## <a name='basics'></a> 01. Basics
 
-React-animatronics aims to expose a small, composable API that enables complex
-animations involving multiple React components. It provides two components:
-`<Animatronics>` and `<Control>`. Both components take a FaCC, a single child
-that must be a function.
+React-animatronics provides two components: `<Animatronics>` and `<Control>`.
+Both components take a FaCC, a single child that must be a function.
 
 > React Tip: "**F**unctions **a**s **C**hild **C**omponents (FaCC)" is a common
 > React pattern for component encapsulation/reusability. It goes by a few other
