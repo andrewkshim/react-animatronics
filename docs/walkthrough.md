@@ -1,4 +1,4 @@
-z Walkthrough
+# Walkthrough
 
 A step-by-step guide that goes through every aspect of react-animatronics.
 
