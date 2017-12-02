@@ -195,11 +195,9 @@ export const throwIfPhaseNotValid = (phase: AnimationPhase, nodes: { [string]: D
         `but react-animatronics isn't aware of any component with that name.`,
         `If you don't know why this is happening, check for the following:`,
         `\n`,
-        `    1) Any misspelled names in withAnimatronics`,
+        `    1) Misspelled names in the <Animatronics> "animations" prop`,
         `\n`,
-        `    2) Any misspelled names in withControl`,
-        `\n`,
-        `    3) If the component you want to animate should be wrapped by withControl`,
+        `    2) Misspelled names in <Control>`,
         `\n`
       );
     }
