@@ -46,12 +46,12 @@ It will pass the following props to its `children`:
 
 - `playAnimation(name?: string, callback?: Function)`: function that takes an optional string name and optional callback function
   - when called with no arguments, it will run the `"default"` animation and return a promise that resolves when the animation is finished
-  - when called with a single `name` argument, it will run the named animation and return a promise that resolve when the animation is finished
+  - when called with a single `name` argument, it will run the named animation and return a promise that resolves when the animation is finished
   - when called with a single `callback` argument, it will run the `"default"` animation and call the `callback` when the animation is finished
   - when called with a `name` and a `callback` argument, it will run the named animation and call the `callback` when the animation is finished
 - `cancelAnimation(name?: string)`: function that takes an optional string name
   - when called with no arguments, it will cancel all currently running animations
-  - when called with a `name` argument, it will cancel the animation with that name
+  - when called with a `name` argument, it will cancel the currently running, named animation
 - `reset()`: function that takes no arguments
   - cancels all currently running animations and sets the `animatronicStyles`
     for every controlled component to the empty object
@@ -129,10 +129,10 @@ import { DebugPanel } from 'react-animatronics'
 <DebugPanel />
 ```
 
-`<DebugPanel>` is a component that will help you debug any animation that
-goes through react-animatronics. Insert it anywhere in your component
-hierarchy and it will render a panel that allows you to play back your
-animations.
+`<DebugPanel>` is a component that will help you debug any animation that goes
+through react-animatronics. It takes no props, so you can simply insert it
+anywhere in your app and it will render a panel that allows you to play back
+your animations.
 
 
 ## <a name='bezier'></a> BezierEasing
@@ -153,15 +153,17 @@ custom `easing`.
 ## <a name='animations'></a> Declaring Animations
 
 The goal of this section is to understand what the `animations` prop
-that you pass into `<Animatronics>` or `withAnimatronics` can be.
+that you pass into `<Animatronics>` (or `withAnimatronics`) can be:
 
 ```js
 const animations = /* this is what we care about */
+
 <Animatronics animations={ animations }></Animatronics>
 ```
 
-We'll start off by saying the `animations` props is a collection of `Phase`
-objects. It can be an array, object, or function:
+We'll start off by saying the `animations` prop is a collection of `Phase`
+objects. It can be an array, object, or function. Here's what I mean in terms
+of type definitions:
 
 ```js
 ArrayAnimations = Array<Phase>
@@ -171,6 +173,8 @@ ObjectAnimations = {
 }
 
 FunctionAnimations = DOMNodes => ArrayAnimations|ObjectAnimations
+
+animations = ArrayAnimations|ObjectAnimations|FunctionAnimations
 ```
 
 As an object, it maps arbitrary animation names to an array of phases.
@@ -179,25 +183,21 @@ into the `playAnimation` function.
 
 As a function, it must return a collection of phases that is either an array
 or an object. The function will receive a single object argument of `DOMNodes`
-that maps the `name` passed into `<Control>` to the component's DOM element:
-
+that maps the `<Control>` `name` to the component's DOM element:
 ```js
 DOMNodes = {
   [string]: DOMElement
 }
 ```
 
-A `Phase` object maps the `name` passed into `<Control>` to `Animation`
-objects.
-
+The `Phase` object maps the `<Control>` `name` to `Animation` objects:
 ```js
 Phase = {
   [string]: Animation
 }
 ```
 
-The `Animation` object can describe a timed or spring animation.
-
+The `Animation` object can describe a timed or spring animation:
 ```js
 TimedAnimation = {
   duration: number,
