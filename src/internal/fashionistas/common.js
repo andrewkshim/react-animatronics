@@ -19,6 +19,10 @@ import type {
 } from '../flow-types'
 
 import {
+  BETWEEN_PAREN_REGEX,
+  ALL_COMMAS_REGEX,
+  NUMBER_REGEX,
+  NON_NUMER_REGEX,
   makeError,
 } from '../utils'
 
@@ -27,10 +31,6 @@ import {
   TRANSFORM,
 } from '../constants'
 
-const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
-const ALL_COMMAS_REGEX: RegExp = /, /g;
-const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
-const NON_NUMER_REGEX: RegExp = /\D+/;
 const EMPTY_UNIT: string = '0px';
 
 const debug = Debug('react-animatronics:fashionistas:common');
@@ -86,7 +86,7 @@ export const createUnitFashion = (raw: string): UnitFashion => {
   }
 };
 
-const parseTransformName = (transform: string): string =>
+export const parseTransformName = (transform: string): string =>
   transform.slice(0, transform.indexOf('('));
 
 const parseTransformStyle = (transform: string): Fashion =>
@@ -194,6 +194,8 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
 export const parseStyle = (raw: string|number, name: ?string): Fashion => {
   return typeof raw === 'number' ?
     createNumberFashion(raw)
+  : isNumberString(raw) ?
+    createNumberFashion(raw)
   : isColorString(raw) ?
     createColorFashion(raw)
   : typeof raw === 'string' && name === TRANSFORM ?
@@ -204,8 +206,6 @@ export const parseStyle = (raw: string|number, name: ?string): Fashion => {
     createBoxShadowFashion(raw)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
-  : isNumberString(raw) ?
-    createNumberFashion(raw)
   : isUnitString(raw) ?
     createUnitFashion(raw)
   :
@@ -247,6 +247,9 @@ export const stringifyFashion = (style: Fashion): string => (
     stringifyBasic(style)
 );
 
+// IMPROVE: By default, all "transforms" will be converted, even if they have
+// the same units. We can be more efficient about this, but it's unclear if
+// that's worth it right now.
 export const haveConvertibleUnits = (rawA: string, rawB: string, styleName: string): boolean => {
   if (styleName === TRANSFORM) return true;
   const fashionA = parseStyle(rawA, styleName);

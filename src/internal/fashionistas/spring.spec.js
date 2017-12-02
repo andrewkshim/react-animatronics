@@ -1,5 +1,9 @@
 import { parseStyle } from './common'
-import { interpolateValue, interpolateFashion, reconstructStyles } from './spring'
+import {
+  interpolateValue,
+  interpolateFashion,
+  reconstructStyles,
+} from './spring'
 
 test('interpolateValue', () => {
   expect(interpolateValue(0, 100, 0.5)).toBe(50);
@@ -26,22 +30,39 @@ test('interpolateFashion', () => {
   expect(interpolatedUnit.value).toBe(42);
 });
 
-test('reconstructStyles', () => {
-  expect(
-    reconstructStyles(
-      { left: '0px', top: '0px' },
-      { left: '100px', top: '100px' },
-      ['left', 'top'],
-      [0.4, 0.7],
-    )
-  ).toEqual({ left: '40px', top: '70px' });
+describe('reconstructStyles', () => {
 
-  expect(
-    reconstructStyles(
-      { transform: 'scale(1)' },
-      { transform: 'scale(1.5)' },
-      ['transform'],
-      [0.5],
-    )
-   ).toEqual({ transform: 'scale(1.25)' });
+  test('should reconstruct basic styles', () => {
+    expect(
+      reconstructStyles(
+        { left: '0px', top: '0px' },
+        { left: '100px', top: '100px' },
+        ['left', 'top'],
+        [0.4, 0.7],
+      )
+    ).toEqual({ left: '40px', top: '70px' });
+  });
+
+  test('should reconstruct transform styles', () => {
+    expect(
+      reconstructStyles(
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.5)' },
+        ['transform'],
+        [0.5],
+      )
+     ).toEqual({ transform: 'scale(1.25)' });
+  });
+
+  test('should reconstruct complex styles', () => {
+    expect(
+      reconstructStyles(
+        { transform: 'scale(1, 1)' },
+        { transform: 'scale(1.5, 2)' },
+        ['transform'],
+        [0.5, 0.5],
+      )
+     ).toEqual({ transform: 'scale(1.25, 1.5)' });
+  });
+
 });

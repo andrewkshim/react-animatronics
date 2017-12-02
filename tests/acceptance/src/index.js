@@ -5,6 +5,7 @@ import Transition from 'react-transition-group/Transition'
 import chroma from 'chroma-js'
 
 import BasicExample from './basic'
+import ExperimentalExample from './experimental'
 import SpringsExample from './springs'
 import InputExample from './input'
 import CurveExample from './curve'
@@ -27,6 +28,7 @@ import {
 } from '../../../src'
 
 const BASIC = 'basic';
+const EXPERIMENTAL = 'experimental';
 const SPRINGS = 'springs';
 const INPUT = 'input';
 const CURVE = 'curve';
@@ -35,6 +37,7 @@ const debug = Debug('animatronics:examples');
 
 const EXAMPLES = {
   [ BASIC ]: BasicExample,
+  [ EXPERIMENTAL ]: ExperimentalExample,
   [ SPRINGS ]: SpringsExample,
   [ INPUT ]: InputExample,
   [ CURVE ]: CurveExample,

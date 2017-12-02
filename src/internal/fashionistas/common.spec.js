@@ -31,18 +31,27 @@ test('createNumberFashion creates a valid NumberFashion', () => {
   expect(numberFashion.isNumberType).toBeTruthy();
 });
 
-test('createTransformFashion creates a valid TransformFashion', () => {
-  const transformFashion = createTransformFashion('scale(0) rotateZ(90deg)');
+describe('createTransformFashion', () => {
 
-  expect(transformFashion.isCompositeType).toBeTruthy();
+  test('should handle multiple transforms', () => {
+    const transformFashion = createTransformFashion('scale(0) rotateZ(90deg)');
+    expect(transformFashion.isCompositeType).toBeTruthy();
+    expect(transformFashion.names).toEqual(['scale', 'rotateZ']);
+    expect(transformFashion.styles).toEqual([
+      createNumberFashion(0),
+      createUnitFashion('90deg')
+    ]);
+  });
 
-  const actualTransformNames = transformFashion.names;
-  const expectedTransformNames = ['scale', 'rotateZ'];
-  expect(actualTransformNames).toEqual(expectedTransformNames);
+  test('should handle multiple values in a single transform', () => {
+    const transformFashion = createTransformFashion('scale3d(1px, 2px, 3px)');
+    expect(transformFashion.isCompositeType).toBeTruthy();
+    expect(transformFashion.names).toEqual(['scale3d']);
+    expect(transformFashion.styles).toEqual([
+      createCommaFashion('1px, 2px, 3px')
+    ]);
+  });
 
-  const actualTransformStyles = transformFashion.styles;
-  const expectedTransformStyles = [createNumberFashion(0), createUnitFashion('90deg')];
-  expect(actualTransformStyles).toEqual(expectedTransformStyles);
 });
 
 test('createUnitFashion creates a valid UnitFashion', () => {
@@ -127,33 +136,54 @@ test('createCommaFashion', () => {
   ]);
 });
 
-test('parseStyle', () => {
-  expect(parseStyle('white')).toEqual(createColorFashion('white'));
+describe('parseStyle', () => {
 
-  expect(parseStyle(42)).toEqual(createNumberFashion(42));
+  test('should parse colors', () => {
+    expect(parseStyle('white')).toEqual(createColorFashion('white'));
 
-  expect(parseStyle('rotateX(90deg) translateY(100px)', 'transform')).toEqual(
-    createTransformFashion('rotateX(90deg) translateY(100px)')
-  );
+    expect(parseStyle('rgba(0, 0, 0, 0)')).toEqual(
+      createColorFashion('rgba(0, 0, 0, 0)')
+    );
+  });
 
-  expect(
-    // $FlowFixMe: flow doesn't know that this will only create a transform fashion
-    parseStyle('scale(1.5)', 'transform').styles[0]
-  ).toEqual(createNumberFashion(1.5));
+  test('should parse numbers', () => {
+    expect(parseStyle(42)).toEqual(createNumberFashion(42));
+  });
 
-  expect(parseStyle('240rem')).toEqual(createUnitFashion('240rem'));
+  test('should parse strings representing numbers', () => {
+    expect(parseStyle('100')).toEqual(createNumberFashion(100));
+  });
 
-  expect(parseStyle('rgba(0, 0, 0, 0)')).toEqual(
-    createColorFashion('rgba(0, 0, 0, 0)')
-  );
+  test('should parse transforms', () => {
+    expect(parseStyle('rotateX(90deg) translateY(100px)', 'transform')).toEqual(
+      createTransformFashion('rotateX(90deg) translateY(100px)')
+    );
 
-  expect(parseStyle('10px 20px', 'padding')).toEqual(
-    createSpacingFashion('10px 20px')
-  );
+    expect(
+      // $FlowFixMe: flow doesn't know that this will only create a transform fashion
+      parseStyle('scale(1.5)', 'transform').styles[0]
+    ).toEqual(createNumberFashion(1.5));
+  });
 
-  expect(parseStyle('1px 2px blue', 'boxShadow')).toEqual(
-    createBoxShadowFashion('1px 2px blue')
-  );
+  test('should parse strings with units', () => {
+    expect(parseStyle('240rem')).toEqual(createUnitFashion('240rem'));
+  });
+
+  test('should parse paddings/margins', () => {
+    expect(parseStyle('10px 20px', 'padding')).toEqual(
+      createSpacingFashion('10px 20px')
+    );
+
+    expect(parseStyle('1px 2px 3px 4px', 'margin')).toEqual(
+      createSpacingFashion('1px 2px 3px 4px')
+    );
+  });
+
+  test('should parse box shadows', () => {
+    expect(parseStyle('1px 2px blue', 'boxShadow')).toEqual(
+      createBoxShadowFashion('1px 2px blue')
+    );
+  });
 });
 
 test('parseStyle multiple box shadows', () => {

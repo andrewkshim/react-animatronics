@@ -22,9 +22,9 @@ export const interpolateValue = (
 export const interpolateFashion = (
   from: Fashion,
   to: Fashion,
-  springValue: number,
-): Fashion => (
-  from.isColorType && to.isColorType ?
+  springValue: number
+): Fashion => {
+  return from.isColorType && to.isColorType ?
     { ...from, value: chroma.mix(from.value, to.value, springValue) }
   : from.isNumberType && to.isNumberType ?
     { ...from, value: interpolateValue(from.value, to.value, springValue) }
@@ -32,15 +32,35 @@ export const interpolateFashion = (
     { ...from, value: interpolateValue(from.value, to.value, springValue) }
   :
     to
-);
+};
+
+const interpolateCompositeFashion = (
+  from: Fashion,
+  to: Fashion,
+  springValue: number
+) => {
+  return {
+    ...from,
+    styles: from.styles.map(
+      (f: Fashion, i: number) => {
+        const t = to.styles[i];
+        return (f.isCompositeType && t.isCompositeType) ? (
+          interpolateCompositeFashion(f, t, springValue)
+        ) : (
+          interpolateFashion(f, t, springValue)
+        );
+      }
+    ),
+  };
+}
 
 export const reconstructStyles = (
   fromStyles: Styles,
   toStyles: Styles,
   styleNames: string[],
   springValues: number[],
-): Styles =>
-  styleNames.reduce(
+): Styles => {
+  return styleNames.reduce(
     (reconstructed, styleName, index) => {
       const from = parseStyle(fromStyles[styleName], styleName);
       const to = parseStyle(toStyles[styleName], styleName);
@@ -49,12 +69,7 @@ export const reconstructStyles = (
         from.isBasicType && to.isBasicType ?
           interpolateFashion(from, to, value)
         : from.isCompositeType && to.isCompositeType ?
-          {
-            ...from,
-            styles: from.styles.map(
-              (s: Fashion, i: number) => interpolateFashion(s, to.styles[i], value)
-            ),
-          }
+          interpolateCompositeFashion(from, to, value)
         :
           to
       );
@@ -62,3 +77,4 @@ export const reconstructStyles = (
     },
     {}
   );
+};

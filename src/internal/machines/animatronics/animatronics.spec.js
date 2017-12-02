@@ -3,9 +3,12 @@ import sinon from 'sinon'
 
 import {
   calculateEasingProgress,
+  checkHasUniqueTransforms,
   makeAnimatronicsMachine,
   makeMutators,
   makeAnimation,
+  mergeStringTransforms,
+  parseMatrix,
   playAnimation,
   promisifyIfCallback,
   reset,
@@ -353,7 +356,6 @@ test('stopMachinesForAnimation', () => {
   });
 });
 
-
 test('reset', () => {
   const state = {};
   const mutators = {
@@ -363,4 +365,49 @@ test('reset', () => {
   expect(reset(state, mutators)).not.toThrow();
   expect(mutators.stopMachine).toHaveBeenCalledTimes(1);
   expect(mutators.resetMachine).toHaveBeenCalledTimes(1);
+});
+
+describe('checkHasUniqueTransforms', () => {
+
+  test('should identify when animations do not have unique transforms', () => {
+    const animations = [
+      { from: { transform: 'scale(1)' } },
+      { from: { transform: 'scale(0)' } },
+    ];
+    expect(checkHasUniqueTransforms(animations)).toBe(false);
+  });
+
+  test('should identify when animations have unique transforms', () => {
+    const animations = [
+      { from: { transform: 'scale(1)' } },
+      { from: { transform: 'translateX(0rem)' } },
+    ];
+    expect(checkHasUniqueTransforms(animations)).toBe(true);
+  });
+
+  test('should identify animations with no transforms', () => {
+    const animations = [
+      { from: { left: '0px' } },
+      { from: { right: '100px' } },
+    ];
+    expect(checkHasUniqueTransforms(animations)).toBe(false);
+  });
+
+});
+
+test('parseMatrix', () => {
+  expect(parseMatrix('matrix(1, 2, 3, 4, 10, 10)')).toEqual([
+     1,  2, 0, 0,
+     3,  4, 0, 0,
+     0,  0, 1, 0,
+    10, 10, 0, 1,
+  ]);
+});
+
+test('mergeStringTransforms', () => {
+  const animations = [
+    { to: { transform: 'scale(0)' } },
+    { to: { transform: 'translateX(100px)' } },
+  ];
+  expect(mergeStringTransforms(animations)).toBe('scale(0) translateX(100px)');
 });

@@ -30,6 +30,7 @@ class Control extends React.Component<Props, State> {
   _onRef: Function
   _registerComponent: Function
   _resetComponentStyle: Function
+  _getComponentStyle: Function
   _setComponentStyle: Function
 
   constructor(props: Props) {
@@ -56,7 +57,12 @@ class Control extends React.Component<Props, State> {
     this._onRef = this._onRef.bind(this);
     this._registerComponent = this._registerComponent.bind(this);
     this._resetComponentStyle = this._resetComponentStyle.bind(this);
+    this._getComponentStyle = this._getComponentStyle.bind(this);
     this._setComponentStyle = this._setComponentStyle.bind(this);
+  }
+
+  _getComponentStyle() {
+    return this.state.animatronicStyles;
   }
 
   _setComponentStyle(updatedStyles: Styles) {
@@ -94,6 +100,7 @@ class Control extends React.Component<Props, State> {
     animatronics.registerComponent(
       name,
       ReactDOM.findDOMNode(this._ref),
+      this._getComponentStyle,
       this._setComponentStyle,
       this._resetComponentStyle,
     );

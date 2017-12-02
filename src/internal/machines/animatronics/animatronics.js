@@ -8,11 +8,17 @@
 
 import Debug from 'debug'
 
-import { haveConvertibleUnits } from '../../fashionistas/common'
 import { constructStyles } from '../../fashionistas/timed'
 import Recorder from '../../recorder'
 
 import {
+  haveConvertibleUnits,
+  parseTransformName,
+  createTransformFashion,
+} from '../../fashionistas/common'
+
+import {
+  BETWEEN_PAREN_REGEX,
   flatten,
   isUsingSpring,
   isUsingTime,
@@ -34,6 +40,16 @@ import {
 
 const debug = Debug('react-animatronics:machines:animatronics');
 
+export const checkHasUniqueTransforms = animations => animations
+  .map(animation => animation.from.transform)
+  .filter(transform => !!transform)
+  .map(parseTransformName)
+  .reduce((result, name) => {
+    result.add(name);
+    return result;
+  }, new Set())
+  .size > 1;
+
 export const calculateEasingProgress = (
   easing: Function,
   duration: number,
@@ -41,6 +57,52 @@ export const calculateEasingProgress = (
 ): number => (
   easing(elapsedTime / (duration === 0 ? elapsedTime : duration))
 );
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
+const convert2Dto3DMatrix = matrix => {
+  if (matrix.length === 16) return matrix;
+
+  const [ a, b, c, d, tx, ty ] = matrix;
+  return [
+     a,  b, 0, 0,
+     c,  d, 0, 0,
+     0,  0, 1, 0,
+    tx, ty, 0, 1,
+  ];
+}
+
+export const parseMatrix = matrixStr => {
+  return convert2Dto3DMatrix(
+    BETWEEN_PAREN_REGEX.exec(matrixStr)[1]
+      .split(',')
+      .map(s => s.trim())
+      .map(parseFloat)
+  );
+};
+
+const composeTransformationMatrices = (initialMatrixStr, ...matrixStrings) => {
+  const initialMatrix = parseMatrix(initialMatrixStr);
+  const composedMatrix = matrixStrings.reduce(
+    (composed, matrixStr) => {
+      const matrix = parseMatrix(matrixStr);
+      matrix.forEach((value, index) => {
+        if (initialMatrix[index] !== value) {
+          composed[index] = value;
+        }
+      });
+      return composed;
+    },
+    initialMatrix.slice()
+  );
+  return `matrix3d(${ composedMatrix.join(', ') })`;
+}
+
+export const mergeStringTransforms = animations => {
+  return animations
+    .map(animation => animation.to.transform)
+    .filter(transform => !!transform)
+    .join(' ');
+}
 
 export const makeAnimation = state => animationName => {
   const { animations, nodes } = state;
@@ -113,7 +175,14 @@ const normalizeStyles = (getComputedStyle, node, fromStyles, toStyles) => {
   return { normalizedFrom, normalizedTo };
 }
 
-export const runTimedAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
+export const runTimedAnimation = (state, mutators) => (
+  animationName,
+  componentName,
+  animation,
+  index,
+  animations,
+  hasUniqueTransforms = false
+) => {
   const {
     from: fromStyles,
     to: toStyles,
@@ -142,7 +211,19 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
   const job = elapsedTime => {
     const progress = calculateEasingProgress(easing, duration, elapsedTime);
     const updatedStyles = constructStyles(normalizedFrom, normalizedTo, progress);
-    mutators.updateComponentStyles({ componentName, updatedStyles });
+    if (hasUniqueTransforms) {
+      mutators.updateMergedTransformComponentStyles({
+        componentName,
+        normalizedFrom,
+        updatedStyles,
+      });
+    } else {
+    mutators.updateComponentStyles({
+      componentName,
+      normalizedFrom,
+      updatedStyles,
+    });
+    }
 
     if (!IS_PRODUCTION) {
       const updateStyles = state.styleUpdaters[componentName];
@@ -154,7 +235,19 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
     const isStopped = !state.animationCountdownMachines[animationName];
     if (isStopped) return;
 
-    mutators.updateComponentStyles({ componentName, updatedStyles: toStyles });
+    if (hasUniqueTransforms) {
+      mutators.setNormalizedMergedTransform({
+        componentName,
+        normalizedFrom,
+        normalizedTo,
+        toStyles,
+      });
+    } else {
+      mutators.updateComponentStyles({
+        componentName,
+        updatedStyles: toStyles,
+      });
+    }
     mutators.countdownAnimations({ animationName });
   }
 
@@ -163,26 +256,41 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
   mutators.startTimedJob({ animationName, index, componentName });
 };
 
-const runSpringAnimation = (state, mutators) => (animationName, componentName, animation, index) => {
+const runSpringAnimation = (state, mutators) => (
+  animationName,
+  componentName,
+  animation,
+  index,
+  hasUniqueTransforms
+) => {
   const {
     from: fromStyles,
     to: toStyles,
     stiffness,
     damping,
   } = animation;
+
   let startTime;
+
   if (!IS_PRODUCTION) {
     startTime = mutators.now();
   }
+
+  const { normalizedFrom, normalizedTo } = normalizeStyles(
+    mutators.getComputedStyle,
+    state.nodes[componentName],
+    fromStyles,
+    toStyles
+  );
 
   mutators.createSpringMachine({
     animationName,
     componentName,
     damping,
-    fromStyles,
     index,
+    normalizedFrom,
+    normalizedTo,
     stiffness,
-    toStyles,
   });
   mutators.createEndlessJobMachine({
     animationName,
@@ -195,12 +303,26 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
   }
 
   const onNext = updatedStyles => {
-    mutators.updateComponentStyles({ componentName, updatedStyles });
+    if (hasUniqueTransforms) {
+      mutators.updateMergedTransformComponentStyles({
+        componentName,
+        normalizedFrom,
+        updatedStyles,
+      });
+    } else {
+      mutators.updateComponentStyles({ componentName, updatedStyles });
+    }
 
     if (!IS_PRODUCTION) {
       const updateStyles = state.styleUpdaters[componentName];
       const elapsedTime = mutators.now() - startTime;
-      Recorder.record({ animationName, componentName, elapsedTime, updatedStyles, updateStyles });
+      Recorder.record({
+        animationName,
+        componentName,
+        elapsedTime,
+        updateStyles,
+        updatedStyles,
+      });
     }
   }
 
@@ -208,7 +330,20 @@ const runSpringAnimation = (state, mutators) => (animationName, componentName, a
     const isStopped = !state.animationCountdownMachines[animationName];
     if (isStopped) return;
 
-    mutators.updateComponentStyles({ componentName, updatedStyles });
+    if (hasUniqueTransforms) {
+      mutators.setNormalizedMergedTransform({
+        componentName,
+        normalizedFrom,
+        normalizedTo,
+        toStyles,
+      });
+    } else {
+      mutators.updateComponentStyles({
+        componentName,
+        updatedStyles,
+      });
+    }
+
     mutators.stopEndlessJobMachine({ animationName, index, componentName });
     mutators.countdownAnimations({ animationName });
   }
@@ -309,6 +444,19 @@ export const playAnimation = (state, mutators) => promisifyIfCallback((animation
 
     const job = () => {
       mutators.countdownPhases({ animationName });
+
+      componentNames.forEach(componentName => {
+        const rawAnimation = phase[componentName];
+        const animations = Array.isArray(rawAnimation) ? rawAnimation : [rawAnimation];
+        const hasUniqueTransforms = checkHasUniqueTransforms(animations);
+        if (!hasUniqueTransforms) return;
+        mutators.setMergedTransforms({
+          componentName,
+          mergedTransforms: mergeStringTransforms(animations),
+        });
+
+      });
+
       if (phaseIndex < (numPhases - 1)) {
         runPhase(phaseIndex + 1);
       }
@@ -323,12 +471,30 @@ export const playAnimation = (state, mutators) => promisifyIfCallback((animation
     componentNames.forEach(componentName => {
       const rawAnimation = phase[componentName];
       const animations = Array.isArray(rawAnimation) ? rawAnimation : [rawAnimation];
+      const hasUniqueTransforms = checkHasUniqueTransforms(animations);
 
       const runAnimation = (animation, index) => {
         if (isUsingTime(animation)) {
-          runTimedAnimation(state, mutators)(animationName, componentName, animation, index);
+          // TODO: Reorganize this code, look at all the arguments :(
+          // You can see that the wrong lines are drawn because we're passing in
+          // the "animations", "animation", and "index". We only need the "animations"
+          // to merge the transform styles IN CASE they happen to be unique.
+          runTimedAnimation(state, mutators)(
+            animationName,
+            componentName,
+            animation,
+            index,
+            animations,
+            hasUniqueTransforms
+          );
         } else if (isUsingSpring(animation)) {
-          runSpringAnimation(state, mutators)(animationName, componentName, animation, index);
+          runSpringAnimation(state, mutators)(
+            animationName,
+            componentName,
+            animation,
+            index,
+            hasUniqueTransforms
+          );
         }
       };
 
@@ -386,10 +552,17 @@ export const reset = (state, mutators) => () => {
   mutators.resetMachine();
 };
 
-const registerComponent = (state, mutators) => (componentName, node, styleUpdater, styleResetter) => {
+const registerComponent = (state, mutators) => (
+  componentName,
+  node,
+  styleGetter,
+  styleUpdater,
+  styleResetter,
+) => {
   mutators.registerComponent({
     componentName,
     node,
+    styleGetter,
     styleUpdater,
     styleResetter,
   });
@@ -405,20 +578,19 @@ const setAnimations = (state, mutators) => animations => {
 
 // EXPERIMENT: Isolating any shared state mutations here.
 export const makeMutators = (machinist, state) => ({
-
   createSpringMachine: action => {
     const {
       animationName,
       componentName,
       damping,
-      fromStyles,
+      normalizedFrom,
       index,
       stiffness,
-      toStyles,
+      normalizedTo,
     } = action;
     const machine = machinist.makeSpringMachine(
-      fromStyles,
-      toStyles,
+      normalizedFrom,
+      normalizedTo,
       stiffness,
       damping
     );
@@ -501,9 +673,16 @@ export const makeMutators = (machinist, state) => ({
   },
 
   registerComponent: action => {
-    const { componentName, node, styleUpdater, styleResetter } = action;
+    const {
+      componentName,
+      node,
+      styleGetter,
+      styleUpdater,
+      styleResetter,
+    } = action;
     debug('registering component %s %o', componentName, node);
     state.nodes[componentName] = node;
+    state.styleGetters[componentName] = styleGetter;
     state.styleUpdaters[componentName] = styleUpdater;
     state.styleResetters[componentName] = styleResetter;
   },
@@ -595,7 +774,66 @@ export const makeMutators = (machinist, state) => ({
   unregisterComponent: action => {
     const { componentName } = action;
     delete state.nodes[componentName];
+    delete state.styleGetters[componentName];
     delete state.styleUpdaters[componentName];
+  },
+
+  setMergedTransforms: action => {
+    const { componentName, mergedTransforms } = action;
+    state.styleUpdaters[componentName]({
+      transform: mergedTransforms
+    });
+  },
+
+  setNormalizedMergedTransform: action => {
+    const {
+      componentName,
+      normalizedFrom,
+      normalizedTo,
+      toStyles,
+    } = action;
+
+    const { transform: existingTransform } = state.styleGetters[componentName]();
+    const node = state.nodes[componentName];
+
+    if (!existingTransform || !normalizedTo || !normalizedTo.transfor) return;
+
+    state.styleUpdaters[componentName]({
+      ...toStyles,
+      transform: composeTransformationMatrices(
+        normalizedFrom.transform,
+        existingTransform,
+        normalizedTo.transform,
+      )
+    });
+  },
+
+  updateMergedTransformComponentStyles: action => {
+    const {
+      componentName,
+      normalizedFrom,
+      updatedStyles,
+    } = action;
+
+    const updateStyles = state.styleUpdaters[componentName];
+    const { transform: existingTransform } = state.styleGetters[componentName]();
+    const { transform: updatedTransform } = updatedStyles;
+    const node = state.nodes[componentName];
+
+    if (existingTransform && updatedTransform) {
+      // NOTE: All transforms will have been converted to "matrix" at this point.
+      // See "haveConvertibleUnits" in fashionista/common.
+      updateStyles({
+        ...updatedStyles,
+        transform: composeTransformationMatrices(
+          normalizedFrom.transform,
+          existingTransform,
+          updatedTransform
+        )
+      });
+    } else {
+      updateStyles(updatedStyles);
+    }
   },
 
   updateComponentStyles: action => {
@@ -611,6 +849,7 @@ export const makeAnimatronicsMachine = machinist => animations => {
   const state = {
     animations,
     nodes: {},
+    styleGetters: {},
     styleUpdaters: {},
     styleResetters: {},
     timedJobMachines: {},
@@ -633,4 +872,5 @@ export const makeAnimatronicsMachine = machinist => animations => {
   };
 
   return animatronicsMachine;
-}
+};
+

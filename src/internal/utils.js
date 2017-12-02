@@ -5,6 +5,11 @@
  * @module internal/utils
  */
 
+export const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
+export const ALL_COMMAS_REGEX: RegExp = /, /g;
+export const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
+export const NON_NUMER_REGEX: RegExp = /\D+/;
+
 export const noop = (): void => {};
 
 export const isStatelessComponent = (Component: Object): boolean => !Component.prototype.render;
@@ -48,3 +53,4 @@ export const isUsingTime = (animation: Object): boolean =>
 
 export const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
+
