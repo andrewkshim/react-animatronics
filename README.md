@@ -27,8 +27,8 @@ yarn add react-animatronics
 
 ## Quick Intro
 
-React-animatronics aims to expose a simple API that allows you to declare
-complex animations involving multiple React components.
+React-animatronics exposes a simple API that allows you to declare complex
+animations involving multiple React components.
 
 If you learn by looking at code first, here's an example demonstrating some of
 what react-animatronics can do:
