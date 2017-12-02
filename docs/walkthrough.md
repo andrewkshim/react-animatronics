@@ -817,6 +817,48 @@ unexpected behavior accross different browsers. It also needs to temporarily
 manipulate the `style` on the actual DOM nodes, so your controlled components
 need to be class components.
 
+One more thing! You can simultaneously animate different transforms:
+
+```js
+const animations = [
+  {
+    square: [
+      {
+        duration: 500,
+        from: {
+          transform: 'scale(0)',
+        },
+        to: {
+          transform: 'scale(1)',
+        }
+      },
+      {
+        duration: 300,
+        from: {
+          transform: 'translateX(0px)',
+        },
+        to: {
+          transform: 'translateX(100px)',
+        }
+      },
+      {
+        duration: 400,
+        from: {
+          transform: 'translateY(0px)',
+        },
+        to: {
+          transform: 'translateY(100px)',
+        }
+      },
+    ]
+  }
+];
+```
+
+React-animatronics will merge the transformations so they all get applied as
+expected. This gives you a ton of flexibility with transforms, which is a good
+thing since [they're less expensive to animate][anim_perf].
+
 That's the end of the walkthrough. If any parts were confusing or unclear, please
 let me know by [filing an issue][issue] or [submitting a pull request][pr].
 
@@ -834,4 +876,5 @@ Enjoy using react-animatronics and let me know how I can make it better. Thanks!
 [render_prop]:https://cdb.reacttraining.com/use-a-render-prop-50de598f11ce
 [higher_order]:https://reactjs.org/docs/higher-order-components.html
 [material]:https://material.io/guidelines/motion/duration-easing.html#duration-easing-natural-easing-curves
+[anim_perf]:https://www.html5rocks.com/en/tutorials/speed/high-performance-animations/
 
