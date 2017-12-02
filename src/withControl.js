@@ -10,11 +10,26 @@ import type { ComponentType } from 'react'
 
 import ContextTypes from './internal/context-types'
 import Control from './Control'
-import { isStatelessComponent } from './internal/utils'
+import { IS_PRODUCTION } from './internal/constants'
+
+import {
+  isStatelessComponent,
+  isReactComponent,
+  makeError,
+} from './internal/utils'
 
 type Props = {};
 
 const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
+
+  if (!IS_PRODUCTION) {
+    if (!isReactComponent(BaseComponent)) {
+      throw makeError(
+        `The withControl() higher-order component must be used to wrap a`,
+        `valid React component but it received: ${ BaseComponent }.`
+      );
+    }
+  }
 
   class ControlledComponent extends React.Component<Props> {
     static contextTypes: Object = ContextTypes

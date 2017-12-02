@@ -3,27 +3,38 @@ import { mount } from 'enzyme'
 
 import withControl from './withControl'
 
-test('withControl()', () => {
+describe('withControl', () => {
 
-  class Base extends React.Component {
-    render() {
-      return <div id='test' />;
-    }
-  }
+  test('should render its base component', () => {
 
-  const Controlled = withControl('base')(Base);
-
-  const wrapper = mount(
-    <Controlled />,
-    {
-      context: {
-        animatronics: {
-          registerComponent: () => {},
-          unregisterComponent: () => {},
-        }
+    class Base extends React.Component {
+      render() {
+        return <div id='test' />;
       }
     }
-  );
 
-  expect(wrapper.find('#test').length).toBe(1);
+    const Controlled = withControl('base')(Base);
+
+    const wrapper = mount(
+      <Controlled />,
+      {
+        context: {
+          animatronics: {
+            registerComponent: () => {},
+            unregisterComponent: () => {},
+          }
+        }
+      }
+    );
+
+    expect(wrapper.find('#test').length).toBe(1);
+  });
+
+  test('should throw when not given a valid React component', () => {
+    expect(() => {
+      withControl(() => {})(undefined)
+    }).toThrow(/must be used to wrap a valid React component/);
+  });
+
 });
+

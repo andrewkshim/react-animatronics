@@ -19,5 +19,11 @@ describe('withAnimatronics', () => {
     expect(wrapper.find('#test').length).toBe(1);
   });
 
+  test('should throw when not given a valid React component', () => {
+    expect(() => {
+      withAnimatronics(() => {})(undefined)
+    }).toThrow(/must be used to wrap a valid React component/);
+  });
+
 });
 
