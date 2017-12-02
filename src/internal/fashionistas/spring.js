@@ -7,7 +7,7 @@
 
 import chroma from 'chroma-js'
 
-import type { Styles, Fashion } from '../flow-types'
+import type { Styles, Fashion, CompositeFashion } from '../flow-types'
 import { parseStyle, stringifyFashion } from './common'
 
 export const interpolateValue = (
@@ -35,15 +35,15 @@ export const interpolateFashion = (
 };
 
 const interpolateCompositeFashion = (
-  from: Fashion,
-  to: Fashion,
+  from: CompositeFashion,
+  to: CompositeFashion,
   springValue: number
-) => {
+): Fashion => {
   return {
     ...from,
     styles: from.styles.map(
       (f: Fashion, i: number) => {
-        const t = to.styles[i];
+        const t: Fashion = to.styles[i];
         return (f.isCompositeType && t.isCompositeType) ? (
           interpolateCompositeFashion(f, t, springValue)
         ) : (
