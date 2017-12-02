@@ -1,4 +1,4 @@
-import type { VoidFn, Styles, SpringMachine } from '../../flow-types'
+import type { VoidFn, Styles } from '../../flow-types'
 
 import { noop } from '../utils'
 import { parseStyle } from '../fashionistas/common'

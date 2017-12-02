@@ -1,3 +1,6 @@
+// @flow
+import type { Animation, AnimationPhase, DOMNode } from '../../flow-types'
+
 import {
   makeError,
   isUsingTime,

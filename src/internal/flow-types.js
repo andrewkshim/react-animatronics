@@ -61,8 +61,6 @@ export type Fashion = BasicFashion | CompositeFashion | StaticFashion;
 
 export type Styles = { [string]: string | number };
 
-export type StyleUpdater = (styles: Styles) => void;
-
 export type DOMNode = Object;
 
 export type Animation = {
@@ -71,7 +69,7 @@ export type Animation = {
   stiffness?: number,
   damping?: number,
   from: Object,
-  end: Object,
+  to: Object,
 }
 
 export type AnimationPhase = { [string]: Animation };
@@ -84,29 +82,3 @@ export type AnimationPhase = { [string]: Animation };
 export type Machinist = Object;
 
 export type AnimatronicsMachine = Object;
-
-export type TimeMachine = {
-  isStopped: () => boolean,
-  do: (job: Function, onFrame?: VoidFn) => TimeMachine,
-  run: (onComplete?: VoidFn) => TimeMachine,
-  stop: VoidFn,
-};
-
-export type SpringMachine = {
-  isStopped: () => boolean,
-  next: (onNext: Function, onComplete: Function) => void,
-}
-
-export type AnimationMachine = {
-  play: (animationName: string, components: ComponentsMachine, onComplete: Function) => void,
-  rewind: (animationName: string, components: ComponentsMachine, onComplete: Function) => void,
-  stop: () => void,
-  setCreateAnimationSequences: (createAnimationSequences: Function) => void,
-}
-
-export type ComponentsMachine = {
-  registerComponent: (componentName: string, node: DOMNode, styleUpdater: StyleUpdater) => void,
-  unregisterComponent: (componentName: string) => void,
-  updateStyles: (componentName: string, styles: Styles) => void,
-  getNodes: () => { [string]: DOMNode },
-}
