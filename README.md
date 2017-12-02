@@ -153,9 +153,7 @@ const App = () => (
         style={{ cursor: 'pointer' }}
         onClick={() => {
           playAnimation(() => {
-            setTimeout(() => {
-              reset();
-            }, 500);
+            setTimeout(reset, 500);
           });
         }}
       >
