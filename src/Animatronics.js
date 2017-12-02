@@ -29,8 +29,14 @@ import {
   makeError,
 } from './internal/utils'
 
+const isAnimationsInvalid = animations => (
+  typeof animations !== 'function'
+  && !Array.isArray(animations)
+  && typeof animations !== 'object'
+);
+
 type Props = {
-  animations: Function,
+  animations: Function|Array<Object>|Object,
   children: Function,
   requestAnimationFrame?: Function,
   cancelAnimationFrame?: Function,
@@ -74,10 +80,11 @@ class Animatronics extends React.Component<Props> {
           `single React element.`
         );
       }
-      if (typeof animations !== 'function') {
+      if (isAnimationsInvalid(animations)) {
         throw makeError(
-          `<Animatronics> must receive a function "animations" prop`,
-          `that returns you animation declarations.` // TODO: link to docs
+          `<Animatronics> must receive an "animations" prop`,
+          `that is either an array, function, or object, but it`,
+          `received an "animations" prop this is a ${ typeof animations }.`
         );
       }
     }

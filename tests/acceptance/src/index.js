@@ -217,7 +217,7 @@ class ExampleItem extends React.Component {
 
 const createAnimatedHighlight = example => withControl(`${ example }Highlight`)(ExampleItemHighlight);
 
-const createAnimatedItem = example => withControl(example)(withAnimatronics(() => ({
+const createAnimatedItem = example => withControl(example)(withAnimatronics({
   selected: [
     {
       [`${ example }Highlight`]: {
@@ -295,7 +295,7 @@ const createAnimatedItem = example => withControl(example)(withAnimatronics(() =
       },
     },
   ],
-}) )( ExampleItem ));
+})( ExampleItem ));
 
 class App extends React.Component {
 

@@ -53,7 +53,7 @@ class ClickWaveContainer extends React.Component {
 
 }
 
-const AnimatedClickWave = withAnimatronics(() => ({
+const AnimatedClickWave = withAnimatronics({
   click: [
     {
       wave: {
@@ -69,7 +69,7 @@ const AnimatedClickWave = withAnimatronics(() => ({
       },
     },
   ],
-}))( ClickWaveContainer );
+})( ClickWaveContainer );
 
 class Button extends React.Component {
 

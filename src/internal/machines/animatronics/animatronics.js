@@ -35,49 +35,45 @@ import {
 const debug = Debug('react-animatronics:machines:animatronics');
 
 export const calculateEasingProgress = (
-  easingFn: Function,
+  easing: Function,
   duration: number,
   elapsedTime: number,
 ): number => (
-  easingFn(elapsedTime / (duration === 0 ? elapsedTime : duration))
+  easing(elapsedTime / (duration === 0 ? elapsedTime : duration))
 );
 
-export const makeSequence = state => animationName => {
+export const makeAnimation = state => animationName => {
   const { animations, nodes } = state;
-  const areSequencesStatic = typeof animations === 'function';
 
-  const sequences = areSequencesStatic
-    ? animations(nodes)
+  const namedAnimations = (Array.isArray(animations) || typeof animations === 'function')
+    ? { [DEFAULT_ANIMATION_NAME]: animations }
     : animations;
 
-  const namedSequences = Array.isArray(sequences)
-    ? { [DEFAULT_ANIMATION_NAME]: sequences }
-    : sequences;
-
   if (!IS_PRODUCTION) {
-    if (namedSequences[animationName] == null) {
+    if (namedAnimations[animationName] == null) {
       throw makeError(
         `Attempted to run an animation named "${ animationName }", but there is no such`
         + ` named animation. The animations you have defined are:`
-        + ` [${ Object.keys(namedSequences).filter(name => name !== DEFAULT_ANIMATION_NAME) }]`
+        + ` [${ Object.keys(namedAnimations).filter(name => name !== DEFAULT_ANIMATION_NAME) }]`
       );
     }
   }
 
-  const sequence = areSequencesStatic
-    ? namedSequences[animationName]
-    : namedSequences[animationName](nodes);
+  const isAnimationDynamic = typeof namedAnimations[animationName] === 'function';
+  const animation = isAnimationDynamic
+    ? namedAnimations[animationName](nodes)
+    : namedAnimations[animationName];
 
   if (!IS_PRODUCTION) {
-    sequence.forEach(phase => throwIfPhaseNotValid(phase, nodes));
+    animation.forEach(phase => throwIfPhaseNotValid(phase, nodes));
   }
 
-  return sequence;
+  return animation;
 };
 
 const getNumPhases = state => animationName => {
-  const sequence = makeSequence(state)(animationName);
-  return sequence.length;
+  const animation = makeAnimation(state)(animationName);
+  return animation.length;
 };
 
 const normalizeStyles = (getComputedStyle, node, fromStyles, toStyles) => {
@@ -122,7 +118,7 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
     from: fromStyles,
     to: toStyles,
     duration,
-    easingFn = DEFAULT_EASING_FN,
+    easing = DEFAULT_EASING_FN,
   } = animation;
 
   const { normalizedFrom, normalizedTo } = normalizeStyles(
@@ -144,7 +140,7 @@ export const runTimedAnimation = (state, mutators) => (animationName, componentN
   }
 
   const job = elapsedTime => {
-    const progress = calculateEasingProgress(easingFn, duration, elapsedTime);
+    const progress = calculateEasingProgress(easing, duration, elapsedTime);
     const updatedStyles = constructStyles(normalizedFrom, normalizedTo, progress);
     mutators.updateComponentStyles({ componentName, updatedStyles });
 
@@ -273,7 +269,7 @@ export const playAnimation = (state, mutators) => promisifyIfCallback((animation
     }
   }
 
-  // IMPROVE: It's weird that getNumPhases calls makeSequence internally, but
+  // IMPROVE: It's weird that getNumPhases calls makeAnimation internally, but
   // things are the way they are so the user does not need to write each
   // phase as a function - having this inefficiency makes the API nicer.
   const numPhases = getNumPhases(state)(animationName);
@@ -281,7 +277,7 @@ export const playAnimation = (state, mutators) => promisifyIfCallback((animation
   if (!IS_PRODUCTION) {
     if (numPhases === 0) {
       throw makeError(
-        `Attemped to run an empty animation sequence. Check <Animatronics/>`
+        `Attemped to run an empty animation. Check <Animatronics/>`
         + ` or withAnimatronics and make sure youre're returning either an Array or`
         + ` an Object from the "animations" function. Here's what your`
         + ` function looks like right now:`
@@ -301,8 +297,8 @@ export const playAnimation = (state, mutators) => promisifyIfCallback((animation
     const isStopped = !state.phasesCountdownMachines[animationName];
     if (isStopped) return;
 
-    const sequence = makeSequence(state)(animationName);
-    const phase = sequence[phaseIndex];
+    const animation = makeAnimation(state)(animationName);
+    const phase = animation[phaseIndex];
     debug('executing phase %O', phase);
     const componentNames = Object.keys(phase);
     const numAnimations = componentNames.reduce(
@@ -364,7 +360,7 @@ const cancelAnimation = (state, mutators) => (animationName) => {
   mutators.stopMachine({ animationName });
 };
 
-const stopMachinesForAnimation = (state) => (animationName) => {
+export const stopMachinesForAnimation = (machinist, state) => animationName => {
   if (state.timedJobMachines[animationName]) {
     flatten(Object.values(state.timedJobMachines[animationName]))
       .forEach(machine => machine.stop());
@@ -589,10 +585,10 @@ export const makeMutators = (machinist, state) => ({
 
     if (!animationName) {
       Object.keys(state.phasesCountdownMachines).forEach(name => {
-        stopMachinesForAnimation(state)(name);
+        stopMachinesForAnimation(machinist, state)(name);
       })
     } else {
-       stopMachinesForAnimation(state)(animationName);
+       stopMachinesForAnimation(machinist, state)(animationName);
     }
   },
 

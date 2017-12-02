@@ -125,7 +125,7 @@ class Input extends React.Component {
           marginTop: '2.5%',
           marginLeft: '2.5%',
         }}>
-          <Animatronics animations={() => ({
+          <Animatronics animations={{
             reveal: [
               text.split('').reduce(
                 (result, letter, index) => {{
@@ -154,7 +154,7 @@ class Input extends React.Component {
                 {}
               )
             ]
-          })}>{({ playAnimation }) =>
+          }}>{({ playAnimation }) =>
             <Letters
               didAnimate={ didAnimate }
               text={ text }
@@ -185,14 +185,12 @@ class InputExample extends React.Component {
 // TODO: Better organize these example components and/or figure out a better
 // way to support dynamic animatronics. Need to wrap the root element and
 // have a fake animation to trigger the child Letters animation.
-export default withAnimatronics(
-  () => [
-    {
-      input: {
-        duration: 0,
-        from: { transform: 'scale(1)' },
-        to: { transform: 'scale(1)' },
-      }
+export default withAnimatronics([
+  {
+    input: {
+      duration: 0,
+      from: { transform: 'scale(1)' },
+      to: { transform: 'scale(1)' },
     }
-  ]
-)( InputExample );
+  }
+])( InputExample );

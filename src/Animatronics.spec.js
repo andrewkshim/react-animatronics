@@ -18,14 +18,14 @@ describe('<Animatronics>', () => {
     }).toThrow(/must receive a function "children" prop/);
   });
 
-  test('should throw when "animations" prop is not a function', () => {
+  test('should throw when "animations" prop is not an array, function, or object', () => {
     expect(() => {
       shallow(
         <Animatronics>{() =>
           <Base />
         }</Animatronics>
       );
-    }).toThrow(/must receive a function "animations" prop/);
+    }).toThrow(/must receive an "animations" prop that is either an array, function, or object/);
   });
 
   test('should pass the correct props to its child', () => {

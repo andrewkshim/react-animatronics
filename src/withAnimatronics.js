@@ -14,11 +14,9 @@ import { isStatelessComponent } from './internal/utils'
 
 type Props = {};
 
-const withAnimatronics = (animations: Object|Function) => (BaseComponent: ComponentType<{}>) => {
+const withAnimatronics = (animations: Function|Array<Object>|Object) => (BaseComponent: ComponentType<{}>) => {
 
   class AnimatronicsComponent extends React.Component<Props> {
-    //static childContextTypes: Object = ContextTypes
-
     render() {
       return (
         <Animatronics animations={ animations }>{ props =>

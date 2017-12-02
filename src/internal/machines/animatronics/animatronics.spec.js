@@ -3,12 +3,13 @@ import sinon from 'sinon'
 
 import {
   calculateEasingProgress,
+  makeAnimatronicsMachine,
   makeMutators,
-  makeSequence,
+  makeAnimation,
   playAnimation,
   promisifyIfCallback,
   runTimedAnimation,
-  makeAnimatronicsMachine,
+  stopMachinesForAnimation,
 } from './animatronics'
 
 import { makeTimedJobMachine } from '../timed-job'
@@ -28,48 +29,114 @@ test('machines/animatronics/calculateEasingProgress', () => {
   expect(calculateEasingProgress(x => x, 0, 250)).toBe(1.0);
 });
 
-test('machines/animatronics/makeSequence', () => {
-  expect(
-    makeSequence(
-      {
-        animations: () => ({
-          hello: [
-            {
-              circle: {
-                duration: 500,
-                from: { left: '100px' },
-                to: { left: '200px' },
-              }
-            }
-          ]
-        }),
+describe('makeAnimation', () => {
+
+  test('should take an "animations" array and return the sequence array', () => {
+    expect(
+      makeAnimation({
+        animations: [{
+          circle: {
+            duration: 500,
+            from: { left: '100px' },
+            to: { left: '200px' },
+          }
+        }],
         nodes: { circle: {} },
-      }
-    )('hello')
-  ).toEqual(
-    [
-      {
+      })(DEFAULT_ANIMATION_NAME)
+    ).toEqual(
+      [{
         circle: {
           duration: 500,
           from: { left: '100px' },
           to: { left: '200px' },
         }
-      }
-    ]
-  );
+      }]
+    );
+  });
 
-  makeSequence(
-    {
+  test('should take an "animations" object and return the sequence array', () => {
+    expect(
+      makeAnimation({
+        animations: {
+          'myAnimation': [{
+            circle: {
+              duration: 500,
+              from: { left: '100px' },
+              to: { left: '200px' },
+            }
+          }]
+        },
+        nodes: { circle: {} },
+      })('myAnimation')
+    ).toEqual(
+      [{
+        circle: {
+          duration: 500,
+          from: { left: '100px' },
+          to: { left: '200px' },
+        }
+      }]
+    );
+  });
+
+  test('should take dynamic "animations" and return the sequence array', () => {
+    expect(
+      makeAnimation({
+        animations: () => [{
+          circle: {
+            duration: 500,
+            from: { left: '100px' },
+            to: { left: '200px' },
+          }
+        }],
+        nodes: { circle: {} },
+      })(DEFAULT_ANIMATION_NAME)
+    ).toEqual(
+      [{
+        circle: {
+          duration: 500,
+          from: { left: '100px' },
+          to: { left: '200px' },
+        }
+      }]
+    );
+
+    expect(
+      makeAnimation({
+        animations: {
+          hello: () => [{
+            circle: {
+              duration: 500,
+              from: { left: '100px' },
+              to: { left: '200px' },
+            }
+          }]
+        },
+        nodes: { circle: {} },
+      })('hello')
+    ).toEqual(
+      [{
+        circle: {
+          duration: 500,
+          from: { left: '100px' },
+          to: { left: '200px' },
+        }
+      }]
+    );
+  });
+
+  test('should pass in the nodes for unnamed animations', () => {
+    makeAnimation({
       animations: ({ circle }) => {
         expect(circle).toEqual({ message: 'foobar' });
         return [];
       },
       nodes: { circle: { message: 'foobar' } },
-    }
-  )(DEFAULT_ANIMATION_NAME),
+    })(DEFAULT_ANIMATION_NAME);
+  });
 
-  makeSequence(
-    {
+  test('should pass in the nodes for named animations', () => {
+    makeAnimation({
       animations: {
         hey: ({ circle }) => {
           expect(circle).toEqual({ message: 'hey hey' });
@@ -77,20 +144,21 @@ test('machines/animatronics/makeSequence', () => {
         }
       },
       nodes: { circle: { message: 'hey hey' } },
-    }
-  )('hey'),
+    })('hey');
+  });
 
-  expect(() => {
-    makeSequence(
-      {
+  test('should throw when running a named animation that is not declared', () => {
+    expect(() => {
+      makeAnimation({
         animations: () => ({
           foo: [],
           bar: [],
         }),
         nodes: {},
-      }
-    )('woo')
-  }).toThrow(/there is no such named animation/);
+      })('woo')
+    }).toThrow(/there is no such named animation/);
+  });
+
 });
 
 test('machines/animatronics/makeMutators', () => {
@@ -238,5 +306,35 @@ test('promisifyIfCallback', () => {
   wrappedThrower('hello').catch(e => {
     expect(e.message).toBe('foobar');
   })
+});
+
+test('stopMachinesForAnimation', () => {
+  const animationName = 'foobar';
+  const timeout = 42;
+  const clearTimeout = jest.fn();
+  const stop = jest.fn();
+
+  const machinist = { clearTimeout };
+
+  const state = {
+    animationCountdownMachines: { [animationName]: [] },
+    endlessJobMachines: { [animationName]: [[{ stop }]] },
+    phasesCountdownMachines: { [animationName]: [] },
+    springMachines: { [animationName]: [] },
+    timedJobMachines: { [animationName]: [[{ stop }]] },
+    timeouts: { [animationName]: [timeout] },
+  };
+
+  stopMachinesForAnimation(machinist, state)(animationName);
+  expect(stop).toHaveBeenCalledTimes(2);
+  expect(clearTimeout).toHaveBeenCalledWith(timeout);
+  expect(state).toEqual({
+    animationCountdownMachines: { [animationName]: null },
+    endlessJobMachines: { [animationName]: null },
+    phasesCountdownMachines: { [animationName]: null },
+    springMachines: { [animationName]: null },
+    timedJobMachines: { [animationName]: null },
+    timeouts: { [animationName]: null },
+  });
 });
 

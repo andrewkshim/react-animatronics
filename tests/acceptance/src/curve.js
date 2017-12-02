@@ -21,31 +21,27 @@ const BasicExample = props => (
   </Example>
 );
 
-export default withAnimatronics(
-  () => {
-    return [
+export default withAnimatronics([
+  {
+    myCircle: [
       {
-        myCircle: [
-          {
-            duration: 500,
-            from: {
-              top: `${ 0 }px`,
-            },
-            to: {
-              top: `${ 100 }px`,
-            },
-          },
-          {
-            duration: 750,
-            from: {
-              left: `${ 0 }px`,
-            },
-            to: {
-              left: `${ 200 }px`,
-            },
-          }
-        ],
+        duration: 500,
+        from: {
+          top: `${ 0 }px`,
+        },
+        to: {
+          top: `${ 100 }px`,
+        },
       },
-    ];
-  }
-)( BasicExample );
+      {
+        duration: 750,
+        from: {
+          left: `${ 0 }px`,
+        },
+        to: {
+          left: `${ 200 }px`,
+        },
+      }
+    ],
+  },
+])( BasicExample );
