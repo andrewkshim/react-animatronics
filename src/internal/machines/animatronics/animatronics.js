@@ -425,7 +425,6 @@ export const makeMutators = (machinist, state) => ({
       stiffness,
       damping
     );
-    // YUCK
     if (!state.springMachines[animationName]) {
       state.springMachines[animationName] = {};
     }
@@ -441,7 +440,6 @@ export const makeMutators = (machinist, state) => ({
       machinist.requestAnimationFrame,
       machinist.cancelAnimationFrame
     );
-    // YUCK
     if (!state.endlessJobMachines[animationName]) {
       state.endlessJobMachines[animationName] = {};
     }
