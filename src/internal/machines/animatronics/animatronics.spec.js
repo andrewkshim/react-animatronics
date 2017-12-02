@@ -162,7 +162,10 @@ describe('makeAnimation', () => {
 
 });
 
-test('machines/animatronics/makeMutators', () => {
+describe('makeMutators', () => {
+
+  const animationName = 'foobar';
+
   const machinist = {
     makeCountdownJobMachine: () => {
       return { registerJob: () => {} };
@@ -174,37 +177,48 @@ test('machines/animatronics/makeMutators', () => {
 
   const state = {
     animationCountdownMachines: {},
+    endlessJobMachines: {},
     phasesCountdownMachines: {},
+    springMachines: {},
     timedJobMachines: {},
+    timeouts: {},
   };
 
   const mutators = makeMutators(machinist, state);
 
-  const animationName = 'foobar';
-
-  mutators.createAnimationCountdownMachine({
-    numAnimations: 4,
-    job: () => {},
-    animationName,
+  test('createAnimationCountdownMachine', () => {
+    mutators.createAnimationCountdownMachine({
+      numAnimations: 4,
+      job: () => {},
+      animationName,
+    });
+    expect(state.animationCountdownMachines.foobar).toBeTruthy();
   });
 
-  expect(state.animationCountdownMachines.foobar).toBeTruthy();
-
-  mutators.createPhasesCountdownMachine({
-    numPhases: 3,
-    job: () => {},
-    animationName,
+  test('createPhasesCountdownMachine', () => {
+    mutators.createPhasesCountdownMachine({
+      numPhases: 3,
+      job: () => {},
+      animationName,
+    });
+    expect(state.phasesCountdownMachines.foobar).toBeTruthy();
   });
 
-  expect(state.phasesCountdownMachines.foobar).toBeTruthy();
-
-  mutators.createTimedJobMachine({
-    animationName: 'foo',
-    componentName: 'bar',
-    duration: 400,
+  test('createTimedJobMachine', () => {
+    mutators.createTimedJobMachine({
+      animationName: 'foo',
+      componentName: 'bar',
+      duration: 400,
+    });
+    expect(state.timedJobMachines.foo.bar).toBeTruthy();
   });
 
-  expect(state.timedJobMachines.foo.bar).toBeTruthy();
+  test('stopMachine', () => {
+    expect(() => {
+      mutators.stopMachine();
+    }).not.toThrow();
+  });
+
 });
 
 const runTimedAnimationMocked = animation => {

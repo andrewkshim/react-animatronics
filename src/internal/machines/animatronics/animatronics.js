@@ -580,7 +580,7 @@ export const makeMutators = (machinist, state) => ({
     state.endlessJobMachines[animationName][componentName][index].start();
   },
 
-  stopMachine: action => {
+  stopMachine: (action = {}) => {
     const { animationName } = action;
 
     if (!animationName) {
