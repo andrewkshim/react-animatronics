@@ -26,7 +26,7 @@ const withAnimatronics = (animations: Function|Array<Object>|Object) => (BaseCom
     if (!isReactComponent(BaseComponent)) {
       throw makeError(
         `The withAnimatronics() higher-order component must be used to wrap a`,
-        `valid React component but it received: ${ BaseComponent }.`
+        `valid React component.`
       );
     }
   }

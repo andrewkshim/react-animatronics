@@ -26,7 +26,7 @@ const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
     if (!isReactComponent(BaseComponent)) {
       throw makeError(
         `The withControl() higher-order component must be used to wrap a`,
-        `valid React component but it received: ${ BaseComponent }.`
+        `valid React component.`
       );
     }
   }
