@@ -1,10 +1,10 @@
 // To anyone who might judge me. Yes, this code is very stateful and ugly. It's an
 // experiment in vanilla javascript and stateful/imperative programming. I've long
 // since been a fan of functional programming with immutable data structures and
-// purity and referential integrity and all that jazz, but I wanted to go back to
-// my roots and try to bend stateful programming up until the point of breaking
-// (without actually breaking). There's a time and place for stateful programming,
-// and I think it's better to experiment with it than to completely forgo it.
+// purity and referential transparency and all that jazz, but I wanted to try
+// and bend stateful programming up until the point of breaking (without
+// actually breaking). There's a time and place for stateful programming, and I
+// think it's better to experiment with it than to completely forgo it.
 
 import Debug from 'debug'
 
