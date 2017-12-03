@@ -35,6 +35,15 @@ const EMPTY_UNIT: string = '0px';
 
 const debug = Debug('react-animatronics:fashionistas:common');
 
+const isCommaString = (str: string): boolean => {
+  return (
+    typeof str === 'string'
+    && str.includes(',')
+    && !str.includes('rgb')
+    && !str.includes('hsl')
+  );
+}
+
 export const isColorString = (str: string): boolean => {
   let color;
   try {
@@ -202,16 +211,16 @@ export const parseStyle = (raw: string|number, name: ?string): Fashion => {
     createNumberFashion(raw)
   : isNumberString(raw) ?
     createNumberFashion(raw)
-  : isColorString(raw) ?
-    createColorFashion(raw)
   : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
-  : typeof raw === 'string' && raw.includes(',') ?
+  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
+    createSpacingFashion(raw, name)
+  : isCommaString(raw) ?
     createCommaFashion(raw, name)
   : name === BOX_SHADOW ?
     createBoxShadowFashion(raw)
-  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
-    createSpacingFashion(raw, name)
+  : isColorString(raw) ?
+    createColorFashion(raw)
   : isUnitString(raw) ?
     createUnitFashion(raw)
   :
