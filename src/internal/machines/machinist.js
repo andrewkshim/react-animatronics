@@ -4,13 +4,13 @@ import { makeEndlessJobMachine } from './endless-job'
 import { makeSpringMachine } from './spring'
 import { makeTimedJobMachine } from './timed-job'
 
-export const makeMachinist = (
+export const makeMachinist = ({
   requestAnimationFrame,
   cancelAnimationFrame,
   setTimeout,
   clearTimeout,
   now,
-) => {
+}) => {
   const machinist = {
     requestAnimationFrame: (...args) => requestAnimationFrame(...args),
     cancelAnimationFrame: (...args) => cancelAnimationFrame(...args),

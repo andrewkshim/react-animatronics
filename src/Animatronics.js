@@ -89,13 +89,13 @@ class Animatronics extends React.Component<Props> {
       }
     }
 
-    const machinist = makeMachinist(
+    const machinist = makeMachinist({
       requestAnimationFrame,
       cancelAnimationFrame,
       setTimeout,
       clearTimeout,
-      now
-    );
+      now,
+    });
 
     this._animatronics = machinist.makeAnimatronicsMachine(animations);
     this._setAnimations = this._setAnimations.bind(this);
