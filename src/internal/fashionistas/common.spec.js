@@ -129,11 +129,13 @@ test('createBoxShadowFashion', () => {
   ]);
 });
 
-test('createCommaFashion', () => {
-  expect(createCommaFashion('0, 1').styles).toEqual([
-    createNumberFashion(0),
-    createNumberFashion(1),
-  ]);
+describe('createCommaFashion', () => {
+  test('should handle positive numbers', () => {
+    expect(createCommaFashion('0, 1').styles).toEqual([
+      createNumberFashion(0),
+      createNumberFashion(1),
+    ]);
+  });
 });
 
 describe('parseStyle', () => {
@@ -152,6 +154,7 @@ describe('parseStyle', () => {
 
   test('should parse strings representing numbers', () => {
     expect(parseStyle('100')).toEqual(createNumberFashion(100));
+    expect(parseStyle('-1')).toEqual(createNumberFashion(-1));
   });
 
   test('should parse transforms', () => {

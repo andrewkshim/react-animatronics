@@ -66,7 +66,7 @@ export default withAnimatronics(
               transform: 'translateX(0px)',
             },
             to: {
-              transform: 'translateX(100px)',
+              transform: 'translateX(-100px)',
             },
           },
           {
@@ -75,7 +75,7 @@ export default withAnimatronics(
               transform: 'translateY(0px)',
             },
             to: {
-              transform: 'translateY(100px)',
+              transform: 'translateY(-100px)',
             },
           },
           {

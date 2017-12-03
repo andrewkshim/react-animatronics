@@ -36,8 +36,8 @@ const CURVE = 'curve';
 const debug = Debug('animatronics:examples');
 
 const EXAMPLES = {
-  [ BASIC ]: BasicExample,
   [ EXPERIMENTAL ]: ExperimentalExample,
+  [ BASIC ]: BasicExample,
   [ SPRINGS ]: SpringsExample,
   [ INPUT ]: InputExample,
   [ CURVE ]: CurveExample,
@@ -306,7 +306,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      selectedExample: BASIC,
+      selectedExample: EXPERIMENTAL,
       clickX: null,
       clickY: null,
     };

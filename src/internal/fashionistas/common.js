@@ -45,10 +45,12 @@ export const isColorString = (str: string): boolean => {
   return !!color;
 }
 
-// replace decimals otherwise it'll get caught by the NON_NUMBER_REGEX
+// NOTE: replace decimals and negative signs otherwise it'll get caught by the
+// NON_NUMBER_REGEX
+// TODO: why is the NON_NUMBER_REGEX check in here?
 export const isNumberString = (str: string): boolean => (
   !isNaN(parseFloat(str))
-  && !NON_NUMER_REGEX.test(str.replace('.', ''))
+  && !NON_NUMER_REGEX.test(str.replace('.', '').replace('-', ''))
 );
 
 // FIXME: can have false positives
@@ -133,7 +135,10 @@ export const createSpacingFashion = (raw: string, name: string): CompositeFashio
 export const createCommaFashion = (raw: string, name: ?string): CompositeFashion => ({
   isCompositeType: true,
   isCommaType: true,
-  styles: raw.replace(ALL_COMMAS_REGEX, ',').split(',').map(style => parseStyle(style, name)),
+  styles: raw
+    .split(',')
+    .map(s => s.trim())
+    .map(style => parseStyle(style, name)),
 });
 
 export const createBoxShadowFashion = (raw: string): CompositeFashion => {
