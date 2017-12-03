@@ -91,8 +91,9 @@ export const createUnitFashion = (raw: string): UnitFashion => {
 export const parseTransformName = (transform: string): string =>
   transform.slice(0, transform.indexOf('('));
 
-const parseTransformStyle = (transform: string): Fashion =>
-  parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
+const parseTransformStyle = (transform: string): Fashion => {
+  return parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
+}
 
 const normalizeRawTransform = (raw: string): string[] => raw
   .replace(ALL_COMMAS_REGEX, ',')
