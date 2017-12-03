@@ -5,10 +5,19 @@
  * @module internal/fashionistas/spring
  */
 
+import type { Styles, Fashion, CompositeFashion } from '../flow-types'
+
 import chroma from 'chroma-js'
 
-import type { Styles, Fashion, CompositeFashion } from '../flow-types'
-import { parseStyle, stringifyFashion } from './common'
+import {
+  parseStyle,
+  stringifyFashion,
+  pluckTransforms,
+} from './common'
+
+import {
+  TRANSFORM,
+} from '../constants'
 
 export const interpolateValue = (
   currentValue: number,
@@ -54,26 +63,41 @@ const interpolateCompositeFashion = (
   };
 }
 
-export const reconstructStyles = (
+export const constructStyles = (
   fromStyles: Styles,
   toStyles: Styles,
   styleNames: string[],
   springValues: number[],
+  transformations: string[],
 ): Styles => {
   return styleNames.reduce(
-    (reconstructed, styleName, index) => {
-      const from = parseStyle(fromStyles[styleName], styleName);
-      const to = parseStyle(toStyles[styleName], styleName);
+    (constructed, styleName, index) => {
+      const rawFrom = fromStyles[styleName];
+      const rawTo = toStyles[styleName];
+
+      const from = styleName !== TRANSFORM
+        ? rawFrom
+        // $FlowFixMe: need to tell flow that "rawFrom" will always be an Object at this point
+        : pluckTransforms(rawFrom, transformations);
+
+      const to = styleName !== TRANSFORM
+        ? rawTo
+        // $FlowFixMe: need to tell flow that "rawTo" will always be an Object at this point
+        : pluckTransforms(rawTo, transformations);
+
+      const fromFashion: Fashion = parseStyle(from, styleName);
+      const toFashion: Fashion = parseStyle(to, styleName);
       const value = springValues[index];
-      reconstructed[styleName] = stringifyFashion(
-        from.isBasicType && to.isBasicType ?
-          interpolateFashion(from, to, value)
-        : from.isCompositeType && to.isCompositeType ?
-          interpolateCompositeFashion(from, to, value)
+
+      constructed[styleName] = stringifyFashion(
+        fromFashion.isBasicType && toFashion.isBasicType ?
+          interpolateFashion(fromFashion, toFashion, value)
+        : fromFashion.isCompositeType && toFashion.isCompositeType ?
+          interpolateCompositeFashion(fromFashion, toFashion, value)
         :
-          to
+          toFashion
       );
-      return reconstructed;
+      return constructed;
     },
     {}
   );

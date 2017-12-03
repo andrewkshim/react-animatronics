@@ -21,15 +21,17 @@ describe('constructStyles', () => {
 
   test('should handle transform styles', () => {
     expect(constructStyles(
-      { transform: 'translateX(0px)' },
-      { transform: 'translateX(100px)' },
+      { transform: { translateX: 'translateX(0px)' } },
+      { transform: { translateX: 'translateX(100px)' } },
       0.5,
+      ['translateX']
     )).toEqual({ transform: 'translateX(50px)' });
 
     expect(constructStyles(
-      { transform: 'matrix(1, 0, 0, 1, 0, 0)' },
-      { transform: 'matrix(1, 0, 0, 1, 0, -100)' },
+      { transform: { matrix: 'matrix(1, 0, 0, 1, 0, 0)' } },
+      { transform: { matrix: 'matrix(1, 0, 0, 1, 0, -100)' } },
       0.7,
+      ['matrix']
     )).toEqual({ transform: 'matrix(1, 0, 0, 1, 0, -70)' });
   });
 

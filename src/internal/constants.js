@@ -8,6 +8,7 @@ import BezierEasing from 'bezier-easing'
 
 export const BOX_SHADOW = 'boxShadow';
 export const TRANSFORM = 'transform';
+export const TRANSFORM_DELIMITER = ') ';
 
 export const MS_PER_ANIMATION_FRAME: number = 1000 / 60;
 
@@ -51,3 +52,8 @@ export const DEFAULT_CLEAR_TIMEOUT: Function = (
 export const DEFAULT_NOW: Function = Date.now;
 
 export const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
+
+// An style attribute that will be the default to use when doing length conversions.
+// Remember that this attribute must be able to have negative values.
+export const DEFAULT_DOM_LENGTH_ATTR = 'top';
+

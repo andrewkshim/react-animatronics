@@ -48,7 +48,7 @@ export type StaticFashion = {|
   value: string,
 |}
 
-export type BasicFashion = ColorFashion | NumberFashion | UnitFashion;
+export type BasicFashion = ColorFashion|NumberFashion|UnitFashion;
 
 export type CompositeFashion = {|
   isCompositeType: true,
@@ -57,9 +57,9 @@ export type CompositeFashion = {|
   styles: Fashion[],
 |}
 
-export type Fashion = BasicFashion | CompositeFashion | StaticFashion;
+export type Fashion = BasicFashion|CompositeFashion|StaticFashion;
 
-export type Styles = { [string]: string | number };
+export type Styles = { [string]: string|number };
 
 export type DOMNode = Object;
 

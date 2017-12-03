@@ -2,7 +2,7 @@ import type { VoidFn, Styles } from '../../flow-types'
 
 import { noop } from '../utils'
 import { parseStyle } from '../fashionistas/common'
-import { reconstructStyles, interpolateValue } from '../fashionistas/spring'
+import { constructStyles, interpolateValue } from '../fashionistas/spring'
 import {
   SECONDS_PER_ANIMATION_FRAME,
   MS_PER_ANIMATION_FRAME,
@@ -142,11 +142,12 @@ const runNextFrame = (state, mutators) => (
 ) => {
   if (isStopped(state)) {
     if (state.numStops === MIN_STOPS) {
-      const updatedStyles = reconstructStyles(
+      const updatedStyles = constructStyles(
         state.normalizedFrom,
         state.normalizedTo,
         state.styleNames,
-        state.endValues
+        state.endValues,
+        state.transformations
       );
       onComplete(updatedStyles);
       return;
@@ -170,11 +171,12 @@ const runNextFrame = (state, mutators) => (
   syncToLatestFrame(state, mutators)(numFramesBehind);
   moveToNextFrame(state, mutators)(progress);
 
-  const updatedStyles = reconstructStyles(
+  const updatedStyles = constructStyles(
     state.normalizedFrom,
     state.normalizedTo,
     state.styleNames,
-    state.values
+    state.values,
+    state.transformations
   );
   onNext(updatedStyles);
 
@@ -189,6 +191,7 @@ export const makeSpringMachine = machinist => (
   normalizedTo: Styles,
   stiffness: number,
   damping: number,
+  transformations: string[] = [],
 ) => {
   const styleNames = Object.keys(normalizedFrom);
   const state = {
@@ -197,6 +200,7 @@ export const makeSpringMachine = machinist => (
     stiffness,
     damping,
     styleNames,
+    transformations,
     endValues: styleNames.map(() => 1),
     prevTime: Date.now(),
     accumulatedTime: 0,

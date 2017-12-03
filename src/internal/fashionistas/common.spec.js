@@ -19,6 +19,7 @@ import {
   isNumberString,
   isUnitString,
   haveConvertibleUnits,
+  separateTransformNames,
 } from './common'
 
 test('createColorFashion creates a valid ColorFashion', () => {
@@ -265,4 +266,9 @@ test('isUnitString', () => {
   // FIXME: this test should fail in a more thorough implementation,
   // we could check the actual unit string to see if its valid.
   expect(isUnitString('24unknownunit')).toBe(true);
+});
+
+test('separateTransformNames', () => {
+  expect(separateTransformNames('translate(0px, 0px) scale(0)'))
+    .toEqual(['translate', 'scale']);
 });

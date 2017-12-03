@@ -2,7 +2,7 @@ import { parseStyle } from './common'
 import {
   interpolateValue,
   interpolateFashion,
-  reconstructStyles,
+  constructStyles,
 } from './spring'
 
 test('interpolateValue', () => {
@@ -30,11 +30,11 @@ test('interpolateFashion', () => {
   expect(interpolatedUnit.value).toBe(42);
 });
 
-describe('reconstructStyles', () => {
+describe('constructStyles', () => {
 
   test('should reconstruct basic styles', () => {
     expect(
-      reconstructStyles(
+      constructStyles(
         { left: '0px', top: '0px' },
         { left: '100px', top: '100px' },
         ['left', 'top'],
@@ -45,22 +45,24 @@ describe('reconstructStyles', () => {
 
   test('should reconstruct transform styles', () => {
     expect(
-      reconstructStyles(
-        { transform: 'scale(1)' },
-        { transform: 'scale(1.5)' },
+      constructStyles(
+        { transform: { scale: 'scale(1)' } },
+        { transform: { scale: 'scale(1.5)' } },
         ['transform'],
         [0.5],
+        ['scale']
       )
      ).toEqual({ transform: 'scale(1.25)' });
   });
 
   test('should reconstruct complex styles', () => {
     expect(
-      reconstructStyles(
-        { transform: 'scale(1, 1)' },
-        { transform: 'scale(1.5, 2)' },
+      constructStyles(
+        { transform: { scale: 'scale(1, 1)' } },
+        { transform: { scale: 'scale(1.5, 2)' } },
         ['transform'],
         [0.5, 0.5],
+        ['scale']
       )
      ).toEqual({ transform: 'scale(1.25, 1.5)' });
   });

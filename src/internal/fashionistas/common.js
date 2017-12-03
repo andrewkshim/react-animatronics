@@ -29,6 +29,7 @@ import {
 import {
   BOX_SHADOW,
   TRANSFORM,
+  TRANSFORM_DELIMITER,
 } from '../constants'
 
 const EMPTY_UNIT: string = '0px';
@@ -265,7 +266,11 @@ export const stringifyFashion = (style: Fashion): string => (
 // IMPROVE: By default, all "transforms" will be converted, even if they have
 // the same units. We can be more efficient about this, but it's unclear if
 // that's worth it right now.
-export const haveConvertibleUnits = (rawA: string, rawB: string, styleName: string): boolean => {
+export const haveConvertibleUnits = (
+  rawA: string,
+  rawB: string,
+  styleName: string
+): boolean => {
   if (styleName === TRANSFORM) return true;
   const fashionA = parseStyle(rawA, styleName);
   const fashionB = parseStyle(rawB, styleName);
@@ -273,3 +278,38 @@ export const haveConvertibleUnits = (rawA: string, rawB: string, styleName: stri
     ? false
     : fashionA.unit !== fashionB.unit;
 };
+
+const lastChar = (s: string) => s[s.length - 1];
+
+export const separateTransformNames = (transform: string) => {
+  const separated = transform
+    .split(TRANSFORM_DELIMITER)
+    .map(s => lastChar(s) === ')' ? s : `${s})`)
+    .map(parseTransformName);
+  return separated;
+}
+const separateTransforms = (str: string): string[] => !str.includes(TRANSFORM_DELIMITER) ? [str] : str
+  .split(TRANSFORM_DELIMITER)
+  .map(s => lastChar(s) === ')' ? s : `${s})`)
+  .sort();
+
+export const parseTransformsSeparately = (transforms: string) => {
+  return separateTransforms(transforms)
+    .reduce((result, transform) => {
+      const name = parseTransformName(transform);
+      result[name] = transform;
+      return result;
+    }, {})
+};
+
+export const pluckTransforms = (
+  styles: Object,
+  transformations: string[]
+) => {
+  return Object.keys(styles)
+    .map(transformName => {
+      return transformations.includes(transformName) ? styles[transformName] : '';
+    })
+    .filter(t => !!t)
+    .join(' ');
+}

@@ -1,6 +1,5 @@
 import {
   makeError,
-  multiplyMatrices,
 } from './utils'
 
 test('makeError', () => {
@@ -21,38 +20,3 @@ test('makeError', () => {
   );
 });
 
-describe('multiplyMatrices', () => {
-
-  const identity = [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1,
-  ];
-  const matrixA = [
-    1, 2, 3, 4,
-    1, 2, 3, 4,
-    1, 2, 3, 4,
-    1, 2, 3, 4,
-  ];
-  const matrixB = [
-    1, 1, 1, 1,
-    2, 2, 2, 2,
-    3, 3, 3, 3,
-    4, 4, 4, 4,
-  ];
-
-  test('should correctly multiply with the identity matrix', () => {
-    expect(multiplyMatrices(matrixA, identity)).toEqual(matrixA);
-  });
-
-  test('should correctly multiply two different matrices', () => {
-    expect(multiplyMatrices(matrixA, matrixB)).toEqual([
-      30, 30, 30, 30,
-      30, 30, 30, 30,
-      30, 30, 30, 30,
-      30, 30, 30, 30,
-    ]);
-  });
-
-});

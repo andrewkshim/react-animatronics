@@ -18,7 +18,9 @@ const makeRecorder = () => {
         updatedStyles,
         updateStyles,
       });
+    },
 
+    flush() {
       listeners.forEach(listener => {
         listener(recordings);
       });

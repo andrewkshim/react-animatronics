@@ -8,7 +8,7 @@ import {
   makeMutators,
   makeAnimation,
   mergeStringTransforms,
-  parseMatrix,
+  normalizeCombinedTransforms,
   playAnimation,
   promisifyIfCallback,
   reset,
@@ -395,15 +395,6 @@ describe('checkHasUniqueTransforms', () => {
 
 });
 
-test('parseMatrix', () => {
-  expect(parseMatrix('matrix(1, 2, 3, 4, 10, 10)')).toEqual([
-     1,  2, 0, 0,
-     3,  4, 0, 0,
-     0,  0, 1, 0,
-    10, 10, 0, 1,
-  ]);
-});
-
 test('mergeStringTransforms', () => {
   const animations = [
     { to: { transform: 'scale(0)' } },
@@ -411,3 +402,4 @@ test('mergeStringTransforms', () => {
   ];
   expect(mergeStringTransforms(animations)).toBe('scale(0) translateX(100px)');
 });
+

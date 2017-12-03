@@ -5,11 +5,17 @@
  * @module internal/fashionistas/timed
  */
 
+import type { Fashion, Styles } from '../flow-types'
+
 import chroma from 'chroma-js'
 
-import { parseStyle, stringifyFashion } from './common'
+import {
+  parseStyle,
+  stringifyFashion,
+  pluckTransforms,
+} from './common'
 
-import type { Fashion, Styles } from '../flow-types'
+import { TRANSFORM } from '../constants'
 
 export const calculateCurrentValue = (
   startValue: number,
@@ -63,11 +69,26 @@ export const constructStyles = (
   fromStyles: Styles,
   toStyles: Styles,
   progress: number,
+  transformations: string[] = [],
 ): Styles =>
   Object.keys(fromStyles).reduce(
     (currentStyles: Styles, styleName: string) => {
-      const startFashion: Fashion = parseStyle(fromStyles[styleName], styleName);
-      const endFashion: Fashion = parseStyle(toStyles[styleName], styleName);
+      const rawFrom = fromStyles[styleName];
+      const rawTo = toStyles[styleName];
+
+      const from = styleName !== TRANSFORM
+        ? rawFrom
+        // $FlowFixMe: need to tell flow that "rawFrom" will always be an Object at this point
+        : pluckTransforms(rawFrom, transformations);
+
+      const to = styleName !== TRANSFORM
+        ? rawTo
+        // $FlowFixMe: need to tell flow that "rawTo" will always be an Object at this point
+        : pluckTransforms(rawTo, transformations);
+
+      const startFashion: Fashion = parseStyle(from, styleName);
+      const endFashion: Fashion = parseStyle(to, styleName);
+
       currentStyles[styleName] = stringifyFashion(
         calculateFashion(startFashion, endFashion, progress)
       );

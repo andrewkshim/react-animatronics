@@ -204,6 +204,29 @@ const AnimationRowCurrentFrameInput = ({ numFrames, frameNum, setFrameNum }) => 
   />
 );
 
+const runFrame = ({
+  index,
+  numFrames,
+  recording,
+  setFrameNum,
+  prevTimestamp,
+}) => {
+  const currentTimestamp = getFrameElapsedTime(recording, index);
+  const duration = currentTimestamp - prevTimestamp;
+  setTimeout(() => {
+    setFrameNum(index);
+    if (index < numFrames) {
+      runFrame({
+        setFrameNum,
+        recording,
+        numFrames,
+        prevTimestamp: currentTimestamp,
+        index: index + 1,
+      });
+    }
+  }, duration);
+}
+
 const AnimationRowControls = ({ frameNum, numFrames, recording, setFrameNum }) => (
   <div style={{
     boxSizing: 'border-box',
@@ -233,12 +256,13 @@ const AnimationRowControls = ({ frameNum, numFrames, recording, setFrameNum }) =
       }}
       onClick={ev => {
         const startTime = getFrameElapsedTime(recording, 0);
-        for (let index = 0; index < numFrames; index++) {
-          const elapsedTime = getFrameElapsedTime(recording, index);
-          setTimeout(() => {
-            setFrameNum(index + 1);
-          }, elapsedTime - startTime);
-        }
+        runFrame({
+          setFrameNum,
+          recording,
+          numFrames,
+          prevTimestamp: startTime,
+          index: 0,
+        });
       }}
     >
       Replay
@@ -271,7 +295,7 @@ class AnimationRow extends React.Component {
     if (nextNum !== prevNum) {
       Object.values(recording).forEach(frames => {
         if (nextNum < frames.length) {
-          const { updatedStyles, updateStyles } = frames[nextNum];
+          const { updatedStyles, updateStyles, componentName, animationName } = frames[nextNum];
           updateStyles(updatedStyles);
         }
       })

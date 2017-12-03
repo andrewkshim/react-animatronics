@@ -51,22 +51,20 @@ export default withAnimatronics(
           {
             duration,
             from: {
-              top: `${ topA }px`,
-              left: `${ leftA }px`,
+              transform: 'scale(1.0)',
             },
             to: {
-              top: `${ topB }px`,
-              left: `${ leftB }px`,
+              transform: 'scale(2.0)',
             },
           },
           {
-            stiffness: 200,
-            damping: 10,
+            stiffness: 50,
+            damping: 5,
             from: {
               transform: 'translateX(0px)',
             },
             to: {
-              transform: 'translateX(-100px)',
+              transform: 'translateX(-200px)',
             },
           },
           {
@@ -75,29 +73,17 @@ export default withAnimatronics(
               transform: 'translateY(0px)',
             },
             to: {
-              transform: 'translateY(-100px)',
-            },
-          },
-          {
-            duration: duration / 3,
-            from: {
-              transform: 'scale(1)',
-            },
-            to: {
-              transform: 'scale(1.56)',
+              transform: 'translateY(10rem)',
             },
           },
         ],
         circleB: {
-          stiffness: 200,
-          damping: 10,
+          duration,
           from: {
-            top: `${ topB }pt`,
-            left: `${ leftB }px`,
+            transform: 'translateY(0px)',
           },
           to: {
-            top: `${ topC }px`,
-            left: `${ leftC }px`,
+            transform: 'translateY(-10rem)',
           },
         },
         circleC: {
