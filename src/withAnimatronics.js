@@ -18,7 +18,9 @@ import {
   makeError,
 } from './internal/utils'
 
-type Props = {};
+type Props = {
+  innerRef: Function,
+};
 
 const withAnimatronics = (animations: Function|Array<Object>|Object) => (BaseComponent: ComponentType<{}>) => {
 
@@ -33,11 +35,13 @@ const withAnimatronics = (animations: Function|Array<Object>|Object) => (BaseCom
 
   class AnimatronicsComponent extends React.Component<Props> {
     render() {
+      const { innerRef, ...props } = this.props;
       return (
-        <Animatronics animations={ animations }>{ props =>
+        <Animatronics animations={ animations }>{ animatronicProps =>
           <BaseComponent
-            { ...this.props }
+            ref={ innerRef }
             { ...props }
+            { ...animatronicProps }
           />
         }</Animatronics>
       );
