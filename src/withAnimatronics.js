@@ -13,6 +13,7 @@ import Animatronics from './Animatronics'
 import { IS_PRODUCTION } from './internal/constants'
 
 import {
+  getDisplayName,
   isStatelessComponent,
   isReactComponent,
   makeError,
@@ -47,6 +48,7 @@ const withAnimatronics = (animations: Function|Array<Object>|Object) => (BaseCom
       );
     }
   }
+  AnimatronicsComponent.displayName = `withAnimatronics(${ getDisplayName(BaseComponent) })`;
 
   return hoistNonReactStatics(AnimatronicsComponent, BaseComponent);
 }

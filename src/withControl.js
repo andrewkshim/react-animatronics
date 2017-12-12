@@ -13,6 +13,7 @@ import Control from './Control'
 import { IS_PRODUCTION } from './internal/constants'
 
 import {
+  getDisplayName,
   isStatelessComponent,
   isReactComponent,
   makeError,
@@ -52,6 +53,7 @@ const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
       );
     }
   }
+  ControlledComponent.displayName = `withControl(${ getDisplayName(BaseComponent) })`;
 
   return hoistNonReactStatics(ControlledComponent, BaseComponent);
 }
