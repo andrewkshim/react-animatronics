@@ -18,7 +18,9 @@ import {
   makeError,
 } from './internal/utils'
 
-type Props = {};
+type Props = {
+  innerRef: Function,
+};
 
 const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
 
@@ -35,12 +37,16 @@ const withControl = (name: string) => (BaseComponent: ComponentType<{}>) => {
     static contextTypes: Object = ContextTypes
 
     render() {
+      const { innerRef, ...props } = this.props;
       return (
         <Control name={ name }>{ ({ animatronicStyles, ref }) =>
           <BaseComponent
             { ...this.props }
             animatronicStyles={ animatronicStyles }
-            ref={ isStatelessComponent(BaseComponent) ? null : ref }
+            ref={ isStatelessComponent(BaseComponent) ? null : element => {
+              innerRef && innerRef(element);
+              ref(element);
+            } }
           />
         }</Control>
       );
