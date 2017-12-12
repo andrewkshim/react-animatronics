@@ -54,3 +54,10 @@ export const isUsingTime = (animation: Object): boolean =>
 export const isUsingSpring = (animation: Object): boolean =>
   animation.stiffness != null && animation.damping != null;
 
+export const getDisplayName = (Component: Object|string): string =>
+  typeof Component === 'string' ?
+    Component
+  : !Component ?
+    'undefined'
+  :
+    Component.displayName || Component.name || 'Unknown'
