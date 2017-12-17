@@ -77,6 +77,7 @@ export const normalizeCombinedTransforms = (
 }
 
 export const normalizeStyles = ({
+  componentName,
   getComputedStyle,
   node,
   fromStyles,

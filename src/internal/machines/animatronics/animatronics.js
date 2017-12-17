@@ -124,6 +124,7 @@ export const runTimedAnimation = (state, mutators) => (
     && separateTransformNames(animation.from.transform);
 
   const { normalizedFrom, normalizedTo } = normalizeStyles({
+    componentName,
     getComputedStyle: mutators.getComputedStyle,
     node: state.nodes[componentName],
     fromStyles,
