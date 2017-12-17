@@ -64,7 +64,7 @@ export default withAnimatronics(
               transform: 'translateX(0px)',
             },
             to: {
-              transform: 'translateX(calc(100% - 200px))',
+              transform: 'translateX(calc((100% - 200px) * -1))',
             },
           },
           {

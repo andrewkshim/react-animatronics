@@ -1,16 +1,17 @@
 import Debug from 'debug'
 
 import {
+  createTransformFashion,
   createUnitFashion,
   haveConvertibleUnits,
+  parseInnerTransformValue,
+  parseStyle,
   parseTransformsSeparately,
-  createTransformFashion,
-  stringifyUnit,
+  splitTransforms,
   stringifyFashion,
 } from '../../fashionistas/common'
 
 import {
-  DEFAULT_DOM_LENGTH_ATTR,
   TRANSFORM,
 } from '../../constants'
 
@@ -22,30 +23,52 @@ import {
 const debug = Debug('react-animatronics:machines:animatronics:normalizer');
 
 const parseAnimationTransforms = (animation, type) => {
-  const transforms = animation[type].transform
-    .split(') ')
-    .map(s => s[s.length - 1] === ')' ? s : `${s})`)
+  const transforms = splitTransforms(animation[type].transform)
     .map(createTransformFashion);
   return transforms;
 };
 
-const normalizeFashions = (getComputedStyle, node, fashions) => {
+const normalizeTransform = (getComputedStyle, node, fashions) => {
   const normalized = fashions
     .reduce((result, fashion) => {
       // NOTE: There should only ever be one name and style at this point.
       const name = fashion.names[0];
       const style = fashion.styles[0];
+      const transform = stringifyFashion(fashion);
       if (style.isUnitType || style.isCalcType) {
-        const styleStr = stringifyUnit(style);
-        const currentLength = node.style[DEFAULT_DOM_LENGTH_ATTR];
-        node.style[DEFAULT_DOM_LENGTH_ATTR] = styleStr;
+        const styleStr = stringifyFashion(style);
+        const currentLength = node.style.transform;
+        //node.style[domLengthAttr] = styleStr;
+        node.style.transform = transform;
 
-        const updatedLength = getComputedStyle(node)[DEFAULT_DOM_LENGTH_ATTR];
-        node.style[DEFAULT_DOM_LENGTH_ATTR] = currentLength;
+        const updatedMatrix = getComputedStyle(node).transform;
+        const matrix = parseInnerTransformValue(updatedMatrix);
+        const matrixValues = matrix.split(', ');
+        node.style.transform = currentLength;
+
+        // FIXME: using static checks? Can probably implement a more generic solution
+        // by operating on the matrices.
+        const updatedLength = (
+          name === 'translateX' ?
+            matrixValues[4]
+          : name === 'translateY' ?
+            matrixValues[5]
+          : name === 'translateZ' ?
+            matrixValues[6]
+          :
+            null
+        );
+
+        if (updatedLength === null) {
+          throw makeError(
+            `Attempted to normalize a transform but react-animatronics does`,
+            `not know how to deal with "${ name }".`
+          );
+        }
 
         result[name] = stringifyFashion({
           ...fashion,
-          styles: [createUnitFashion(updatedLength)]
+          styles: [parseStyle(`${ updatedLength }px`)]
         });
       } else {
         result[name] = stringifyFashion(fashion);
@@ -76,8 +99,8 @@ export const normalizeCombinedTransforms = (
     );
   }
 
-  const normalizedFromTransform = normalizeFashions(getComputedStyle, node, fromFashions);
-  const normalizedToTransform = normalizeFashions(getComputedStyle, node, toFashions);
+  const normalizedFromTransform = normalizeTransform(getComputedStyle, node, fromFashions);
+  const normalizedToTransform = normalizeTransform(getComputedStyle, node, toFashions);
   return { normalizedFromTransform, normalizedToTransform };
 }
 

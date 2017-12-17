@@ -53,7 +53,3 @@ export const DEFAULT_NOW: Function = Date.now;
 
 export const DEFAULT_EASING_FN = BezierEasing(0.4, 0.0, 0.2, 1);
 
-// An style attribute that will be the default to use when doing length conversions.
-// Remember that this attribute must be able to have negative values.
-export const DEFAULT_DOM_LENGTH_ATTR = 'top';
-

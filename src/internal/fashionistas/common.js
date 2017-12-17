@@ -125,6 +125,38 @@ const last = (array: any[]) => {
   return array[array.length - 1];
 }
 
+// FIXME: Lots of imperative code here, there must be a better way.  To goal is
+// to correctly split any valid CSS transforms, which can have nested parens
+// e.g. "translateX(100px) translateY(calc((100% - 40px) * -1))"
+export const splitTransforms = (transforms: string) => {
+  let openParenCount = 0;
+  const startingCharIndexes = [];
+  const chars = transforms.split('');
+  const splits = [];
+  for (let i = 0; i < chars.length; ++i) {
+    const c = chars[i];
+    if (c === ' ') {
+      continue;
+    } else if (startingCharIndexes.length === 0) {
+      startingCharIndexes.push(i);
+    } else if (c === '(') {
+      openParenCount += 1;
+    } else if (c === ')') {
+      if (openParenCount === 1) {
+        splits.push(
+          chars
+            .slice(startingCharIndexes.pop(), i + 1)
+            .join('')
+        );
+        openParenCount -= 1;
+      } else if (openParenCount > 1) {
+        openParenCount -= 1;
+      }
+    }
+  }
+  return splits;
+}
+
 /**
  * @param string value e.g. "translateX(100x)", "translateY(calc(100% - 40px))"
  * @returns string e.g. "100px", "calc(100% - 40px)"
@@ -140,15 +172,10 @@ const parseTransformStyle = (transform: string): Fashion => {
   return parseStyle(parseInnerTransformValue(transform));
 }
 
-const normalizeRawTransform = (raw: string): string[] => raw
-  .replace(ALL_COMMAS_REGEX, ',')
-  .split(') ')
-  .map(s => s[s.length - 1] === ')' ? s : `${s})`); // TODO: consolidate logic
-
 export const createTransformFashion = (raw: string): CompositeFashion => ({
   isCompositeType: true,
-  names: normalizeRawTransform(raw).map(parseTransformName),
-  styles: normalizeRawTransform(raw).map(parseTransformStyle),
+  names: splitTransforms(raw).map(parseTransformName),
+  styles: splitTransforms(raw).map(parseTransformStyle),
 });
 
 /**
@@ -250,7 +277,7 @@ export const parseStyle = (raw: string|number, name: ?string): Fashion => {
     createNumberFashion(raw)
   : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
-  : typeof raw === 'string' && raw.includes('calc') ?
+  : typeof raw === 'string' && (raw.includes('calc') || raw.includes('matrix')) ?
     createCalcFashion(raw)
   : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
@@ -265,6 +292,8 @@ export const parseStyle = (raw: string|number, name: ?string): Fashion => {
   :
     createStaticFashion(raw)
 };
+
+export const stringifyCalc = (calc: CalcFashion) => calc.value;
 
 export const stringifyColor = (color: ColorFashion) => `${ chroma(color.value).hex() }`;
 
@@ -283,16 +312,19 @@ export const stringifyComposite = (composite: CompositeFashion) => composite.sty
   }, [])
   .join(composite.isCommaType ? ', ' : ' ');
 
-const stringifyBasic = (style: Fashion): string => (
-  style.isColorType ?
-    stringifyColor(style)
-  : style.isNumberType ?
-    stringifyNumber(style)
-  : style.isUnitType ?
-    stringifyUnit(style)
+const stringifyBasic = (fashion: Fashion): string => {
+  debug('stringifying basic fashion %o', fashion);
+  return fashion.isColorType ?
+    stringifyColor(fashion)
+  : fashion.isNumberType ?
+    stringifyNumber(fashion)
+  : fashion.isUnitType ?
+    stringifyUnit(fashion)
+  : fashion.isCalcType ?
+    stringifyCalc(fashion)
   :
     ''
-);
+};
 
 export const stringifyFashion = (style: Fashion): string => (
   style.isCompositeType ?
@@ -323,19 +355,14 @@ export const haveConvertibleUnits = (
 const lastChar = (s: string) => s[s.length - 1];
 
 export const separateTransformNames = (transform: string) => {
-  const separated = transform
-    .split(TRANSFORM_DELIMITER)
-    .map(s => lastChar(s) === ')' ? s : `${s})`)
+  const separated = splitTransforms(transform)
     .map(parseTransformName);
   return separated;
 }
-const separateTransforms = (str: string): string[] => !str.includes(TRANSFORM_DELIMITER) ? [str] : str
-  .split(TRANSFORM_DELIMITER)
-  .map(s => lastChar(s) === ')' ? s : `${s})`)
-  .sort();
 
 export const parseTransformsSeparately = (transforms: string) => {
-  return separateTransforms(transforms)
+  return splitTransforms(transforms)
+    .sort()
     .reduce((result, transform) => {
       const name = parseTransformName(transform);
       result[name] = transform;

@@ -10,7 +10,9 @@ import {
   createCommaFashion,
   parseInnerTransformValue,
   parseStyle,
+  splitTransforms,
 
+  stringifyCalc,
   stringifyColor,
   stringifyNumber,
   stringifyComposite,
@@ -24,12 +26,31 @@ import {
   separateTransformNames,
 } from './common'
 
+describe('splitTransforms', () => {
+
+  test('should handle basic transforms', () => {
+    expect(splitTransforms('translateX(100px) translateY(50px)'))
+      .toEqual(['translateX(100px)', 'translateY(50px)']);
+  });
+
+  test('should handle transforms with parens', () => {
+    expect(splitTransforms('translateX(100px) translateY(calc((100% - 40px) * -1))'))
+      .toEqual(['translateX(100px)', 'translateY(calc((100% - 40px) * -1))']);
+
+    expect(splitTransforms('translateX(calc((100% - 40px)))'))
+      .toEqual(['translateX(calc((100% - 40px)))']);
+  });
+});
+
 describe('parseInnerTransformValue', () => {
   test('should handle basic values', () => {
     expect(parseInnerTransformValue('translateX(100px)')).toBe('100px');
   });
   test('should handle values with parens', () => {
-    expect(parseInnerTransformValue('translateX(calc(100% - 40px))')).toBe('calc(100% - 40px)');
+    expect(parseInnerTransformValue('translateX(calc(100% - 40px))'))
+      .toBe('calc(100% - 40px)');
+    expect(parseInnerTransformValue('translateX(calc((100% - 40px) * -1))'))
+      .toBe('calc((100% - 40px) * -1)');
   });
 });
 
@@ -253,29 +274,45 @@ test('stringifyUnit creates the correct style string', () => {
   expect(actualUnitStyleStr).toBe(expectedUnitStyleStr);
 });
 
-test('stringifyStyle creates the correct style strings', () => {
-  const colorFashion = createColorFashion('black');
-  const actualColorStyleStr = stringifyFashion(colorFashion);
-  const expectedColorStyleStr = stringifyColor(colorFashion);
-  expect(actualColorStyleStr).toBe(expectedColorStyleStr);
+describe('stringifyFashion', () => {
+  test('should handle color fashions', () => {
+    const colorFashion = createColorFashion('black');
+    const actualColorStyleStr = stringifyFashion(colorFashion);
+    const expectedColorStyleStr = stringifyColor(colorFashion);
+    expect(actualColorStyleStr).toBe(expectedColorStyleStr);
+  });
 
-  const numberFashion = createNumberFashion(42);
-  const actualNumberStyleStr = stringifyFashion(numberFashion);
-  const expectedNumberStyleStr = stringifyNumber(numberFashion);
-  expect(actualNumberStyleStr).toBe(expectedNumberStyleStr);
+  test('should handle number fashions', () => {
+    const numberFashion = createNumberFashion(42);
+    const actualNumberStyleStr = stringifyFashion(numberFashion);
+    const expectedNumberStyleStr = stringifyNumber(numberFashion);
+    expect(actualNumberStyleStr).toBe(expectedNumberStyleStr);
+  });
 
-  const transformFashion = createTransformFashion('translateZ(42deg)');
-  expect(stringifyFashion(transformFashion))
-    .toBe(stringifyComposite(transformFashion));
+  test('should handle transform fashions', () => {
+    const transformFashion = createTransformFashion('translateZ(42deg)');
+    expect(stringifyFashion(transformFashion))
+      .toBe(stringifyComposite(transformFashion));
+  });
 
-  const spacingFashion = createSpacingFashion('10px 20px');
-  expect(stringifyFashion(spacingFashion))
-    .toBe(stringifyComposite(spacingFashion));
+  test('should handle spacing fashions', () => {
+    const spacingFashion = createSpacingFashion('10px 20px');
+    expect(stringifyFashion(spacingFashion))
+      .toBe(stringifyComposite(spacingFashion));
+  });
 
-  const unitFashion = createUnitFashion('42px');
-  const actualUnitStyleStr = stringifyFashion(unitFashion);
-  const expectedUnitStyleStr = stringifyUnit(unitFashion);
-  expect(actualUnitStyleStr).toBe(expectedUnitStyleStr);
+  test('should handle unit fashions', () => {
+    const unitFashion = createUnitFashion('42px');
+    const actualUnitStyleStr = stringifyFashion(unitFashion);
+    const expectedUnitStyleStr = stringifyUnit(unitFashion);
+    expect(actualUnitStyleStr).toBe(expectedUnitStyleStr);
+  });
+
+  test('should handle calc fashions', () => {
+    const calcFashion = createCalcFashion('calc(100% - 40px)');
+    expect(stringifyFashion(calcFashion))
+      .toBe(stringifyCalc(calcFashion));
+  });
 });
 
 test('haveConvertibleUnits', () => {

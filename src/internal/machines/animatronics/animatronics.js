@@ -101,8 +101,6 @@ const getNumPhases = state => animationName => {
   return animation.length;
 };
 
-
-
 export const runTimedAnimation = (state, mutators) => (
   animationName,
   componentName,
