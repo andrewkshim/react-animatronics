@@ -98,7 +98,7 @@ const runSpringAnimation = (state, mutators) => (
     const isStopped = !state.animationCountdownMachines[animationName];
     if (isStopped) return;
 
-    if (hasUniqueTransforms) {
+    if (hasUniqueTransforms && normalizedFrom.transform && normalizedTo.transform) {
       mutators.updateUniqueTransformsComponentStyles({
         componentName,
         fromStyles,

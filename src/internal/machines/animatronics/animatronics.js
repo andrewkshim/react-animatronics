@@ -148,7 +148,7 @@ export const runTimedAnimation = (state, mutators) => (
       progress,
       transformations
     );
-    if (hasUniqueTransforms) {
+    if (hasUniqueTransforms && normalizedFrom.transform && normalizedTo.transform) {
       mutators.updateUniqueTransformsComponentStyles({
         componentName,
         fromStyles,
@@ -180,7 +180,7 @@ export const runTimedAnimation = (state, mutators) => (
     const isStopped = !state.animationCountdownMachines[animationName];
     if (isStopped) return;
 
-    if (hasUniqueTransforms) {
+    if (hasUniqueTransforms && normalizedFrom.transform && normalizedTo.transform) {
       mutators.updateUniqueTransformsComponentStyles({
         componentName,
         fromStyles,
