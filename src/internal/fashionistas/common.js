@@ -244,19 +244,15 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
 }
 
 export const parseStyle = (raw: string|number, name: ?string): Fashion => {
-  const isRawNumber = typeof raw === 'number';
-  const isRawString = typeof raw === 'string';
-  const isNameString = typeof name === 'string';
-
-  return isRawNumber ?
+  return typeof raw === 'number' ?
     createNumberFashion(raw)
   : isNumberString(raw) ?
     createNumberFashion(raw)
-  : isRawString && name === TRANSFORM ?
+  : typeof raw === 'string' && name === TRANSFORM ?
     createTransformFashion(raw)
-  : isRawString && raw.includes('calc') ?
+  : typeof raw === 'string' && raw.includes('calc') ?
     createCalcFashion(raw)
-  : isNameString && (name.includes('margin') || name.includes('padding')) ?
+  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
   : isCommaString(raw) ?
     createCommaFashion(raw, name)

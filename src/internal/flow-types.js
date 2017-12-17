@@ -63,7 +63,7 @@ export type CompositeFashion = {|
   styles: Fashion[],
 |}
 
-export type Fashion = BasicFashion|CompositeFashion|StaticFashion;
+export type Fashion = BasicFashion|CompositeFashion|StaticFashion|CalcFashion;
 
 export type Styles = { [string]: string|number };
 
