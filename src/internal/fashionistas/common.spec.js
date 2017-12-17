@@ -1,4 +1,5 @@
 import {
+  createCalcFashion,
   createColorFashion,
   createNumberFashion,
   createTransformFashion,
@@ -7,6 +8,7 @@ import {
   createStaticFashion,
   createBoxShadowFashion,
   createCommaFashion,
+  parseInnerTransformValue,
   parseStyle,
 
   stringifyColor,
@@ -21,6 +23,23 @@ import {
   haveConvertibleUnits,
   separateTransformNames,
 } from './common'
+
+describe('parseInnerTransformValue', () => {
+  test('should handle basic values', () => {
+    expect(parseInnerTransformValue('translateX(100px)')).toBe('100px');
+  });
+  test('should handle values with parens', () => {
+    expect(parseInnerTransformValue('translateX(calc(100% - 40px))')).toBe('calc(100% - 40px)');
+  });
+});
+
+describe('createCalcFashion', () => {
+  test('should create a valid CalcFashion', () => {
+    const calcFashion = createCalcFashion('calc(100% - 40px)');
+    expect(calcFashion.isCalcType).toBeTruthy();
+    expect(calcFashion.value).toBe('calc(100% - 40px)');
+  });
+});
 
 test('createColorFashion creates a valid ColorFashion', () => {
   const colorFashion = createColorFashion('blue');
@@ -51,6 +70,13 @@ describe('createTransformFashion', () => {
     expect(transformFashion.styles).toEqual([
       createCommaFashion('1px, 2px, 3px')
     ]);
+  });
+
+  test('should handle calc', () => {
+    const transformFashion = createTransformFashion('translateX(calc(100% - 40px))');
+    expect(transformFashion.isCompositeType).toBeTruthy();
+    expect(transformFashion.names).toEqual(['translateX']);
+    expect(transformFashion.styles[0]).toEqual(createCalcFashion('calc(100% - 40px)'));
   });
 
 });
@@ -186,6 +212,12 @@ describe('parseStyle', () => {
   test('should parse box shadows', () => {
     expect(parseStyle('1px 2px blue', 'boxShadow')).toEqual(
       createBoxShadowFashion('1px 2px blue')
+    );
+  });
+
+  test('should parse calc', () => {
+    expect(parseStyle('calc(100% - 40px)')).toEqual(
+      createCalcFashion('calc(100% - 40px)')
     );
   });
 });

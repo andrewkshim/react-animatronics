@@ -5,7 +5,6 @@
  * @module internal/utils
  */
 
-export const BETWEEN_PAREN_REGEX: RegExp = /\(([^)]+)\)/;
 export const ALL_COMMAS_REGEX: RegExp = /, /g;
 export const NUMBER_REGEX: RegExp = /(-)?\d+(\.\d+)?/;
 export const NON_NUMER_REGEX: RegExp = /\D+/;

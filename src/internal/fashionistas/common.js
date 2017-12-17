@@ -10,6 +10,7 @@ import Debug from 'debug'
 import chroma from 'chroma-js'
 
 import type {
+  CalcFashion,
   ColorFashion,
   CompositeFashion,
   Fashion,
@@ -19,7 +20,6 @@ import type {
 } from '../flow-types'
 
 import {
-  BETWEEN_PAREN_REGEX,
   ALL_COMMAS_REGEX,
   NUMBER_REGEX,
   NON_NUMER_REGEX,
@@ -95,19 +95,55 @@ export const createUnitFashion = (raw: string): UnitFashion => {
     isUnitType: true,
     value: parseFloat(NUMBER_REGEX.exec(raw)[0]),
     unit: raw.slice(NUMBER_REGEX.exec(raw)[0].length),
-  }
+  };
 };
 
-export const parseTransformName = (transform: string): string =>
-  transform.slice(0, transform.indexOf('('));
+export const createCalcFashion = (raw: string): CalcFashion => {
+  debug('creating calc fashion fro "%s"', raw);
+  return {
+    isBasicType: true,
+    isCalcType: true,
+    value: raw,
+  };
+};
+
+export const parseTransformName = (transform: string): string => {
+  return transform.slice(0, transform.indexOf('('));
+};
+
+// TODO: Better function names
+
+const removeLastChar = (str: string) => {
+  return str.substr(0, str.length - 1);
+};
+
+const butLast = (array: any[]) => {
+  return array.slice(0, array.length - 1);
+}
+
+const last = (array: any[]) => {
+  return array[array.length - 1];
+}
+
+/**
+ * @param string value e.g. "translateX(100x)", "translateY(calc(100% - 40px))"
+ * @returns string e.g. "100px", "calc(100% - 40px)"
+ */
+export const parseInnerTransformValue = (value: string): string => {
+  const [_, ...inner] = value.split('(');
+  return butLast(inner)
+    .concat(removeLastChar(last(inner)))
+    .join('(');
+}
 
 const parseTransformStyle = (transform: string): Fashion => {
-  return parseStyle(BETWEEN_PAREN_REGEX.exec(transform)[1]);
+  return parseStyle(parseInnerTransformValue(transform));
 }
 
 const normalizeRawTransform = (raw: string): string[] => raw
   .replace(ALL_COMMAS_REGEX, ',')
-  .split(' ');
+  .split(') ')
+  .map(s => s[s.length - 1] === ')' ? s : `${s})`); // TODO: consolidate logic
 
 export const createTransformFashion = (raw: string): CompositeFashion => ({
   isCompositeType: true,
@@ -208,13 +244,19 @@ export const createBoxShadowFashion = (raw: string): CompositeFashion => {
 }
 
 export const parseStyle = (raw: string|number, name: ?string): Fashion => {
-  return typeof raw === 'number' ?
+  const isRawNumber = typeof raw === 'number';
+  const isRawString = typeof raw === 'string';
+  const isNameString = typeof name === 'string';
+
+  return isRawNumber ?
     createNumberFashion(raw)
   : isNumberString(raw) ?
     createNumberFashion(raw)
-  : typeof raw === 'string' && name === TRANSFORM ?
+  : isRawString && name === TRANSFORM ?
     createTransformFashion(raw)
-  : typeof name === 'string' && (name.includes('margin') || name.includes('padding')) ?
+  : isRawString && raw.includes('calc') ?
+    createCalcFashion(raw)
+  : isNameString && (name.includes('margin') || name.includes('padding')) ?
     createSpacingFashion(raw, name)
   : isCommaString(raw) ?
     createCommaFashion(raw, name)

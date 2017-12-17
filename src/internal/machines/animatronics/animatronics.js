@@ -17,7 +17,6 @@ import {
 } from '../../fashionistas/common'
 
 import {
-  BETWEEN_PAREN_REGEX,
   flatten,
   isUsingSpring,
   isUsingTime,

@@ -42,6 +42,12 @@ export type UnitFashion = {|
   unit: string,
 |}
 
+export type CalcFashion = {|
+  isBasicType: true,
+  isCalcType: true,
+  value: string,
+|}
+
 export type StaticFashion = {|
   isBasicType: true,
   isStaticType: true,
