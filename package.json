@@ -1,6 +1,6 @@
 {
   "name": "react-animatronics",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "Declarative, coordinated animations for React components",
   "main": "lib/index.js",
   "author": "Andrew Shim",
