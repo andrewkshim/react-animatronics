@@ -1,3 +1,5 @@
+import Debug from 'debug'
+
 import {
   createUnitFashion,
   haveConvertibleUnits,
@@ -14,7 +16,10 @@ import {
 
 import {
   makeError,
+  stringify,
 } from '../../utils'
+
+const debug = Debug('react-animatronics:machines:animatronics:normalizer');
 
 const parseAnimationTransforms = (animation, type) => {
   const transforms = animation[type].transform
@@ -30,7 +35,7 @@ const normalizeFashions = (getComputedStyle, node, fashions) => {
       // NOTE: There should only ever be one name and style at this point.
       const name = fashion.names[0];
       const style = fashion.styles[0];
-      if (style.isUnitType) {
+      if (style.isUnitType || style.isCalcType) {
         const styleStr = stringifyUnit(style);
         const currentLength = node.style[DEFAULT_DOM_LENGTH_ATTR];
         node.style[DEFAULT_DOM_LENGTH_ATTR] = styleStr;

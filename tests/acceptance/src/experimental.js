@@ -64,7 +64,7 @@ export default withAnimatronics(
               transform: 'translateX(0px)',
             },
             to: {
-              transform: 'translateX(-200px)',
+              transform: 'translateX(calc(100% - 200px))',
             },
           },
           {
@@ -77,15 +77,26 @@ export default withAnimatronics(
             },
           },
         ],
-        circleB: {
-          duration,
-          from: {
-            transform: 'translateY(0px)',
+        circleB: [
+          {
+            duration,
+            from: {
+              transform: 'translateY(0px)',
+            },
+            to: {
+              transform: 'translateY(-10rem)',
+            },
           },
-          to: {
-            transform: 'translateY(-10rem)',
-          },
-        },
+          {
+            duration,
+            from: {
+              left: 'calc(90% - 50px)',
+            },
+            to: {
+              left: 'calc(90% - 450px)',
+            },
+          }
+        ],
         circleC: {
           duration,
           from: {

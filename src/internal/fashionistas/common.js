@@ -316,9 +316,12 @@ export const haveConvertibleUnits = (
   if (styleName === TRANSFORM) return true;
   const fashionA = parseStyle(rawA, styleName);
   const fashionB = parseStyle(rawB, styleName);
-  return (!fashionA.unit || !fashionB.unit)
-    ? false
-    : fashionA.unit !== fashionB.unit;
+  return (fashionA.isCalcType || fashionB.isCalcType) ?
+    true
+  : (fashionA.unit && fashionB.unit) ?
+    fashionA.unit !== fashionB.unit
+  :
+    false
 };
 
 const lastChar = (s: string) => s[s.length - 1];
