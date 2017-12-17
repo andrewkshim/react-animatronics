@@ -1,6 +1,13 @@
+import { IS_PRODUCTION } from './constants'
+
 const makeRecorder = () => {
   const listeners = new Set();
   const recordings = {};
+
+  window.reactAnimatronics = {};
+  window.reactAnimatronics.getRecordings = () => {
+    return recordings;
+  }
 
   const recorder = {
 
@@ -43,6 +50,6 @@ const makeRecorder = () => {
   return recorder;
 }
 
-const Recorder = makeRecorder();
+const Recorder = IS_PRODUCTION ? null : makeRecorder();
 
 export default Recorder;
