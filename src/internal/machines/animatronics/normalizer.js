@@ -60,16 +60,13 @@ const normalizeTransform = (getComputedStyle, node, fashions) => {
         );
 
         if (updatedLength === null) {
-          throw makeError(
-            `Attempted to normalize a transform but react-animatronics does`,
-            `not know how to deal with "${ name }".`
-          );
+          result[name] = stringifyFashion(fashion);
+        } else {
+          result[name] = stringifyFashion({
+            ...fashion,
+            styles: [parseStyle(`${ updatedLength }px`)]
+          });
         }
-
-        result[name] = stringifyFashion({
-          ...fashion,
-          styles: [parseStyle(`${ updatedLength }px`)]
-        });
       } else {
         result[name] = stringifyFashion(fashion);
       }
